@@ -1,0 +1,332 @@
+package org.ncbo.stanford.obr.dao.resource;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import obs.obr.populate.Resource;
+import obs.obr.populate.Structure;
+
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
+
+/**
+ * This class is a representation for the the OBR_RT table. The table contains 
+ * the following columns:
+ * 
+ * <ul>
+ * <li> id 				 		SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
+ * <li> name 	 		VARCHAR(150) NOT NULL
+ * <li> resource_id 		  		VARCHAR(50) NOT NULL UNIQUE
+ * <li> structure 		TEXT,
+ * <li> main_context 			VARCHAR(50)
+ * <li> url 			VARCHAR(255)
+ * <li> element_url 		VARCHAR(255)
+ * <li> description 	TEXT
+ * <li> logo 			VARCHAR(255)
+ * <li> dictionary_id            SMALLINT UNSIGNED
+ * </ul>
+ *  
+ * @author kyadav
+ * @version OBR_v0.2		
+ * @created 09-Sep-2009
+ *
+ */
+public class ResourceDao extends AbstractObrDao {
+
+	// Table suffix string
+	private static final String TABLE_SUFIX = "resource";
+
+	// Prepared statement for adding new entry.
+	private static PreparedStatement addEntryStatement;
+	// Prepared statement for updating entry
+	private static PreparedStatement updateEntryStatement;
+	// Prepared statement for getting all resource entries 
+	private static PreparedStatement getAllResourcesStatement;
+	// Prepared statement for finding entry with corresponding ressourceID is present or not.
+	private static PreparedStatement hasEntryStatement;
+	
+	/**
+	 * Default constructor 
+	 */
+	private ResourceDao() {
+		super("", TABLE_SUFIX);
+	}
+
+	@Override
+	protected String creationQuery(){
+		return "CREATE TABLE " + getTableSQLName() +" (" +
+					"id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"name VARCHAR(150) NOT NULL, " +
+					"resource_id VARCHAR(50) NOT NULL UNIQUE, " +
+					"structure TEXT, " +
+					"main_context VARCHAR(50), " +
+					"url VARCHAR(255), " +
+					"element_url VARCHAR(255), " +
+					"description TEXT, " +
+					"logo VARCHAR(255), " +	
+					"dictionary_id SMALLINT UNSIGNED, "+ 
+					"FOREIGN KEY (dictionary_id) REFERENCES " + ObsSchemaEnum.DICTIONARY_VERSION_TABLE.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
+				    ");";
+	}
+
+	@Override
+	protected void openPreparedStatements() {
+		super.openPreparedStatements();
+		this.openAddEntryStatement();
+		this.openUpdateEntryStatement();
+		this.openGetAllResourcesStatement();
+		this.openHasEntryStatement();
+	}
+
+	@Override
+	protected void closePreparedStatements() throws SQLException {
+		super.closePreparedStatements();
+		addEntryStatement.close();
+		getAllResourcesStatement.close();
+		updateEntryStatement.close();
+		hasEntryStatement.close();
+	}
+
+	private static class ResourceTableHolder {
+		private final static ResourceDao OBR_RT_INSTANCE = new ResourceDao();
+	}
+
+	/**
+	 * Returns a ResourceDao object by creating one if a singleton not already exists.
+	 */
+	public static ResourceDao getInstance(){
+		return ResourceTableHolder.OBR_RT_INSTANCE;
+	}
+
+	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
+	
+	@Override
+	protected void openAddEntryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("INSERT INTO ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" (name, resource_id, structure, main_context, url, element_url, description, logo ) ");
+		queryb.append(" VALUES ");
+		queryb.append(" (?, ?, ?, ?, ?, ?, ?, ?)");
+		addEntryStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	
+	protected void openUpdateEntryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("UPDATE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" SET name= ?, structure= ?, main_context= ?, url= ?, element_url= ?, description= ?, logo= ? ");
+		queryb.append(" WHERE ");
+		queryb.append("resource_id= ?");
+		updateEntryStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	
+	protected void openHasEntryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT 1 FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" WHERE resource_id = ?");		 
+		hasEntryStatement = this.prepareSQLStatement(queryb.toString());
+	}
+
+	/**
+	 * Add an new entry in corresponding SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
+	public boolean addEntry(Resource resource){
+		boolean inserted = false;
+		try {
+			addEntryStatement.setString(1, resource.getResourceName());
+			addEntryStatement.setString(2, resource.getResourceID());
+			addEntryStatement.setString(3, resource.getResourceStructure().toXMLString());
+			addEntryStatement.setString(4, resource.getMainContext());
+			addEntryStatement.setString(5, resource.getResourceURL().toString());
+			addEntryStatement.setString(6, resource.getResourceElementURL());
+			addEntryStatement.setString(7, resource.getResourceDescription());
+			addEntryStatement.setString(8, resource.getResourceLogo().toString());		
+ 
+			this.executeSQLUpdate(addEntryStatement);
+			inserted = true;
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openAddEntryStatement();
+			return this.addEntry(resource);
+		}
+		catch (MySQLIntegrityConstraintViolationException e){
+			//logger.error("Table " + this.getTableSQLName() + " already contains an entry for the concept: " + entry.getLocalConceptID() +".");
+		}
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot add an entry on table " + this.getTableSQLName(), e);
+			logger.error(resource.toString());
+		}
+		return inserted;	
+	}
+	
+	/**
+	 * This method add new entry for resource or update it if exists previously. 
+	 * 
+	 * @param resource
+	 * @return True if the entry was added or updated to the SQL table, false if a problem occurred during insertion.
+	 */
+	public boolean addEntryOrUpdate(Resource resource){
+		
+		// if entry already present then update the entry.		
+		if(hasResourceEntry(resource.getResourceID())){
+			return this.updateEntry(resource);
+		} 
+		
+		return this.addEntry(resource);		 
+	}	
+	
+	/**
+	 * This method ensures whether resource entry with given resourceID is present or not.
+	 * 
+	 * @param resourceID
+	 * @return True if the entry is present in SQL table.
+	 */
+	public boolean hasResourceEntry(String resourceID){ 
+		boolean hasEntry = false;
+		try {
+			hasEntryStatement.setString(1, resourceID); 			 
+			ResultSet rSet = this.executeSQLQuery(hasEntryStatement);
+			
+			if(rSet.next()){
+				hasEntry = true;
+			}
+			 
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openHasEntryStatement();
+			return this.hasResourceEntry(resourceID);
+		} 
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot get resource entry from " + this.getTableSQLName(), e);			 
+		}
+		 
+		return hasEntry;
+	}
+	
+	/**
+	 * Add an new entry in corresponding SQL table.
+	 * @return True if the entry was updated to the SQL table, false if a problem occurred during insertion.
+	 */
+	public boolean updateEntry(Resource resource){
+		boolean updated = false;
+		try {
+			updateEntryStatement.setString(1, resource.getResourceName());			
+			updateEntryStatement.setString(2, resource.getResourceStructure().toXMLString());
+			updateEntryStatement.setString(3, resource.getMainContext());
+			updateEntryStatement.setString(4, resource.getResourceURL().toString());
+			updateEntryStatement.setString(5, resource.getResourceElementURL());
+			updateEntryStatement.setString(6, resource.getResourceDescription());
+			updateEntryStatement.setString(7, resource.getResourceLogo().toString());
+			updateEntryStatement.setString(8, resource.getResourceID());
+ 
+			this.executeSQLUpdate(updateEntryStatement);
+			
+			logger.info("Resource entry updated.");
+			updated = true;
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openUpdateEntryStatement();
+			return this.updateEntry(resource);
+		}		 
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot update an entry on table " + this.getTableSQLName(), e);
+			logger.error(resource.toString());
+		}
+		return updated;	
+	}
+	
+	private void openGetAllResourcesStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT name, resource_id, structure, main_context, url, element_url, description, logo FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(";");
+		getAllResourcesStatement = this.prepareSQLStatement(queryb.toString());
+	} 
+	
+	/**
+	 * Update table with dictionaryID with latest dictionaryID from DAT table 
+	 * for given resource.
+	 * 
+	 * @return True if the entry was updated to the SQL table.
+	 */
+	public boolean updateDictionaryID(Resource resource){
+		boolean updated = false;
+		try {
+			StringBuffer queryb = new StringBuffer();
+			queryb.append("UPDATE ");
+			queryb.append(this.getTableSQLName());
+			queryb.append(" SET dictionary_id= (SELECT MAX(id) FROM ");
+			queryb.append(DirectAnnotationDao.name(resource.getResourceID()));
+			queryb.append(" ) WHERE ");
+			queryb.append("resource_id= '");
+			queryb.append(resource.getResourceID());
+			queryb.append("' ;");
+			
+			this.executeSQLUpdate(queryb.toString());			
+			logger.info("Resource entry updated with latest dictionary ID.");
+			updated = true;
+		}
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.updateDictionaryID(resource);
+		}		 
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
+			logger.error(resource.toString());
+		}
+		return updated;	
+	}
+	
+	
+	/**
+	 * This method get list of all the resources from Resource Table (OBR_RT) 
+	 * 
+	 * @return list of Resource
+	 */
+	public ArrayList<Resource> getAllResources(){
+		
+		ArrayList<Resource> resources= new ArrayList<Resource>(1);
+		Resource resource;
+		try {
+			ResultSet rSet = this.executeSQLQuery(getAllResourcesStatement);
+			while(rSet.next()){ 				
+				try {
+					// Creating resource object from Resource.
+					resource = new Resource(rSet.getString(1), rSet.getString(2),						
+								Structure.createStructureFromXML(rSet.getString(3)), rSet.getString(4),
+								new URL(rSet.getString(5)),rSet.getString(6),  rSet.getString(7),new URL(rSet.getString(8))
+							 
+							);
+					resources.add(resource); 
+				} catch (MalformedURLException e) {
+					 logger.error("Problem in getting resource :" +rSet.getString(1));
+				} 
+			}
+			rSet.close();			 
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetAllResourcesStatement();
+			return this.getAllResources();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get resource. ", e);
+		} 
+		
+		return resources;
+	}
+
+	 
+}

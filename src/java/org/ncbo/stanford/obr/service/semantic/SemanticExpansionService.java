@@ -1,0 +1,27 @@
+/**
+ * 
+ */
+package org.ncbo.stanford.obr.service.semantic;
+
+/**
+ * @author Kuladip Yadav
+ *
+ */
+public interface SemanticExpansionService {
+	
+	/**
+	 * 
+	 * Processes the resource direct annotations to produce expanded annotations and
+	 * populates the the corresponding _EAT.
+	 * This function implements the step 3 of the OBR workflow.
+	 * The 3 booleans corresponds to the semantic expansion component to use.
+	 *  
+	 * 
+	 * @param isaClosureExpansion  - boolean 
+	 * @param mappingExpansion     - boolean
+	 * @param distanceExpansion    - boolean  
+	 * @return                     - the number of direct annotations created. 
+	 */
+	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
+
+}

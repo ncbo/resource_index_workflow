@@ -1,0 +1,60 @@
+####################################################
+# Resource Index Workflow Properties
+####################################################
+# All available resource in workflow 
+resource.wp=org.ncbo.stanford.obr.resource.wikipathways.WikiPathwaysAccessTool
+resource.geo=org.ncbo.stanford.obr.resource.testresource.TestResourceAccessTool
+
+# Resources to be included in workflow i.e resource ids separated by comma.
+obr.resource.ids=WP,TR
+
+# Resource Index Workflow flags
+
+# This flag used to  re initialized all tables for resources. 
+obr.reinitialize.all=@obrreinitializeall@
+
+# Re initialized all tables except element table
+obr.reinitialize.only.annotation=@obrreinitializeonlyannotation@
+
+# Used to update element table for resources.
+obr.update.resource=@obrupdateresource@
+
+# If set then use complete dictionary for annoation otherwise only latest dictionary used. 
+obr.dictionary.complete=@obrdictionarycomplete@
+
+# Flag related to semantic expansions
+obr.expansion.relational=@obrexpansionrelational@
+obr.expansion.mapping=@obrexpansionmapping@
+obr.expansion.distance=@obrexpansiondistance@
+
+####################################################
+# OBS Schema/Tables properties 
+####################################################
+obs.schema.name=@obsschemaname@
+
+obs.ontology.table=obs_ontology
+obs.concept.table=obs_concept
+obs.dictionary.table=obs_dictionary
+obs.term.table=obs_term
+obs.map.table=obs_map
+obs.relation.table=obs_relation
+
+####################################################
+# Resource Index Schema/Tables properties 
+####################################################
+
+# Resource index table name properties
+obr.tables.prefix=obr_
+obr.element.table.suffix=_element
+obr.annoataion.table.suffix=_annotation
+obr.expanded.annoataion.table.suffix=_expanded_annotation
+obr.index.table.suffix=_index
+
+obr.resource.table.suffix=resource
+obr.context.table.suffix=context
+
+# Configuring database 
+obr.jdbc.url=@obrjdbcurl@
+obr.jdbc.driver=@obrjdbcdriver@
+obr.jdbc.username=@obrjdbcusername@
+obr.jdbc.password=@obrjdbcpassword@

@@ -1,0 +1,59 @@
+package org.ncbo.stanford.obr.service.semantic.impl;
+
+import obs.common.utils.ExecutionTimer;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.service.AbstractResourceService;
+import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
+
+public class SemanticExpansionServiceImpl extends AbstractResourceService implements SemanticExpansionService{
+
+	public SemanticExpansionServiceImpl(ResourceAccessTool resourceAccessTool) {
+		super(resourceAccessTool);
+		// TODO Auto-generated constructor stub
+	}	 
+
+	/**
+	 * Processes the resource direct annotations to produce expanded annotations and
+	 * populates the the corresponding _EAT.
+	 * This function implements the step 3 of the OBR workflow.
+	 * The 3 booleans corresponds to the semantic expansion component to use.
+	 * Returns the number of direct annotations created. 
+	 */
+	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion){
+		int nbAnnotation = 0;
+		ExecutionTimer timer = new ExecutionTimer();
+		// isaClosure expansion
+		if(isaClosureExpansion){
+			timer.start();
+			logger.info("Executing isa transitive closure expansion... ");
+			int isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
+			logger.info(isaAnnotation);
+			nbAnnotation += isaAnnotation;
+			timer.end();
+			logger.info("Isa transitive closure expansion  processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			timer.reset();
+		}
+		// mapping expansion
+		if(mappingExpansion){
+			timer.start();
+			logger.info("Executing mapping expansion... ");
+			int mappingAnnotation = expandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
+			logger.info(mappingAnnotation);
+			nbAnnotation += mappingAnnotation;
+			timer.end();
+			logger.info("Mapping expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			timer.reset();
+		}
+		// distance expansion
+		if(distanceExpansion){
+			timer.start();
+			logger.info("Distance semantic expansion not implemeted yet.");
+			timer.end();
+			logger.info("Distance expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			timer.reset();
+		}
+		return nbAnnotation;
+	}
+
+}
