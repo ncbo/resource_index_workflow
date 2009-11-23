@@ -3,30 +3,30 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.5.0_17"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/OBS_v1_common"/>
-	<classpathentry kind="lib" path="/Shared libs/log4j-1.2.8.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/mysql-connector-java-5.0.7-bin.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/wikipathways-client.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis-jaxrpc-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-discovery-0.2.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-pool-1.4.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/commons-validator-1.3.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/jaxrpc.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/wsdl4j-1.6.2.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/XmlSchema-1.3.2.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/xpp3-1.1.4c.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/activation-1.0.2-2002-08-28.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axiom-api-1.2.5.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis-ant-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis-saaj-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis-wsdl4j-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis2-adb-1.3.jar"/>
-	<classpathentry kind="lib" path="/Shared libs/axis2-kernel-1.3.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/mysql-connector-java-5.0.7-bin.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/wikipathways-client.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis-jaxrpc-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-pool-1.4.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-validator-1.3.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/wsdl4j-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/XmlSchema-1.3.2.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/activation-1.0.2-2002-08-28.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axiom-api-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis-ant-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis-saaj-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis-wsdl4j-1.2.1.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis2-adb-1.3.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/axis2-kernel-1.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/obs_v1_common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
