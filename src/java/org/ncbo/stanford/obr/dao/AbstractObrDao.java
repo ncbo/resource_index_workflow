@@ -43,14 +43,20 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 public abstract class AbstractObrDao implements StringHelper{
 	
 	protected static Logger logger = Logger.getLogger(AbstractObrDao.class);
+	
+	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
+	
+	// Database connection properties.
+	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
+	private static final String DATABASE_JDBC_DRIVER = MessageUtils.getMessage("obr.jdbc.driver");
+	private static final String DATABASE_USER = MessageUtils.getMessage("obr.jdbc.username");;
+	private static final String DATABASE_PASSWORD = MessageUtils.getMessage("obr.jdbc.password");
 	private String tableSQLName;
 	
 	protected String resourceID;
 	
 	private static Connection tableConnection;
-	private static Statement tableStatement;
-	
-	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
+	private static Statement tableStatement; 
 	
 	private PreparedStatement numberOfEntryStatement; 
 	
@@ -63,13 +69,7 @@ public abstract class AbstractObrDao implements StringHelper{
 	// **** OBR tables
 	public static ContexDao contextTableDao = ContexDao.getInstance();
 	public static ResourceDao resourceTableDao = ResourceDao.getInstance();
-	
-	// Databse connection properties.
-	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
-	private static final String DATABASE_JDBC_DRIVER = MessageUtils.getMessage("obr.jdbc.driver");
-	private static final String DATABASE_USER = MessageUtils.getMessage("obr.jdbc.username");;
-	private static final String DATABASE_PASSWORD = MessageUtils.getMessage("obr.jdbc.password");
-	
+	 
 		
 	/**
 	 * Construct a new Table object and the corresponding DB table if does not exists.

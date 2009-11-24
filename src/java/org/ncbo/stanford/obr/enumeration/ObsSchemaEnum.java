@@ -18,7 +18,7 @@ public enum ObsSchemaEnum {
 	private String name;
 	
 	/** OBS Schema name. */
-	private static final String OBS_SCHEMA_NAME = MessageUtils.getMessage("obs.schema.name");
+	private static final String OBS_SCHEMA_NAME = MessageUtils.getMessage("obs.schema.name") +".";
 
 	private ObsSchemaEnum(String name) {
 		this.name = name;

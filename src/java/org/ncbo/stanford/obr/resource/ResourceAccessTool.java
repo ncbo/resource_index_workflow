@@ -50,7 +50,8 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * If the corresponding contexts do not exist in OBR_CXT, they are created.
 	 */
 	public ResourceAccessTool(String resource, String resourceID, Structure structure){
-		super();		 
+		super();	
+		
 		logger.info("ResourceAccessTool creation...");		 
 		this.toolName = RESOURCE_NAME_PREFIX + resourceID + Utilities.getRandomString(3);
 		String mainContext = Structure.generateContextName(resourceID, this.mainContextDescriptor());

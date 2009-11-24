@@ -22,7 +22,7 @@ import org.ncbo.stanford.obr.util.StringUtilities;
 public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 
 	// Logger for this class
-	private Logger logger = Logger.getLogger(ResourceIndexWorkflowImpl.class);
+	private static Logger logger = Logger.getLogger(ResourceIndexWorkflowImpl.class);
 
 	private static ObrWeight obrWeights = new ObrWeight(
 			MgrepContextBean.PDA_WEIGHT, MgrepContextBean.SDA_WEIGHT,

@@ -35,13 +35,13 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */
 	public int resourceAnnotation(boolean withCompleteDictionary,
 			HashSet<String> stopwords) {
-		int nbAnnotation=0;
+		int nbAnnotation;
 		// gets the latest dictionary from OBS_DVT
 		DictionaryBean dictionary = commonObsDao.getLastDictionaryBean();
 
 		// processes direct mgrep annotations
-		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
-				withCompleteDictionary, stopwords);
+		 nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
+		 		withCompleteDictionary, stopwords);
 
 		// processes direct reported annotations
 		nbAnnotation += this.reportExistingAnnotations(dictionary);

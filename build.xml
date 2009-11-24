@@ -1,0 +1,145 @@
+<?xml version="1.0"?> 
+<!-- ====================================================================== 
+     Build script for Resource Index Workflow  
+                   
+     kyadav                                                                
+     ====================================================================== -->
+<project name="resource_index_workflow" basedir="." default="usage">
+	<property file="build.properties" />
+
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" /> 
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="lib.dir" value="${web.dir}/WEB-INF/lib" />
+	<property name="tmpl.dir" value="tmpl" />
+	<property name="shared.lib.dir" value="${basedir}/../shared_libs"/>
+	<property name="protege.lib.dir" value="${shared.lib.dir}/protege_jars"/>
+	<property name="cananolab.lib.dir" value="${shared.lib.dir}/cananolabs_jars"/>
+	<property name="ontologyaccess.dir" value="${basedir}/../OntologyAccess"/>	 
+	<property name="obs.common.dir" value="${basedir}/../obs_v1_common"/>
+	<property name="config.dir" value="${basedir}/conf"/>	
+	 
+	<fileset id="shared.jars" dir="${shared.lib.dir}">
+		<include name="com.noelios.restlet.ext.httpclient_*.jar"/>
+		<include name="commons-httpclient-3.1.jar"/>			
+		<include name="oro-2.0.8.jar"/>
+		<include name="orphanNodesAlg.jar"/>
+		<include name="xpp3-1.1.4c.jar"/>
+		<include name="xstream-1.3.jar"/> 
+	</fileset>	
+	<fileset id="protege.jars" dir="${protege.lib.dir}">
+		<include name="*.jar"/>
+		<exclude name="commons-lang-2.0.jar"/>
+		<exclude name="edtftpj-1.5.2.jar"/>
+		<exclude name="ekitspell.jar"/>
+		<exclude name="icu4j-3.4.4.jar"/>
+		<exclude name="jena-2.3.jar"/>
+		<exclude name="lucene-core-2.0.0.jar"/>		 
+	</fileset>
+	
+	<fileset id="cananolab.jars" dir="${cananolab.lib.dir}">
+		<include name="*.jar"/>
+		<exclude name="commons-lang-2.0.jar"/>
+		<exclude name="edtftpj-1.5.2.jar"/>
+		<exclude name="ekitspell.jar"/>
+		<exclude name="icu4j-3.4.4.jar"/>
+		<exclude name="jena-2.3.jar"/>
+		<exclude name="lucene-core-2.0.0.jar"/>		 
+	</fileset>
+	<path id="master-classpath">
+		<fileset refid="shared.jars" /> 	
+		<fileset refid="protege.jars" /> 		
+		<fileset refid="cananolab.jars" /> 	
+    
+		<fileset dir="${ontologyaccess.dir}/dist">
+			<include name="**/*.jar"/>
+		</fileset> 
+		
+		<fileset dir="${obs.common.dir}/dist">
+			<include name="**/*.jar"/>
+		</fileset> 
+
+		<pathelement path="${classes.dir}" /> 
+	</path>
+
+	<target name="usage">
+		<echo message="" />
+		<echo message="${app.name} build file" />
+		<echo message="-----------------------------------" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="clean     --> Remove build directories" />
+		<echo message="build     --> Build the application" />
+		<echo message="deploy    --> Deploy application as directory" />
+		<echo message="createwar --> Create a WAR file but don't deploy it to the server" />
+		<echo message="deploywar --> Deploy application as a WAR file" />
+		<echo message="" />
+	</target>
+
+	<target name="clean">
+		<delete failonerror="false">
+			<fileset dir="${classes.dir}">
+				<include name="**/*.*" />				 
+			</fileset>
+		</delete>
+
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${build.dir}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+
+		<delete file="${dist.dir}/${app.name}.war" />		
+	</target> 
+	
+	<target name="prepare" description="Create configuration files using templates">
+		<mkdir dir="${build.dir}" />
+		
+		<copy file="${tmpl.dir}/log4j.dtd" tofile="${config.dir}/log4j.dtd" overwrite="true" />
+		
+		<copy file="${tmpl.dir}/log4j.xml.tmpl" tofile="${config.dir}/log4j.xml" overwrite="true">
+			<filterset>
+				<filter token="logfilepath" value="${obr.app.logfilepath}" />
+				<filter token="maxlogfilesize" value="${obr.app.maxlogfilesize}" />
+				<filter token="maxlogbackupindex" value="${obr.app.maxlogbackupindex}" />
+				<filter token="obrlevel" value="${obr.app.log.obslevel}" />
+				<filter token="deflevel" value="${obr.app.log.deflevel}" />
+			</filterset>
+		</copy>
+		
+		<copy file="${tmpl.dir}/message.properties.tmpl" tofile="${config.dir}/message.properties" overwrite="true">
+			<filterset>				
+				<filter token="obrjdbcdriver" value="${obr.jdbc.driver}" />
+				<filter token="obrjdbcurl" value="${obr.jdbc.url}" />
+				<filter token="obrjdbcusername" value="${obr.jdbc.username}" />
+				<filter token="obrjdbcpassword" value="${obr.jdbc.password}" />
+				<filter token="obsschemaname" value="${obs.schema.name}" />
+				
+				<filter token="obrresourceids" value="${obr.resource.ids}" />
+				
+				<filter token="obrreinitializeall" value="${obr.reinitialize.all}" />
+				<filter token="obrreinitializeonlyannotation" value="${obr.reinitialize.only.annotation}" />
+				<filter token="obrupdateresource" value="${obr.update.resource}" />
+				<filter token="obrdictionarycomplete" value="${obr.dictionary.complete}" />
+				<filter token="obrexpansionrelational" value="${obr.expansion.relational}" />
+				<filter token="obrexpansionmapping" value="${obr.expansion.mapping}" />
+				<filter token="obrexpansiondistance" value="${obr.expansion.distance}" />
+				 
+			</filterset>
+		</copy>		 
+	</target> 
+	
+	<target name="build_dependencies">
+		<echo>Building OBS_v1_common project Starts...</echo>
+		<ant antfile="${obs.common.dir}/build.xml" target="build" inheritall="false"/>
+		<echo>Building OBS_v1_common project Ends...</echo>
+		<echo>...</echo>				 
+		<echo>...</echo>		 
+		<copy todir="${lib.dir}" flatten="true"> 
+			<fileset dir="${ontologyaccess.dir}/dist" />
+			<fileset dir="${obs.common.dir}/dist" />			 	
+		</copy>
+	</target>
+  
+</project>
