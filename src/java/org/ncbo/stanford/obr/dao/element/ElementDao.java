@@ -345,47 +345,46 @@ public class ElementDao extends AbstractObrDao {
 	 * to insert them in the corresponding _DAT table.
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){		
+	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion ){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		try{
-			for(String contextName: structure.getContextNames()){
-				// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
-				
-				if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
-						!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
-					StringBuffer queryb = new StringBuffer();
-					queryb.append("SELECT local_element_id, ");
-					queryb.append(contextName+" FROM ");
-					queryb.append(this.getTableSQLName());
-					queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-					queryb.append(dictionaryID);
-					queryb.append(";");		
-					ResultSet rSet = this.executeSQLQuery(queryb.toString());
-					while(rSet.next()){
-						String localElementID = rSet.getString(1);		
-						String annotationSet  = rSet.getString(2);
-						String[] splittedLocalConceptIDs = annotationSet.split(GT_SEPARATOR_STRING);
-						for (int i =0;i<splittedLocalConceptIDs.length;i++){			
-							try{
-								//if the this is a valid localConceptID (to exclude case with "" or " " in the reported annotation column
-								if(splittedLocalConceptIDs[i].matches(".*/.*")){
-								reportedAnnotations.add(
-										new DirectAnnotationEntry(localElementID, 
-												splittedLocalConceptIDs[i],
-												contextName, 
-												dictionaryID, // dictionaryID for existing annotations
-												false, false, false, false));// for now the semantic distance expansion is not done
-								}
-							}
-							catch (Exception e) {
-								logger.error("** PROBLEM ** Problem with existing annotations of element: "+ localElementID +" on table " + this.getTableSQLName() +".", e);
-							}
+		try{				
+			StringBuffer queryb = new StringBuffer();
+			queryb.append("SELECT local_element_id, ");
+			queryb.append(contextName+" FROM ");
+			queryb.append(this.getTableSQLName());
+			queryb.append(" WHERE dictionary_id IS NULL ");
+			
+			if(isNewVirsion){
+				queryb.append("OR dictionary_id<");
+				queryb.append(dictionaryID);
+			} 
+			
+			queryb.append(";");		
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				String localElementID = rSet.getString(1);		
+				String annotationSet  = rSet.getString(2);
+				String[] splittedLocalConceptIDs = annotationSet.split(GT_SEPARATOR_STRING);
+				for (int i =0;i<splittedLocalConceptIDs.length;i++){			
+					try{
+						//if the this is a valid localConceptID (to exclude case with "" or " " in the reported annotation column
+						if(splittedLocalConceptIDs[i].matches(".*/.*")){
+						reportedAnnotations.add(
+								new DirectAnnotationEntry(localElementID, 
+										splittedLocalConceptIDs[i].replace(structure.getOntoID(contextName), localOntologyID),
+										contextName, 
+										dictionaryID, // dictionaryID for existing annotations
+										false, false, false, false));// for now the semantic distance expansion is not done
 						}
 					}
-					rSet.close();
+					catch (Exception e) {
+						logger.error("** PROBLEM ** Problem with existing annotations of element: "+ localElementID +" on table " + this.getTableSQLName() +".", e);
+					}
 				}
 			}
+			rSet.close();
+				 
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot report annotation from the table "+this.getTableSQLName()+". Empty set returned.", e);

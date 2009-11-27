@@ -56,6 +56,17 @@ public interface ResourceUpdateService {
 	 * @return String containing local concept id's separated by '>' 
 	 */
 	public String mapTermsToLocalConceptIDs(String terms, String localOntologyID, String splitString);
+	
+	/**
+	 * This method split terms string with splitString
+	 * and get local concept id's using ontology access tool. 
+	 * 
+	 * @param terms
+	 * @param virtualOntologyID
+	 * @param splitString
+	 * @return String containing local concept id's separated by '>' 
+	 */
+	public String mapTermsToVirtualLocalConceptIDs(String terms, String virtualOntologyID, String splitString);
 
 	/**
 	 * Adds new entry for given @code Element in element table.

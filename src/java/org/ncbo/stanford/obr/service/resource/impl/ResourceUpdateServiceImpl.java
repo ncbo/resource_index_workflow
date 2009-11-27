@@ -106,7 +106,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		directAnnotationTableDao.reInitializeSQLTable();
 		expandedAnnotationTableDao.reInitializeSQLTable();
 		indexTableDao.reInitializeSQLTable();
-		
+		AbstractObrDao.resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
 	}
 	
 	/**
@@ -198,6 +198,18 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		return conceptIDs.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#mapTermsToVirtualLocalConceptIDs(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public String mapTermsToVirtualLocalConceptIDs(String terms,
+			String virtualOntologyID, String splitString) {
+		String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+		
+		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID, splitString );
+		 
+		return concepts.replaceAll(localOntologyID, virtualOntologyID);
 	}
 	
 }

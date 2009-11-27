@@ -53,7 +53,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 	private static final Double[] WP_WEIGHTS  = { 1.0, 0.9 };
 	
 	// OntoID associated for reported annotations
-	private static final String[] WP_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, "NCBI"};
+	private static final String[] WP_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, "1132"};
 	
 	// Structure for resource Access tool 
 	private static final Structure WP_STRUCTURE = new Structure(WP_ITEMKEYS, WP_RESOURCEID, WP_WEIGHTS, WP_ONTOIDS);
@@ -166,7 +166,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 			   
 			    // Mapping organism string to concepts.
 			    if(pathwayInfo.getSpecies()!= null && !pathwayInfo.getSpecies().trim().equals(EMPTY_STRING)){
-			    	organism = resourceUpdateService.mapTermsToLocalConceptIDs(pathwayInfo.getSpecies(), WP_ONTOIDS[1], SEMICOLON_STRING);
+			    	organism = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(pathwayInfo.getSpecies(), WP_ONTOIDS[1], SEMICOLON_STRING);
 			    }
 		    	 // if mapping concepts are null or empty then log message for it.
 				if(organism== null || organism.trim().length()== 0){

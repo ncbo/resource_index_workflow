@@ -7,8 +7,10 @@ import java.util.HashSet;
 import obs.common.beans.DictionaryBean;
 import obs.common.files.FileParameters;
 import obs.common.utils.ExecutionTimer;
+import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.obs.CommonObsDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
@@ -40,7 +42,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		DictionaryBean dictionary = commonObsDao.getLastDictionaryBean();
 
 		// processes direct mgrep annotations
-		 nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
+		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
 		 		withCompleteDictionary, stopwords);
 
 		// processes direct reported annotations
@@ -203,8 +205,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 
 		logger.info("Processing of existing reported annotations...");
 		timer.start();
-		nbReported = directAnnotationTableDao.addEntries(elementTableDao
-				.getExistingAnnotations(dictionary.getDictionaryID(),
+		nbReported = directAnnotationTableDao.addEntries(getExistingAnnotations(dictionary.getDictionaryID(),
 						resourceAccessTool.getToolResource()
 								.getResourceStructure()));
 
@@ -213,6 +214,29 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 				+ timer.millisecondsToTimeString(timer.duration()));
 
 		return nbReported;
+	}
+	
+	/**
+	 * 
+	 * @param dictionaryID
+	 * @param structure
+	 * @return
+	 */
+	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
+		
+		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
+		
+		for(String contextName: structure.getContextNames()){
+			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
+			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
+					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
+				boolean isNewVersionOntlogy = commonObsDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
+				String localOntologyID = commonObsDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
+				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
+			}
+			
+		}
+		return reportedAnnotations;
 	}
 
 }

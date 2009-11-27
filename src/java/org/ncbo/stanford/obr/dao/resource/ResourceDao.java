@@ -52,6 +52,10 @@ public class ResourceDao extends AbstractObrDao {
 	private static PreparedStatement getAllResourcesStatement;
 	// Prepared statement for finding entry with corresponding ressourceID is present or not.
 	private static PreparedStatement hasEntryStatement;
+	// Prepared statement for finding dictionary id with corresponding ressourceID is present or not.
+	private static PreparedStatement getDictioanryIDStatement;
+	// Prepared statement for removing entry for specific resource.
+	private static PreparedStatement resetDictionaryStatement;
 	
 	/**
 	 * Default constructor 
@@ -84,6 +88,8 @@ public class ResourceDao extends AbstractObrDao {
 		this.openUpdateEntryStatement();
 		this.openGetAllResourcesStatement();
 		this.openHasEntryStatement();
+		this.openGetDictioanryIDStatement();
+		this.openResetDictionaryStatement();
 	}
 
 	@Override
@@ -178,8 +184,7 @@ public class ResourceDao extends AbstractObrDao {
 	 * @param resource
 	 * @return True if the entry was added or updated to the SQL table, false if a problem occurred during insertion.
 	 */
-	public boolean addEntryOrUpdate(Resource resource){
-		
+	public boolean addEntryOrUpdate(Resource resource){		
 		// if entry already present then update the entry.		
 		if(hasResourceEntry(resource.getResourceID())){
 			return this.updateEntry(resource);
@@ -202,8 +207,8 @@ public class ResourceDao extends AbstractObrDao {
 			
 			if(rSet.next()){
 				hasEntry = true;
-			}
-			 
+			}		
+			
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {
@@ -290,6 +295,32 @@ public class ResourceDao extends AbstractObrDao {
 		return updated;	
 	}
 	
+	 
+	protected void openResetDictionaryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("UPDATE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" SET dictionary_id= NULL WHERE ");
+		queryb.append("resource_id= ? ;");
+		resetDictionaryStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	public boolean resetDictionary(String resourceID){
+		boolean updated = false;
+		try{
+			resetDictionaryStatement.setString(1, resourceID);
+			this.executeSQLUpdate(resetDictionaryStatement);
+			updated = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openResetDictionaryStatement();
+			return this.resetDictionary(resourceID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
+		}
+		return updated;
+	}
 	
 	/**
 	 * This method get list of all the resources from Resource Table (OBR_RT) 
@@ -326,6 +357,45 @@ public class ResourceDao extends AbstractObrDao {
 		} 
 		
 		return resources;
+	}
+	
+	
+	protected void openGetDictioanryIDStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT dictionary_id FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" WHERE resource_id = ?");		 
+		getDictioanryIDStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	/**
+	 * 
+	 * Get the dictionary id processed by given resource.
+	 * 
+	 * @param resourceID
+	 * @return int - dictionary id 
+	 */
+	public int getDictionaryID(String resourceID){
+		int dictionaryID = -1;
+		try {
+			getDictioanryIDStatement.setString(1, resourceID); 			 
+			ResultSet rSet = this.executeSQLQuery(getDictioanryIDStatement);
+			
+			if(rSet.next()){
+				dictionaryID = rSet.getInt(1);
+			}
+			 
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openHasEntryStatement();
+			return this.getDictionaryID(resourceID);
+		} 
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot get resource entry from " + this.getTableSQLName(), e);			 
+		}
+		 
+		return dictionaryID;
 	}
 
 	 

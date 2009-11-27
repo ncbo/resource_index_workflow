@@ -24,6 +24,8 @@ public class CommonObsDao extends AbstractObrDao {
 
 	private static PreparedStatement getLastDictionaryBeanStatement;
 	private static PreparedStatement exactMapStringToLocalConceptIDsStatement;
+	private static PreparedStatement getLatestLocalOntologyIDStatement;
+	private static PreparedStatement hasNewVersionOfOntologyStatement;
 	
 	public CommonObsDao() {
 		 super();
@@ -44,8 +46,10 @@ public class CommonObsDao extends AbstractObrDao {
 	protected void openPreparedStatements(){	 
 		this.openGetLastDictionaryBeanStatement();
 		this.openExactMapStringToLocalConceptIDsStatement();
+		this.openGetLatestLocalOntologyIDStatement();
+		this.openHasNewVersionOfOntologyStatement();
 	} 
-	
+
 	protected void closePreparedStatements() throws SQLException { 
 		getLastDictionaryBeanStatement.close();
 	}
@@ -263,5 +267,102 @@ public class CommonObsDao extends AbstractObrDao {
 		}
 		return localConceptIDs;
 	}
+	
+	/**************************Methos on ontology Table***************************************/
+
+	/**
+	 * 
+	 */
+	private void openGetLatestLocalOntologyIDStatement() {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_ontology_id FROM ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" where virtual_ontology_id= ? order by id DESC;");
+		 
+		getLatestLocalOntologyIDStatement = this.prepareSQLStatement(queryb.toString());		
+	}
+	
+	/**
+	 * @param virtualOntologyID
+	 * @return
+	 */
+	public String getLatestLocalOntologyID(String virtualOntologyID) {
+		String localOntologyID= null;
+		try {
+			ResultSet rSet;			 
+			getLatestLocalOntologyIDStatement.setString(1, virtualOntologyID);
+			rSet = this.executeSQLQuery(getLatestLocalOntologyIDStatement);
+			 
+			if(rSet.first()){
+				localOntologyID=rSet.getString(1); 
+			} 
+			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openExactMapStringToLocalConceptIDsStatement();
+			 
+			return this.getLatestLocalOntologyID(virtualOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get local ontology ID for "+virtualOntologyID+". Empty set returned.", e);
+		}
+		return localOntologyID;
+	}
+	
+	private void openHasNewVersionOfOntologyStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT DISTINCT local_ontology_id, dictionary_id FROM ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" OT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" CT, ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(" TT WHERE TT.concept_id = CT.id AND  CT.ontology_id=OT.id");
+		queryb.append(" AND OT.virtual_ontology_id= ? order BY OT.id DESC;");
+		 
+		hasNewVersionOfOntologyStatement = this.prepareSQLStatement(queryb.toString());	
+	}
+
+	/**
+	 * Check the new version for given virtualOntologyID present which is not processed(not annotated )
+	 * by given respurceID.
+	 * 
+	 * @param ontoID
+	 * @param resourceID
+	 * @return
+	 */
+	public boolean hasNewVersionOfOntology(String virtualOntologyID, String resourceID) {
+	 
+		int dictionaryID= 0;
+		try {
+			ResultSet rSet;			 
+			hasNewVersionOfOntologyStatement.setString(1, virtualOntologyID);
+			rSet = this.executeSQLQuery(hasNewVersionOfOntologyStatement);
+			 
+			if(rSet.first()){				 
+				dictionaryID = rSet.getInt(2);
+			} 
+			rSet.close();
+			 
+			if(dictionaryID >0){
+				if(dictionaryID > resourceTableDao.getDictionaryID(resourceID)){
+					return true;
+				}
+			} 
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openExactMapStringToLocalConceptIDsStatement();
+			 
+			return this.hasNewVersionOfOntology(virtualOntologyID, resourceID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get local ontology ID for "+virtualOntologyID+". Empty set returned.", e);
+		}
+		return false;
+	
+	}
+
+	 
 		
 }
