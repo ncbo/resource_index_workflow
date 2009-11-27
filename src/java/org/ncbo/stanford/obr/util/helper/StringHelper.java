@@ -31,5 +31,10 @@ public interface StringHelper {
 	public static final String PLUS_STRING = "+";	
 	// Regex for plus string
 	public static final String PLUS_STRING_REG = "\\"+PLUS_STRING;
+	
+	// Regex for plus string
+	public static final String NEW_LINE_REGEX = "\n";
+	
+	
 
 }

@@ -198,7 +198,7 @@ public class CommonObsDao extends AbstractObrDao {
 			String column2 = couplesSet.getString(2);
 			lineb.append(column1);
 			lineb.append("\t");
-			lineb.append(column2);
+			lineb.append(column2.replaceAll(NEW_LINE_REGEX, BLANK_SPACE));
 			out.write(lineb.toString());
 			lineb.delete(0, lineb.length());
 			//out.newLine();
@@ -326,7 +326,7 @@ public class CommonObsDao extends AbstractObrDao {
 
 	/**
 	 * Check the new version for given virtualOntologyID present which is not processed(not annotated )
-	 * by given respurceID.
+	 * by given resourceID.
 	 * 
 	 * @param ontoID
 	 * @param resourceID
