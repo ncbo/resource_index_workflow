@@ -16,6 +16,8 @@ import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
 /**
+ * 
+ * 
  * @author Kuladip Yadav
  * 
  */
@@ -33,6 +35,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 
 	}
 
+	/**
+	 * This is entry point for obr workflow which process all the resources included in property file.
+	 * 
+	 */
 	public void startResourceIndexWorkflow() {
 
 		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
@@ -55,6 +61,13 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 		}
 	}
 
+	/**
+	 * 
+	 * Processing particular resource.
+	 *  
+	 * @param ResourceAccessTool
+	 * 
+	 */
 	public void resourceProcessing(ResourceAccessTool tool) {
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
@@ -91,7 +104,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
 				.getMessage("obr.dictionary.complete"));
 
-		// Processing direct anotations
+		// Processing direct annotations
 		int nbDirectAnnotation = tool.getAnnotationService()
 				.resourceAnnotation(withCompleteDictionary,
 						Utilities.arrayToHashSet(FileParameters.STOP_WORDS));
@@ -132,6 +145,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 
 		// Update resource table entry for latest DictionaryID for DAT table
 		tool.updateResourceTableDictionaryID();
+		
+		// Update obr_statistics table.
+		tool.calculateObrStatistics();
 
 		timer.end();
 		toolLogger.info("Resource " + tool.getToolResource().getResourceName()

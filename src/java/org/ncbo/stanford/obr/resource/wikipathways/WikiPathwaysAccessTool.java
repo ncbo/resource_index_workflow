@@ -53,7 +53,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 	private static final Double[] WP_WEIGHTS  = { 1.0, 0.9 };
 	
 	// OntoID associated for reported annotations
-	private static final String[] WP_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, "1132"};
+	private static final String[] WP_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, "1123"};
 	
 	// Structure for resource Access tool 
 	private static final Structure WP_STRUCTURE = new Structure(WP_ITEMKEYS, WP_RESOURCEID, WP_WEIGHTS, WP_ONTOIDS);

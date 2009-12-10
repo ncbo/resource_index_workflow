@@ -139,7 +139,7 @@ public class ResourceDao extends AbstractObrDao {
 	
 	protected void openHasEntryStatement(){
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("SELECT 1 FROM ");
+		queryb.append("SELECT id FROM ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(" WHERE resource_id = ?");		 
 		hasEntryStatement = this.prepareSQLStatement(queryb.toString());
@@ -396,6 +396,36 @@ public class ResourceDao extends AbstractObrDao {
 		}
 		 
 		return dictionaryID;
+	}
+	
+	
+	/**
+	 * This method gives id(primary key) from SQL table for given resourceID
+	 * 
+	 * @param resourceID
+	 * @return int - id .
+	 */
+	public int getResourceIDKey(String resourceID){ 
+		int id= -1;
+		try {
+			hasEntryStatement.setString(1, resourceID); 			 
+			ResultSet rSet = this.executeSQLQuery(hasEntryStatement);
+			
+			if(rSet.next()){
+				 id = rSet.getInt(1);
+			}
+			 
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openHasEntryStatement();
+			return this.getResourceIDKey(resourceID);
+		} 
+		catch (SQLException e) {			 
+			logger.error("** PROBLEM ** Cannot get resource id from " + this.getTableSQLName(), e);			 
+		}
+		 
+		return id;
 	}
 
 	 

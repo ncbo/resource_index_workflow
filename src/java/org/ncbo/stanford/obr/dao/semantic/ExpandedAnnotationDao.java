@@ -1,7 +1,9 @@
 package org.ncbo.stanford.obr.dao.semantic;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
@@ -328,6 +330,79 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyID: "+ localOntologyID+". False returned.", e);
 		}
 		return deleted;
+	}
+	
+	//**********************Annotations Statistics ******************/
+	
+	/**
+	 * 
+	 *  Get number of IS A Annotations for each ontlogyID
+	 *  
+	 *  @return HashMap<Integer, Integer>
+	 */
+	public HashMap<Integer, Integer> getISAAnnotationStatistics(){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+		
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
+		queryb.append(this.getTableSQLName());		 	 
+		queryb.append(" AS EAT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" AS CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.child_concept_id IS NOT NULL GROUP BY OT.id; ");
+		
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+			}			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.getISAAnnotationStatistics();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get IS A annotations statistics from "+this.getTableSQLName()+" .", e);
+		}
+		return annotationStats;
+		 
+	}
+	
+	
+	/**
+	 * 
+	 *  Get number of Mapping Annotations for each ontlogyID
+	 *  
+	 *  @return HashMap<Integer, Integer>
+	 */
+	public HashMap<Integer, Integer> getMappingAnnotationStatistics(){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+		
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
+		queryb.append(this.getTableSQLName());		 	 
+		queryb.append(" AS EAT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" AS CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.mapped_concept_id IS NOT NULL GROUP BY OT.id; ");
+		
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+			}			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.getMappingAnnotationStatistics();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get mapping annotations statistics from " + this.getTableSQLName()+ " .", e);
+		}
+		return annotationStats;
+		 
 	}
 	
 	/********************************* ENTRY CLASS *****************************************************/

@@ -1,7 +1,9 @@
 package org.ncbo.stanford.obr.dao.index;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import obs.obr.populate.ObrWeight;
 
@@ -36,6 +38,7 @@ public class IndexDao extends AbstractObrDao {
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
+	private PreparedStatement getIndexedAnnotationStatsStatement;
 	
 	/**
 	 * Creates a new IndexDao with a given resourceID.
@@ -70,6 +73,7 @@ public class IndexDao extends AbstractObrDao {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();		 
 		this.openDeleteEntriesFromOntologyStatement();
+		this.openGetIndexedAnnotationStatsStatement();
 	}
 
 	@Override
@@ -77,6 +81,7 @@ public class IndexDao extends AbstractObrDao {
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		 
 		this.deleteEntriesFromOntologyStatement.close();
+		this.getIndexedAnnotationStatsStatement.close();
 	}
 	
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
@@ -387,6 +392,46 @@ public class IndexDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyID: "+ localOntologyID+". False returned.", e);
 		}
 		return deleted;
+	}
+	
+	//**********************************Statistics Method****************
+	
+	private void openGetIndexedAnnotationStatsStatement(){
+	    StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+		queryb.append(this.getTableSQLName());		 	 
+		queryb.append(" AS IT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" AS CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id = OT.id GROUP BY OT.id; ");
+ 		this.getIndexedAnnotationStatsStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	/**
+	 * This method gives number of indexed annotations for each ontologyID 
+	 *  
+	 * @return map containing number of indexed annotations for each ontologyID as key.
+	 */
+	public HashMap<Integer, Integer> getIndexedAnnotationStatistics(){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+		 
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(this.getIndexedAnnotationStatsStatement);
+			while(rSet.next()){
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+			}			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetIndexedAnnotationStatsStatement();
+			return this.getIndexedAnnotationStatistics();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get indexed annotations statistics from "+this.getTableSQLName()+" .", e);
+		}
+		return annotationStats;
+		 
 	}
 		
 	// ********************************* ENTRY CLASS *****************************************************/

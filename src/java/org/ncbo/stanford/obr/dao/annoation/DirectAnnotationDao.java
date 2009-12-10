@@ -2,7 +2,9 @@ package org.ncbo.stanford.obr.dao.annoation;
 
 import java.io.File;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -449,6 +451,77 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		return nbDelete;
 	}
 	
+	//**********************Annotations Statistics ******************/
+	
+	/**
+	 * 
+	 *  Get number of Mgrep Annotations for each ontlogyID
+	 *  
+	 *  @return Map containing number of mgerp annotations for each ontology as key. 
+	 *   
+	 */
+	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+		
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+		queryb.append(this.getTableSQLName());		 	 
+		queryb.append(" AS DAT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" AS CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL GROUP BY OT.id; ");
+		
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+			}			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.getMgrepAnnotationStatistics();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get mgrep annotations statistics from "+this.getTableSQLName()+" .", e);
+		}
+		return annotationStats;
+		 
+	}
+	
+	/**
+	 *  Get number of reported annotations for each ontlogyID
+	 *  
+	 *  @return Map containing number of reported annotations for each ontology as key. 
+	 */
+	public HashMap<Integer, Integer> getReportedAnnotationStatistics(){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+		
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+		queryb.append(this.getTableSQLName());		 	 
+		queryb.append(" AS DAT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" AS CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" AS OT WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND DAT.term_id IS NULL GROUP BY OT.id; ");
+		
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+			}			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.getReportedAnnotationStatistics();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get reported annotations statistics from " +this.getTableSQLName()+" .", e);
+		}
+		return annotationStats;
+		 
+	}
 	
 	/********************************* ENTRY CLASSES *****************************************************/
 

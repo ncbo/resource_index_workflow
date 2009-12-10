@@ -16,6 +16,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.context.ContexDao;
 import org.ncbo.stanford.obr.dao.resource.ResourceDao;
+import org.ncbo.stanford.obr.dao.statistics.StatisticsDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
@@ -69,7 +70,7 @@ public abstract class AbstractObrDao implements StringHelper{
 	// **** OBR tables
 	public static ContexDao contextTableDao = ContexDao.getInstance();
 	public static ResourceDao resourceTableDao = ResourceDao.getInstance();
-	 
+	public static StatisticsDao statisticsDao = StatisticsDao.getInstance();	 
 		
 	/**
 	 * Construct a new Table object and the corresponding DB table if does not exists.

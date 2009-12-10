@@ -94,5 +94,11 @@ public interface ResourceUpdateService {
 	 */
 	void reInitializeAllTablesExcept_ET();
 
+	/**
+	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * for current resource.
+	 * 
+	 */
+	public void calculateObrStatistics();
 	
 }

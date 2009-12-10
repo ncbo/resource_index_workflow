@@ -5,16 +5,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
-import obs.obr.populate.Element.BadElementStructureException; 
+import obs.obr.populate.Element.BadElementStructureException;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.statistics.StatisticsDao.StatisticsEntry;
 import org.ncbo.stanford.obr.exception.ResourceFileException;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
@@ -107,6 +109,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		expandedAnnotationTableDao.reInitializeSQLTable();
 		indexTableDao.reInitializeSQLTable();
 		AbstractObrDao.resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
+		AbstractObrDao.statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
 	}
 	
 	/**
@@ -211,5 +214,98 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		 
 		return concepts.replaceAll(localOntologyID, virtualOntologyID);
 	}
+	
+	
+	/**
+	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * for current resource.
+	 * 
+	 */
+	public void calculateObrStatistics() {
+		
+		logger.info("Processing of statistics started...");
+		
+		// Getting Indexed annotations
+		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics();
+
+		// Getting MGREP annotations
+		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics();
+		
+		// Getting REPORTED annotations
+		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics();
+		
+		// Getting ISA annotations
+		HashMap<Integer, Integer> isaAnnotations= expandedAnnotationTableDao.getISAAnnotationStatistics();
+		
+		// Getting Mapping annotations
+		HashMap<Integer, Integer> mappingAnnotations= expandedAnnotationTableDao.getMappingAnnotationStatistics();
+		
+		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
+		
+		int indexed = 0;
+		int mgrep = 0;
+		int reported = 0;
+		int isA = 0;
+		int mapping = 0;
+		
+		// Get resource id (primary key) from ResourceTable
+		int resource_id = AbstractObrDao.resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
+
+		// Get list of onltogyID used for indexing 
+		ArrayList<Integer> ontologyListFromStatsTables = AbstractObrDao.statisticsDao.getOntolgyIDsForResource(resource_id);
+		
+		// Iterating for each ontologies
+		for (Integer ontologyID : indexedAnnotations.keySet()) {			
+			
+			ontologyListFromStatsTables.remove(ontologyID);
+			
+			
+			if(indexedAnnotations.get(ontologyID)!= null){
+				indexed = indexedAnnotations.get(ontologyID).intValue();
+			}else{
+				indexed = 0;
+			}
+			
+			if(mgrepAnnotations.get(ontologyID)!= null){
+				mgrep = mgrepAnnotations.get(ontologyID).intValue();
+			}else{
+				mgrep = 0;
+			}
+			
+			if(reportedAnnotations.get(ontologyID)!= null){
+				reported = reportedAnnotations.get(ontologyID).intValue();
+			}else{
+				reported = 0;
+			}
+			
+			if(isaAnnotations.get(ontologyID)!= null){
+				isA = isaAnnotations.get(ontologyID).intValue();
+			}else{
+				isA = 0;
+			}
+			
+			if(mappingAnnotations.get(ontologyID)!= null){
+				mapping = mappingAnnotations.get(ontologyID).intValue();
+			}else{
+				mapping = 0;
+			} 
+			
+			// Creating entry for OBR_STATS table
+			StatisticsEntry entry= new StatisticsEntry(resource_id, ontologyID.intValue(), indexed, mgrep, reported, isA, mapping);
+			entries.add(entry);
+		}
+		
+		// Adding/updating entries for OBR_STATS tables.
+		int noOfEntiesUpdated=AbstractObrDao.statisticsDao.addEntries(entries);
+		
+		// Remove non updated entries from stats table.
+		for (Integer integer : ontologyListFromStatsTables) {
+			AbstractObrDao.statisticsDao.deleteEntry(resource_id, integer);
+		}
+		
+		logger.info("Number of entries added/updated in statistics table are :" + noOfEntiesUpdated);
+		logger.info("Processing of statistics completed.");
+		
+	} 
 	
 }

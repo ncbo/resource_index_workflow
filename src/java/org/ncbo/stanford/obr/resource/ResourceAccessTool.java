@@ -258,6 +258,15 @@ public abstract class ResourceAccessTool implements StringHelper {
 		resourceUpdateService.updateResourceForLatestDictionary(this.getToolResource());
 	} 
 	
+	/**
+	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * for current resource.
+	 * 
+	 */
+	public void calculateObrStatistics(){
+		resourceUpdateService.calculateObrStatistics();
+	}
+	
 	
 	/**
 	 * Constructs a <code>String</code> with all attributes in name = value format.
