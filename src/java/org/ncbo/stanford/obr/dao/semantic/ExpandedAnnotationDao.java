@@ -242,19 +242,17 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
     				FROM OBR_TR_DAT AS DAT, OBS_CT AS CT1, OBS_CT AS CT2, OBS_MAPT AS MAPT
     					WHERE CT2.localConceptID = MAPT.mappedLocalConceptID
     					AND CT1.localConceptID = MAPT.localConceptID
-    					AND OBR_TR_DAT.conceptID = CT1.conceptID AND mappingDone = false; */
+    					AND OBR_TR_DAT.conceptID = CT1.conceptID AND mappingDone = false; */		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, CT2.id, context_id, DAT.concept_id, mapping_type, false FROM ");
+		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, CT.id, context_id, DAT.concept_id, mapping_type, false FROM ");
 		queryb.append(table.getTableSQLName());
 		queryb.append(" AS DAT, ");
 		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
-		queryb.append(" AS CT1, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
-		queryb.append(" AS CT2, ");
+		queryb.append(" AS CT, ");	 
 		queryb.append(ObsSchemaEnum.MAPPING_TABLE.getTableSQLName());
-		queryb.append(" AS MAPT WHERE CT2.local_concept_id = MAPT.mapped_local_concept_id AND CT1.local_concept_id = MAPT.local_concept_id AND DAT.concept_id = CT1.id AND mapping_done = false;");
+		queryb.append(" AS MAPT WHERE CT.id = MAPT.mapped_concept_id AND DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");

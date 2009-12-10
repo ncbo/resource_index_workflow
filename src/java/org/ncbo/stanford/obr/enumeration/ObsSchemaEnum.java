@@ -11,7 +11,8 @@ public enum ObsSchemaEnum {
 	CONCEPT_TABLE(MessageUtils.getMessage("obs.concept.table")), 
 	DICTIONARY_VERSION_TABLE(MessageUtils.getMessage("obs.dictionary.table")), 
 	TERM_TABLE(MessageUtils.getMessage("obs.term.table")), 
-	MAPPING_TABLE(MessageUtils.getMessage("obs.map.table")), 
+	//TODO : For dev purpose use resource_index.obs_map_temp
+	MAPPING_TABLE("resource_index.obs_map_temp"), 
 	IS_A_PARENT_TABLE(MessageUtils.getMessage("obs.relation.table")),
 	;
 
@@ -29,6 +30,10 @@ public enum ObsSchemaEnum {
 	 * @return table name with schema
 	 */
 	public String getTableSQLName() {	
+		// TODO : Remove condition after fixing obs_map issue.
+		if(this== MAPPING_TABLE){
+			return  this.name;
+		}
 		
 		return OBS_SCHEMA_NAME + this.name;
 	}
