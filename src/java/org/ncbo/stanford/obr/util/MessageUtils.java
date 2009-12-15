@@ -15,7 +15,7 @@ public class MessageUtils {
 	@SuppressWarnings("unused")
 	private static final Log log = LogFactory.getLog(MessageUtils.class);
 
-	private static Messages messages = new Messages("message");
+	private static Messages messages = new Messages("config");
 
 	/**
 	 * Initializes the messages bundle

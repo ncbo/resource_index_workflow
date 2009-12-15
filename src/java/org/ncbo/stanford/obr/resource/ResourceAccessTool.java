@@ -3,7 +3,6 @@ package org.ncbo.stanford.obr.resource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
- 
 import obs.common.utils.Utilities;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -19,6 +18,8 @@ import org.ncbo.stanford.obr.service.resource.ResourceUpdateService;
 import org.ncbo.stanford.obr.service.resource.impl.ResourceUpdateServiceImpl;
 import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
 import org.ncbo.stanford.obr.service.semantic.impl.SemanticExpansionServiceImpl;
+import org.ncbo.stanford.obr.util.LoggerUtils;
+import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
@@ -50,9 +51,9 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * If the corresponding contexts do not exist in OBR_CXT, they are created.
 	 */
 	public ResourceAccessTool(String resource, String resourceID, Structure structure){
-		super();	
-		
-		logger.info("ResourceAccessTool creation...");		 
+		super(); 
+		initializeLogger(resourceID); 
+		logger.info("ResourceAccessTool creation...");
 		this.toolName = RESOURCE_NAME_PREFIX + resourceID + Utilities.getRandomString(3);
 		String mainContext = Structure.generateContextName(resourceID, this.mainContextDescriptor());
 		this.toolResource = new Resource(resource, resourceID, structure, mainContext);
@@ -73,6 +74,14 @@ public abstract class ResourceAccessTool implements StringHelper {
 		logger.info("ResourceAccessTool " + this.getToolResource().getResourceID() + " created to access " + this.getToolResource().getResourceName() +" (" + this.getToolResource().getResourceID() + ").");
 	} 
 		
+	/** 
+	 * This method initialize log4j logger for given resource id.
+	 *  
+	 * @param resourceID
+	 */
+	private void initializeLogger(String resourceID) {
+		logger= LoggerUtils.createRATSpecificLogger(this.getClass(), resourceID.toLowerCase() + MessageUtils.getMessage("obr.logs.suffix"));
+	}
 
 	/**
 	 * @return the resourceUpdateService

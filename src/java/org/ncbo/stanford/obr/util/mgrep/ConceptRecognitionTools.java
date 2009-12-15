@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import obs.common.files.FileParameters;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 
 import org.apache.log4j.Logger;
 
@@ -25,32 +25,32 @@ public class ConceptRecognitionTools {
 	// Mgrep local version 
 	public static File mgrepLocal(File dictionaryFile, File resourceFile) throws Exception {
 		StringBuffer mgrepCmdb = new StringBuffer();
-		File mgrepFile = new File(FileParameters.mgrepOutputFolder() + resourceFile.getName() + ".mgrep");	
+		File mgrepFile = new File(FileResourceParameters.mgrepOutputFolder() + resourceFile.getName() + ".mgrep");	
 		
 		/* For the new Mgrep	*/	
-		mgrepCmdb.append(FileParameters.mgrepFolder());
+		mgrepCmdb.append(FileResourceParameters.mgrepFolder());
 		mgrepCmdb.append("mgrep -w -i -f ");
-		mgrepCmdb.append(FileParameters.dictionaryFolder());
+		mgrepCmdb.append(FileResourceParameters.dictionaryFolder());
 		mgrepCmdb.append(dictionaryFile.getName());
 		mgrepCmdb.append(" < ");
-		mgrepCmdb.append(FileParameters.mgrepInputFolder());
+		mgrepCmdb.append(FileResourceParameters.mgrepInputFolder());
 		mgrepCmdb.append(resourceFile.getName());
 		mgrepCmdb.append(" > ");
-		mgrepCmdb.append(FileParameters.mgrepOutputFolder());
+		mgrepCmdb.append(FileResourceParameters.mgrepOutputFolder());
 		mgrepCmdb.append(resourceFile.getName());
 		mgrepCmdb.append(".mgrep");
 		
 		/* For the old mgrep */
 		/*
-		commandb.append(FileParameters.MGREP_FOLDER);
+		commandb.append(FileResourceParameters.MGREP_FOLDER);
 		commandb.append("mgrep -w -i ");
-		commandb.append(FileParameters.REMOTE_DICTIONARY_FOLDER);
+		commandb.append(FileResourceParameters.REMOTE_DICTIONARY_FOLDER);
 		commandb.append(dictionaryFile.getName());
 		commandb.append(" ");
-		commandb.append(FileParameters.REMOTE_RESOURCE_FOLDER);
+		commandb.append(FileResourceParameters.REMOTE_RESOURCE_FOLDER);
 		commandb.append(resourceFile.getName());
 		commandb.append(" > ");
-		commandb.append(FileParameters.MGREP_RESULT_FOLDER);
+		commandb.append(FileResourceParameters.MGREP_RESULT_FOLDER);
 		commandb.append(resourceFile.getName());
 		commandb.append(".mgrep");
 		*/

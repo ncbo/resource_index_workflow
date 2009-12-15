@@ -12,6 +12,7 @@ import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -34,7 +35,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  */
 public class IndexDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = "_index"; // element Index Table
+	private static final String TABLE_SUFIX = MessageUtils.getMessage("obr.index.table.suffix"); // element Index Table
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;

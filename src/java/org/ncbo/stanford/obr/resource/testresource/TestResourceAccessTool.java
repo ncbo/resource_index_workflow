@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 
-import obs.common.files.FileParameters;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
@@ -53,7 +53,7 @@ public class TestResourceAccessTool extends ResourceAccessTool {
 	@Override
 	public int updateResourceContent(){
 		int nbElement = 0;
-		File resourceFile = new File(FileParameters.resourceFolder() + TR_FILE);
+		File resourceFile = new File(FileResourceParameters.resourceFolder() + TR_FILE);
 		try {
 			resourceFile.createNewFile();
 			nbElement = resourceUpdateService.updateResourceContentFromFile(resourceFile);

@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 
 import obs.common.beans.DictionaryBean;
-import obs.common.files.FileParameters;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
@@ -109,11 +109,11 @@ public class CommonObsDao extends AbstractObrDao {
 	 */
 	
 	public static String dictionaryFileName(DictionaryBean dictionary){
-		return FileParameters.dictionaryFolder() + dictionary.getDictionaryName() + "_MGREP.txt";
+		return FileResourceParameters.dictionaryFolder() + dictionary.getDictionaryName() + "_MGREP.txt";
 	}
 	
 	public static String completeDictionaryFileName(DictionaryBean dictionary){
-		return FileParameters.dictionaryFolder() + dictionary.getDictionaryName() + "_CMP_MGREP.txt";
+		return FileResourceParameters.dictionaryFolder() + dictionary.getDictionaryName() + "_CMP_MGREP.txt";
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class CommonObsDao extends AbstractObrDao {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" WHERE name NOT IN(''");
 		// reads the black list file
-		File blackFile = new File(FileParameters.LOCAL_FOLDER + FileParameters.BLACK_LIST_FOLDER + blacklist);
+		File blackFile = new File(FileResourceParameters.blackListFolder() + blacklist);
 		try{
 		FileReader fstream = new FileReader(blackFile);
 		BufferedReader in = new BufferedReader(fstream);

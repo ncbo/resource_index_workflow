@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
-import obs.common.beans.DictionaryBean;
-import obs.common.files.FileParameters;
+import obs.common.beans.DictionaryBean; 
 import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
@@ -15,6 +14,7 @@ import org.ncbo.stanford.obr.dao.obs.CommonObsDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.mgrep.ConceptRecognitionTools;
 
 public class AnnotationServiceImpl extends AbstractResourceService implements
@@ -171,7 +171,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	public File writeMgrepResourceFile(int dictionaryID) {
 		logger
 				.info("Exporting the resource content to a file to be annotated with Mgrep...");
-		String name = FileParameters.mgrepInputFolder()
+		String name = FileResourceParameters.mgrepInputFolder()
 				+ ResourceAccessTool.RESOURCE_NAME_PREFIX
 				+ resourceAccessTool.getToolResource().getResourceID() + "_V"
 				+ dictionaryID + "_MGREP.txt";

@@ -14,18 +14,19 @@
 	<property name="tmpl.dir" value="tmpl" />
 	<property name="shared.lib.dir" value="${basedir}/../shared_libs"/>
 	<property name="protege.lib.dir" value="${shared.lib.dir}/protege_jars"/>
-	<property name="cananolab.lib.dir" value="${shared.lib.dir}/cananolabs_jars"/>
+	<property name="cananolab.lib.dir" value="${shared.lib.dir}/cananolab_jars"/>
 	<property name="ontologyaccess.dir" value="${basedir}/../OntologyAccess"/>	 
 	<property name="obs.common.dir" value="${basedir}/../obs_v1_common"/>
 	<property name="config.dir" value="${basedir}/conf"/>	
 	 
 	<fileset id="shared.jars" dir="${shared.lib.dir}">
-		<include name="com.noelios.restlet.ext.httpclient_*.jar"/>
-		<include name="commons-httpclient-3.1.jar"/>			
-		<include name="oro-2.0.8.jar"/>
-		<include name="orphanNodesAlg.jar"/>
-		<include name="xpp3-1.1.4c.jar"/>
-		<include name="xstream-1.3.jar"/> 
+		<include name="*.jar"/>
+		<exclude name="com.noelios.restlet.ext.httpclient_*.jar"/>
+		<exclude name="commons-httpclient-3.1.jar"/>			
+		<exclude name="oro-2.0.8.jar"/>
+		<exclude name="orphanNodesAlg.jar"/>
+		<exclude name="xpp3-1.1.4c.jar"/>
+		<exclude name="xstream-1.3.jar"/> 
 	</fileset>	
 	<fileset id="protege.jars" dir="${protege.lib.dir}">
 		<include name="*.jar"/>
@@ -66,31 +67,20 @@
 		<echo message="" />
 		<echo message="${app.name} build file" />
 		<echo message="-----------------------------------" />
-		<echo message="" />
-		<echo message="Available targets are:" />
-		<echo message="" />
-		<echo message="clean     --> Remove build directories" />
-		<echo message="build     --> Build the application" />
-		<echo message="deploy    --> Deploy application as directory" />
-		<echo message="createwar --> Create a WAR file but don't deploy it to the server" />
-		<echo message="deploywar --> Deploy application as a WAR file" />
-		<echo message="" />
+		<echo message="" />		 
+		<echo message="Available targets are:"/>
+		<echo message=""/>
+		<echo message="build               --> build project."/>
+		<echo message="build_dependencies  --> builds OntologyAccess project."/>
+		<echo message="clean               --> delete old resources."/>
+		<echo message="dist                --> Create exceution environment for project."/>		
+		<echo message="all                 --> Execute dist and build." />
+ 		<echo message="" />
 	</target>
 
-	<target name="clean">
-		<delete failonerror="false">
-			<fileset dir="${classes.dir}">
-				<include name="**/*.*" />				 
-			</fileset>
-		</delete>
-
-		<delete includeemptydirs="true" failonerror="false">
-			<fileset dir="${build.dir}">
-				<include name="**/*" />
-			</fileset>
-		</delete>
-
-		<delete file="${dist.dir}/${app.name}.war" />		
+	<target name="clean">		 
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />			 	
 	</target> 
 	
 	<target name="prepare" description="Create configuration files using templates">
@@ -100,7 +90,7 @@
 		
 		<copy file="${tmpl.dir}/log4j.xml.tmpl" tofile="${config.dir}/log4j.xml" overwrite="true">
 			<filterset>
-				<filter token="logfilepath" value="${obr.app.logfilepath}" />
+				<filter token="logfilepath" value="${obr.app.logfilepath}${obr.app.logfile.name}" />
 				<filter token="maxlogfilesize" value="${obr.app.maxlogfilesize}" />
 				<filter token="maxlogbackupindex" value="${obr.app.maxlogbackupindex}" />
 				<filter token="obrlevel" value="${obr.app.log.obslevel}" />
@@ -108,7 +98,7 @@
 			</filterset>
 		</copy>
 		
-		<copy file="${tmpl.dir}/message.properties.tmpl" tofile="${config.dir}/message.properties" overwrite="true">
+		<copy file="${tmpl.dir}/config.properties.tmpl" tofile="${config.dir}/config.properties" overwrite="true">
 			<filterset>				
 				<filter token="obrjdbcdriver" value="${obr.jdbc.driver}" />
 				<filter token="obrjdbcurl" value="${obr.jdbc.url}" />
@@ -125,21 +115,91 @@
 				<filter token="obrexpansionrelational" value="${obr.expansion.relational}" />
 				<filter token="obrexpansionmapping" value="${obr.expansion.mapping}" />
 				<filter token="obrexpansiondistance" value="${obr.expansion.distance}" />
+				<filter token="obrlogfilename" value="${obr.app.logfile.name}" />
 				 
 			</filterset>
 		</copy>		 
 	</target> 
 	
+	<!-- ================================= 
+		          target: build_dependencies
+		          Build OBS_v1_common project	                        
+			 ================================= -->
 	<target name="build_dependencies">
 		<echo>Building OBS_v1_common project Starts...</echo>
 		<ant antfile="${obs.common.dir}/build.xml" target="build" inheritall="false"/>
 		<echo>Building OBS_v1_common project Ends...</echo>
 		<echo>...</echo>				 
-		<echo>...</echo>		 
-		<copy todir="${lib.dir}" flatten="true"> 
-			<fileset dir="${ontologyaccess.dir}/dist" />
-			<fileset dir="${obs.common.dir}/dist" />			 	
-		</copy>
+		<echo>...</echo> 
 	</target>
+	
+	
+	<!-- ================================= 
+			      target: build	                        
+			 ================================= -->
+	<target name="build">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}/classes"/>
+		<javac destdir="${build.dir}/classes" debug="true" optimize="true" failonerror="true" nowarn="true">
+			<src path="${src.dir}"/>			
+			<classpath refid="master-classpath"/>
+		</javac>		
+	</target>
+	
+	<!-- ================================= 
+	          target: dist              
+	         ================================= -->
+	<target name="dist" depends="build_dependencies, build" description="Create exceution environment for project">
+		<mkdir dir="${dist.dir}"/>
+			<!-- Create jar file  -->
+			<jar destfile="${dist.dir}/${app.name}.jar" >
+				<fileset dir="${build.dir}/classes">
+					<include name="**/*.*"/>
+				</fileset>			
+			</jar>		
+			<!-- Copy shell scripts and bash script to dist directory -->
+		 
+			<copy file="${basedir}/run.sh" todir="${dist.dir}">			
+				 
+			</copy>
+			 
+			<!-- Copy all jar files required to lib directory -->
+			<mkdir dir="${dist.dir}/lib"/>
+			<copy todir="${dist.dir}/lib">
+				<fileset dir="${ontologyaccess.dir}/dist">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${obs.common.dir}/dist">
+					<include name="**/*.jar"/>
+				</fileset> 
+				<fileset refid="shared.jars" /> 	
+				<fileset refid="protege.jars" /> 		
+				<fileset refid="cananolab.jars" /> 
+			</copy>
+			
+			<!-- Copy properties folder containg all properties files to dist directory -->
+			<mkdir dir="${dist.dir}/conf"/>
+			<copy todir="${dist.dir}/conf">
+				<fileset dir="${config.dir}">
+					<include name="*.*"/>
+				</fileset>			 		 
+			</copy>	
+			
+			<!-- Copy all perl scripts and shell scripts requied from src directory -->
+			<mkdir dir="${dist.dir}/script"/>
+			<copy todir="${dist.dir}/script">
+				<fileset dir="${src.dir}">
+					<include name="**/*.pl"/>
+					<include name="**/*.sh"/>
+				</fileset>			 		 
+			</copy> 
+	</target> 
+	
+	<!-- ================================= 
+	          target: all              
+	         ================================= -->
+    <target name="all" depends="dist" description="This will excute target build and dist">
+    </target>
   
 </project>

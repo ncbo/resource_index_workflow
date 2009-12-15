@@ -3,15 +3,16 @@ package org.ncbo.stanford.obr.service.workflow.impl;
 import obs.common.beans.IsaContextBean;
 import obs.common.beans.MappingContextBean;
 import obs.common.beans.MgrepContextBean;
-import obs.common.beans.ReportedContextBean;
-import obs.common.files.FileParameters;
-import obs.common.utils.ExecutionTimer;
+import obs.common.beans.ReportedContextBean; 
+import obs.common.utils.ExecutionTimer; 
 import obs.common.utils.Utilities;
-import obs.obr.populate.ObrWeight;
+import obs.obr.populate.ObrWeight; 
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.workflow.ResourceIndexWorkflow;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
+import org.ncbo.stanford.obr.util.LoggerUtils;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -24,7 +25,7 @@ import org.ncbo.stanford.obr.util.StringUtilities;
 public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 
 	// Logger for this class
-	private static Logger logger = Logger.getLogger(ResourceIndexWorkflowImpl.class);
+	private static Logger logger;
 
 	private static ObrWeight obrWeights = new ObrWeight(
 			MgrepContextBean.PDA_WEIGHT, MgrepContextBean.SDA_WEIGHT,
@@ -32,7 +33,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 			ReportedContextBean.RDA_WEIGHT);
 
 	public ResourceIndexWorkflowImpl() {
-
+		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
 	}
 
 	/**
@@ -43,7 +44,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 
 		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
 				.getMessage("obr.resource.ids"), ",");
-
+		//Initialize the Execution timer 
+		ExecutionTimer timer = new ExecutionTimer();
+		
+		logger.info("Welcome to the Resources index Workflow");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool tool = null;
 			try {
@@ -51,7 +55,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 				tool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();
+				logger.info("");
+				logger.info("Start processing Resource " + tool.getToolResource().getResourceName() + "....");
+				timer.start();
 				resourceProcessing(tool);
+				timer.end();
+				logger.info("Resource " + tool.getToolResource().getResourceName() + " processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			} catch (Exception e) {
 				logger.error(
 						"Problem in creating resource tool for resource id : "
@@ -59,6 +68,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 			}
 
 		}
+		logger.info("Resources index Workflow completed.");	
 	}
 
 	/**
@@ -107,7 +117,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 		// Processing direct annotations
 		int nbDirectAnnotation = tool.getAnnotationService()
 				.resourceAnnotation(withCompleteDictionary,
-						Utilities.arrayToHashSet(FileParameters.STOP_WORDS));
+						Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS));
 
 		toolLogger.info(nbEntry + " elements annotated (with "
 				+ nbDirectAnnotation

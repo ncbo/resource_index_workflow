@@ -5,20 +5,19 @@ obr.environment=dev
 app.name=${ant.project.name} 
 
 # Source directory
-src.dir=src 
+src.dir=src/java
 
 # Logging properties
 obr.app.log.deflevel=ERROR
 obr.app.log.obslevel=DEBUG
-obr.app.logfilepath=files/logs/resource_index_workflow.log
+obr.app.logfilepath=files/logs/obr/
+obr.app.logfile.name=resource_index_workflow.log
+
 # Max log file size (10MB)
 obr.app.maxlogfilesize=10000KB
 # How many backup log files to keep
 obr.app.maxlogbackupindex=15
  
-
-# Resources to be include in query API separated by comma. 
-obr.resource.ids=GEO,AE,CT,GM,OMIM,CDD,PGDI,PGDR,PGGE,REAC,RXRD,UPKB,WP,BSM,DBK,SMD,CANANO,PC,PCM
 ####################################################
 # OBS Schema/Tables properties 
 ####################################################

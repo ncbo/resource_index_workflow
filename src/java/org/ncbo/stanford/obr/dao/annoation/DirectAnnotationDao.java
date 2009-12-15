@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import obs.common.files.FileParameters;
-
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -44,7 +43,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  */
 public class DirectAnnotationDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = MessageUtils.getMessage("obr.annoataion.table.suffix");
+	private static final String TABLE_SUFIX = MessageUtils.getMessage("obr.annotation.table.suffix");
 	
 	private PreparedStatement addEntryStatement;
 	private PreparedStatement addMgrepEntryStatement;	 
@@ -279,7 +278,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		// DO NOT USE a embedded SELECT IT SLOWS DOWN SIGNIFICANTLY THE QUERY
 		StringBuffer loadingQuery = new StringBuffer();
 		loadingQuery.append("LOAD DATA INFILE '");
-		loadingQuery.append(FileParameters.mgrepOutputFolder());
+		loadingQuery.append(FileResourceParameters.mgrepOutputFolder());
 		loadingQuery.append(mgrepFile.getName());
 		loadingQuery.append("' INTO TABLE ");
 		loadingQuery.append(this.getTableSQLName());
