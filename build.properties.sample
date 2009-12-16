@@ -2,7 +2,7 @@
 obr.environment=dev
 
 # App name
-app.name=${ant.project.name} 
+app.name=${ant.project.name}
 
 # Source directory
 src.dir=src/java

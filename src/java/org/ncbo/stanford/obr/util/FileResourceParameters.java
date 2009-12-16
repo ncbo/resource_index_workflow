@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.InetAddress;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.util.messages.Messages;
 
 public class FileResourceParameters {
 	
