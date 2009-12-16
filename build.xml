@@ -24,9 +24,7 @@
 		<exclude name="com.noelios.restlet.ext.httpclient_*.jar"/>
 		<exclude name="commons-httpclient-3.1.jar"/>			
 		<exclude name="oro-2.0.8.jar"/>
-		<exclude name="orphanNodesAlg.jar"/>
-		<exclude name="xpp3-1.1.4c.jar"/>
-		<exclude name="xstream-1.3.jar"/> 
+		<exclude name="orphanNodesAlg.jar"/>		 
 		<exclude name="OntologyAccess*.jar"/>
 	</fileset>	
 	<fileset id="protege.jars" dir="${protege.lib.dir}">
@@ -162,8 +160,7 @@
 			<!-- Copy shell scripts and bash script to dist directory -->
 		 
 			<copy file="${basedir}/run.sh" todir="${dist.dir}" />	
-			<copy file="${basedir}/run.bat" todir="${dist.dir}" />	
-			  
+			   
 			<!-- Copy all jar files required to lib directory -->
 			<mkdir dir="${dist.dir}/lib"/>
 			<copy todir="${dist.dir}/lib">

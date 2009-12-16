@@ -1,9 +1,7 @@
 package org.ncbo.stanford.obr.util;
 
 import java.util.Enumeration;
-
-import obs.common.files.FileParameters;
-
+ 
 import org.apache.log4j.Appender;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.Logger;
@@ -40,7 +38,7 @@ public class LoggerUtils {
 			if (appender instanceof RollingFileAppender) {
 				try {
 					// Creates new file appender				 
-					((RollingFileAppender) appender).setFile(FileParameters.obrLogFolder()	+ logFile);
+					((RollingFileAppender) appender).setFile(FileResourceParameters.resourceLogFolder()	+ logFile);
 					((RollingFileAppender) appender).activateOptions();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -77,7 +75,7 @@ public class LoggerUtils {
 				try {
 					// Creates new file appender
 					RollingFileAppender newFileAppender = new RollingFileAppender(
-							appender.getLayout(), FileParameters.obrLogFolder()	+ OBR_LOG_FILE 
+							appender.getLayout(), FileResourceParameters.resourceLogFolder()	+ OBR_LOG_FILE 
 							 );
 					newFileAppender.activateOptions();
 					
