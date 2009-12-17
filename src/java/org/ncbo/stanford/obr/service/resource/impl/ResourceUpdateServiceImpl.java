@@ -118,6 +118,14 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public HashSet<String> getAllLocalElementIDs(){
 		return elementTableDao.getAllLocalElementIDs();
 	}
+	
+	/**
+	 * Returns a set of all the values contained in the given column of table. 
+	 */
+	public HashSet<String> getAllValuesByColumn(String columName){
+		return elementTableDao.getAllValuesByColumn(columName);
+	}
+	
 
 	public boolean addElement(Element element){
 		return elementTableDao.addEntry(element);

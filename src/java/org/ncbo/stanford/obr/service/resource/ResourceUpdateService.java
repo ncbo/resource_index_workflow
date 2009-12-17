@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.ncbo.stanford.obr.service.resource;
 
 import java.io.File;
@@ -23,12 +20,12 @@ public interface ResourceUpdateService {
 	 * 
 	 * @param toolResource
 	 */
-	void addResource(Resource toolResource);
+	public void addResource(Resource toolResource);
 
 	/**
 	 * @param toolResource
 	 */
-	void updateResourceForLatestDictionary(Resource toolResource);
+	public void updateResourceForLatestDictionary(Resource toolResource);
 
 	/**
 	 * @param resourceFile
@@ -36,7 +33,7 @@ public interface ResourceUpdateService {
 	 * @throws ResourceFileException 
 	 * @throws BadElementStructureException 
 	 */
-	int updateResourceContentFromFile(File resourceFile) throws BadElementStructureException, ResourceFileException;
+	public int updateResourceContentFromFile(File resourceFile) throws BadElementStructureException, ResourceFileException;
 
 	/**
 	 *
@@ -44,7 +41,12 @@ public interface ResourceUpdateService {
 	 *
 	 * @return Collection of local_element_id strings.
 	 */
-	HashSet<String> getAllLocalElementIDs();
+	public HashSet<String> getAllLocalElementIDs();
+	
+	/**
+	 * Returns a set of all the values contained in the given column of table. 
+	 */
+	public  HashSet<String> getAllValuesByColumn(String columName);
 
 	/**
 	 * This method split terms string with splitString
