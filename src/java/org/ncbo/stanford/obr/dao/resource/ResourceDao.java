@@ -274,7 +274,7 @@ public class ResourceDao extends AbstractObrDao {
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("UPDATE ");
 			queryb.append(this.getTableSQLName());
-			queryb.append(" SET dictionary_id= (SELECT MAX(id) FROM ");
+			queryb.append(" SET dictionary_id= (SELECT MAX(dictionary_id) FROM ");
 			queryb.append(DirectAnnotationDao.name(resource.getResourceID()));
 			queryb.append(" ) WHERE ");
 			queryb.append("resource_id= '");

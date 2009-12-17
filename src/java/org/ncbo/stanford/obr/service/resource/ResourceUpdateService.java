@@ -83,18 +83,18 @@ public interface ResourceUpdateService {
 	 * 
 	 * @return int
 	 */
-	int numberOfEntry();
+	public int numberOfEntry();
 
 	/**
 	 * Remove all the entries from element table, annotation table, index table for
 	 *  
 	 */
-	void reInitializeAllTables();
+	public void reInitializeAllTables();
 
 	/**
 	 * Remove all the entries from element table, annotation table, index table for
 	 */
-	void reInitializeAllTablesExcept_ET();
+	public void reInitializeAllTablesExcept_ET();
 
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
