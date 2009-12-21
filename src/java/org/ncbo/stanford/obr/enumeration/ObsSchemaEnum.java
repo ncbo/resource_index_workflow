@@ -11,7 +11,7 @@ public enum ObsSchemaEnum {
 	CONCEPT_TABLE(MessageUtils.getMessage("obs.concept.table")), 
 	DICTIONARY_VERSION_TABLE(MessageUtils.getMessage("obs.dictionary.table")), 
 	TERM_TABLE(MessageUtils.getMessage("obs.term.table")), 
-	//TODO : For dev purpose use resource_index.obs_map_temp
+	//TODO : Use obs_hibernate.obs_map after fixed by Cherie
 	MAPPING_TABLE("resource_index.obs_map_temp"), 
 	IS_A_PARENT_TABLE(MessageUtils.getMessage("obs.relation.table")),
 	;

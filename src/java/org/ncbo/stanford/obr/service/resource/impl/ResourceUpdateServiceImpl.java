@@ -126,6 +126,12 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		return elementTableDao.getAllValuesByColumn(columName);
 	}
 	
+	/**
+	 * Returns the value of a given context for a given element in the table.
+	 */
+	public String getContextValueByContextName(String localElementID, String contextName){
+		return elementTableDao.getContextValueByContextName(localElementID, contextName);
+	}
 
 	public boolean addElement(Element element){
 		return elementTableDao.addEntry(element);
@@ -222,6 +228,20 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		 
 		return concepts.replaceAll(localOntologyID, virtualOntologyID);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#mapTermsToVirtualLocalConceptIDs(java.util.HashSet, java.lang.String, java.lang.String)
+	 */
+	public String mapTermsToVirtualLocalConceptIDs(java.util.HashSet<String> terms, String virtualOntologyID ) {
+		String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+		
+		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID);
+		 
+		return concepts.replaceAll(localOntologyID, virtualOntologyID);
+
+		
+	};
 	
 	
 	/**

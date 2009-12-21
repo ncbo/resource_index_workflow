@@ -49,6 +49,12 @@ public interface ResourceUpdateService {
 	public  HashSet<String> getAllValuesByColumn(String columName);
 
 	/**
+	 * Returns the value of a given context for a given element in the table.
+	 */
+	public String getContextValueByContextName(String localElementID, String contextName);
+
+		
+	/**
 	 * This method split terms string with splitString
 	 * and get local concept id's using ontology access tool. 
 	 * 
@@ -58,6 +64,17 @@ public interface ResourceUpdateService {
 	 * @return String containing local concept id's separated by '>' 
 	 */
 	public String mapTermsToLocalConceptIDs(String terms, String localOntologyID, String splitString);
+	
+	/**
+	 * This method split terms string with splitString
+	 * and get local concept id's using ontology access tool. 
+	 * 
+	 * @param terms
+	 * @param virtualOntologyID
+	 * @param splitString
+	 * 
+	 */
+	public String mapTermsToVirtualLocalConceptIDs(HashSet<String> terms, String virtualOntologyID);
 	
 	/**
 	 * This method split terms string with splitString
