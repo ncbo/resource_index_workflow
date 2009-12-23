@@ -26,6 +26,7 @@ public class CommonObsDao extends AbstractObrDao {
 	private static PreparedStatement exactMapStringToLocalConceptIDsStatement;
 	private static PreparedStatement getLatestLocalOntologyIDStatement;
 	private static PreparedStatement hasNewVersionOfOntologyStatement;
+	private static PreparedStatement getLocalConceptIdByPrefNameAndOntologyIdStatement;
 	
 	public CommonObsDao() {
 		 super();
@@ -48,6 +49,7 @@ public class CommonObsDao extends AbstractObrDao {
 		this.openExactMapStringToLocalConceptIDsStatement();
 		this.openGetLatestLocalOntologyIDStatement();
 		this.openHasNewVersionOfOntologyStatement();
+		this.openGetLocalConceptIdByPrefNameAndOntologyId();
 	} 
 
 	protected void closePreparedStatements() throws SQLException { 
@@ -363,6 +365,39 @@ public class CommonObsDao extends AbstractObrDao {
 	
 	}
 
+	private void openGetLocalConceptIdByPrefNameAndOntologyId(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_concept_id ");
+		queryb.append("FROM ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(" TT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" OT WHERE TT.concept_id= CT.id AND CT.ontology_id=OT.id AND ");
+		queryb.append("TT.is_preferred=true AND OT.local_ontology_id=? AND TT.name=?;");		 
+		getLocalConceptIdByPrefNameAndOntologyIdStatement = this.prepareSQLStatement(queryb.toString());
+	}
+
+	public String getLocalConceptIdByPrefNameAndOntologyId(String localOntologyID, String termName){
+		String localConceptID = "";
+		try {
+			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(1, localOntologyID);
+			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(2, termName);
+			ResultSet rSet = this.executeSQLQuery(getLocalConceptIdByPrefNameAndOntologyIdStatement);
+			rSet.first();
+			localConceptID = rSet.getString(1);
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetLocalConceptIdByPrefNameAndOntologyId();
+			return this.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID,termName);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get localConceptID from "+this.getTableSQLName()+" for localConceptID: "+ localConceptID +" and termName: "+termName+". EmptySet returned.", e);
+		}
+		return localConceptID;
+	}
 	 
 		
 }

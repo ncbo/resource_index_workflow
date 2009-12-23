@@ -171,8 +171,10 @@
 					<include name="**/*.jar"/>
 				</fileset> 
 				<fileset refid="shared.jars" /> 	
-				<fileset refid="protege.jars" /> 		
+				<fileset refid="protege.jars" /> 	
+				<!--TODO : comment for test
 				<fileset refid="cananolab.jars" /> 
+				-->
 			</copy>
 			
 			<!-- Copy properties folder containg all properties files to dist directory -->
@@ -186,7 +188,7 @@
 			<!-- Copy all perl scripts and shell scripts requied from src directory -->
 			<mkdir dir="${dist.dir}/script"/>
 			<copy todir="${dist.dir}/script">
-				<fileset dir="${src.dir}">
+				<fileset dir="${src.perl.dir}">
 					<include name="**/*.pl"/>
 					<include name="**/*.sh"/>
 				</fileset>			 		 

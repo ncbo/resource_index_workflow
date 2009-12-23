@@ -243,6 +243,14 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 	};
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLocalConceptIdByPrefNameAndOntologyId(java.lang.String, java.lang.String)
+	 */
+	public String getLocalConceptIdByPrefNameAndOntologyId(String localOntologyID, String termName){
+		return commonObsDao.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID, termName);
+	}
+	
 	
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations

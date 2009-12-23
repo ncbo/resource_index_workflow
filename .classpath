@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="conf"/>
+	<classpathentry kind="src" path="src/perl"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.5.0_17"/>
 	<classpathentry kind="lib" path="/shared_libs/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="/shared_libs/mysql-connector-java-5.0.7-bin.jar"/>
@@ -29,5 +30,11 @@
 	<classpathentry kind="lib" path="/shared_libs/axis2-kernel-1.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/obs_v1_common"/>
 	<classpathentry kind="lib" path="/shared_libs/Eutils.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/BioSitemaps-API_1.4.jar" sourcepath="/BioSitemaps-API1/src"/>
+	<classpathentry kind="lib" path="/shared_libs/protege_jars/protege-owl.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/protege_jars/protege.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/paxtools.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/commons-net-ftp-2.0.jar" sourcepath="D:/Kuldeep/Java/commons-net-2.0/commons-net-2.0/commons-net-2.0-sources.jar"/>
+	<classpathentry kind="lib" path="/shared_libs/reactomews.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
