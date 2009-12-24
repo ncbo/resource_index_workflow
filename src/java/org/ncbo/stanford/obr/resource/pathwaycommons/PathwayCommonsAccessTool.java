@@ -26,7 +26,7 @@ import org.ncbo.stanford.obr.resource.ResourceAccessTool;
  * PathwayCommons.  
  * It process all pathways data available from different resources from PathwayCommons site.
  * 
- * @author k.yadav & palanisamy
+ * @author Kuladip Yadav & palanisamy
  * @version $$
  */
 public class PathwayCommonsAccessTool extends ResourceAccessTool {
@@ -82,8 +82,7 @@ public class PathwayCommonsAccessTool extends ResourceAccessTool {
 	/**
 	 * Construct PathwayCommonsAccessTool using database connection property.
 	 * It set properties for tool Resource.
-	 * 
-	 * @param obsConnectionInfo
+	 *
 	 */
 	public PathwayCommonsAccessTool(){
 		super(PC_NAME, PC_RESOURCEID, PC_STRUCTURE);		

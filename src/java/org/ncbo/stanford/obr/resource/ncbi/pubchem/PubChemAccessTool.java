@@ -73,8 +73,7 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 	/**
 	 * Construct PubChemAccessTool using database connection property
 	 * It set properties for tool Resource
-	 * 
-	 * @param obsConnectionInfo
+	 *
 	 */
 	public PubChemAccessTool(){
 		super(PCM_NAME, PCM_RESOURCEID, PCM_STRUCTURE);

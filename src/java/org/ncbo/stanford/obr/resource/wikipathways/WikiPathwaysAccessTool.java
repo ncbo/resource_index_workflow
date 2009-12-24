@@ -23,7 +23,7 @@ import org.wso2.www.php.WikiPathwaysPortTypeProxy;
  * Web Service definition found at location 
  * http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl
  *  
- * @author k.yadav
+ * @author Kuladip Yadav
  * @version $$
  */
 public class WikiPathwaysAccessTool extends ResourceAccessTool {
@@ -64,8 +64,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 	/**
 	 * Construct WikiPathwaysAccessTool using database connection property
 	 * It set properties for tool Resource
-	 * 
-	 * @param obsConnectionInfo
+	 *
 	 */
 	public WikiPathwaysAccessTool(){
 		super(WP_NAME, WP_RESOURCEID, WP_STRUCTURE);

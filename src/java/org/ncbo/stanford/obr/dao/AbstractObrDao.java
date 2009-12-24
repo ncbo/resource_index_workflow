@@ -50,7 +50,7 @@ public abstract class AbstractObrDao implements StringHelper{
 	// Database connection properties.
 	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
 	private static final String DATABASE_JDBC_DRIVER = MessageUtils.getMessage("obr.jdbc.driver");
-	private static final String DATABASE_USER = MessageUtils.getMessage("obr.jdbc.username");;
+	private static final String DATABASE_USER = MessageUtils.getMessage("obr.jdbc.username");
 	private static final String DATABASE_PASSWORD = MessageUtils.getMessage("obr.jdbc.password");
 	private String tableSQLName;
 	

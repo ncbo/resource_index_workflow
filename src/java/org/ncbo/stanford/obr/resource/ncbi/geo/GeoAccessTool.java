@@ -80,8 +80,7 @@ public class GeoAccessTool extends AbstractNcbiResourceAccessTool {
 	/**
 	 * Construct GeoAccessTool using database connection property
 	 * It set properties for tool Resource
-	 * 
-	 * @param obsConnectionInfo
+	 *
 	 */
 	public GeoAccessTool(){
 		super(GEO_NAME, GEO_RESOURCEID, GEO_STRUCTURE);

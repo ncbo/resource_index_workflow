@@ -82,7 +82,6 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 	 * Construct BioSitemapsAccessTool using database connection property
 	 * It set properties for tool Resource
 	 * 
-	 * @param obsConnectionInfo
 	 */
 	public BioSitemapsAccessTool(){
 		super(BSM_NAME, BSM_RESOURCEID, BSM_STRUCTURE);

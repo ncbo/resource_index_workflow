@@ -29,7 +29,9 @@ public class ReactomeAccessTool extends ResourceAccessTool {
 	
 	private static final String[] REAC_ITEMKEYS  = {"name", 							"participants", 					"goBiologicalProcess",	"goCellCompartiment"};
 	private static final Double[] REAC_WEIGHTS 	 = {  1.0,       						0.8,             					0.7,                	0.2};  			       
-	private static final String[] REAC_ONTOIDS 	 = {Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION, 	"GO",					"GO"};    
+	
+	// // OntoID associated for reported annotations  Gene ontology (GO) with virtual ontology id 1070 
+	private static final String[] REAC_ONTOIDS 	 = {Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION, 	"1070",					"1070"};    
 		
 	private static Structure REAC_STRUCTURE      = new Structure(REAC_ITEMKEYS, REAC_RESOURCEID, REAC_WEIGHTS, REAC_ONTOIDS);
 	private static String    REAC_MAIN_ITEMKEY   = "name";

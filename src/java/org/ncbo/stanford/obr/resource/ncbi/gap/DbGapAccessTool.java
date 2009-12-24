@@ -80,8 +80,7 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 	/**
 	 * Construct DbGapAccessTool using database connection property
 	 * It set properties for tool Resource
-	 * 
-	 * @param obsConnectionInfo
+	 *
 	 */
 	public DbGapAccessTool(){
 		super(GAP_NAME, GAP_RESOURCEID, GAP_STRUCTURE);

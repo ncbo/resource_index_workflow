@@ -98,7 +98,8 @@
 		</copy>
 		
 		<copy file="${tmpl.dir}/config.properties.tmpl" tofile="${config.dir}/config.properties" overwrite="true">
-			<filterset>				
+			<filterset>	
+				<!-- For resource_index database 						-->
 				<filter token="obrjdbcdriver" value="${obr.jdbc.driver}" />
 				<filter token="obrjdbcurl" value="${obr.jdbc.url}" />
 				<filter token="obrjdbcusername" value="${obr.jdbc.username}" />
@@ -107,6 +108,12 @@
 				
 				<filter token="obrresourceids" value="${obr.resource.ids}" />
 				
+				<!-- For rxrd resource access tool database 						-->
+				<filter token="obrrxrdjdbcurl" value="${obr.rxrd.jdbc.url}" />
+				<filter token="obrrxrdjdbcusername" value="${obr.rxrd.jdbc.username}" />
+				<filter token="obrrxrdjdbcpassword" value="${obr.rxrd.jdbc.password}" />
+				
+				<!-- Resource Index workflow parameter -->
 				<filter token="obrreinitializeall" value="${obr.reinitialize.all}" />
 				<filter token="obrreinitializeonlyannotation" value="${obr.reinitialize.only.annotation}" />
 				<filter token="obrupdateresource" value="${obr.update.resource}" />
