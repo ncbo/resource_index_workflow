@@ -129,4 +129,9 @@ public interface ResourceUpdateService {
 	 */
 	public void calculateObrStatistics();
 	
+	/**
+	 * @param virtualOntologyID
+	 * @return
+	 */
+	public String getLatestLocalOntologyID(String virtualOntologyID); 
 }

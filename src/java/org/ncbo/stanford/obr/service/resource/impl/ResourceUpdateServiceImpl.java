@@ -344,4 +344,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 	} 
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLatestLocalOntologyID(java.lang.String)
+	 */
+	public String getLatestLocalOntologyID(String virtualOntologyID) {
+		return commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+	}
 }

@@ -12,4 +12,3 @@ done
 echo "${CLASSPATH}"
 
 java -Xms512M -Xmx1024M -cp "script:conf:${CLASSPATH}:resource_index_workflow.jar" org.ncbo.stanford.obr.populate.main.PopulateResourceIndex
-

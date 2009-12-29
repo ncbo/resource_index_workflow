@@ -60,8 +60,8 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 	// Weight associated to a context
 	private static final Double[] BSM_WEIGHTS  = {1.0, 0.8, 1.0, 0.8, 0.0};
 	
-	// OntoID associated for reported annotations. 39002 - ontologyID for Biomedical Resource Ontology(BRO)  
-	private static final String[] BSM_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "39977", Structure.NOT_FOR_ANNOTATION};
+	// OntoID associated for reported annotations. 1104 -virtual ontology ID for Biomedical Resource Ontology(BRO)  
+	private static final String[] BSM_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "1104", Structure.NOT_FOR_ANNOTATION};
 	
 	// Structure for GEO Access tool 
 	private static final Structure BSM_STRUCTURE = new Structure(BSM_ITEMKEYS, BSM_RESOURCEID, BSM_WEIGHTS, BSM_ONTOIDS);
@@ -126,6 +126,8 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 		File tempRDFFile = new File(BSM_TEMP_FILE);	 
 				
 		List<String> biositesmaps= getBiositemaps();
+		// Get latest local onotlogy for given  virtual ontology id
+		String latestLocalOntologyID= resourceUpdateService.getLatestLocalOntologyID(BSM_ONTOIDS[3]);
 		
 		// Process each biositemap URL
 		for (Iterator<String> biositemapIterator = biositesmaps.iterator(); biositemapIterator.hasNext();) {
@@ -161,7 +163,7 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 					   
 					    // Extraction of resource type
 					    if(resourceDescription.hasBROResourceType()){
-					    	resource_type = getResourceType(resourceDescription);
+					    	resource_type = getResourceType(resourceDescription, latestLocalOntologyID);
 					    }else{
 					    	resource_type = EMPTY_STRING;
 					    }						   
@@ -278,7 +280,7 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 	 * @param resourceDescription
 	 * @return
 	 */
-	private String getResourceType(ResourceDescription resourceDescription) {
+	private String getResourceType(ResourceDescription resourceDescription, String latestLocalOntologyID) {
 		StringBuffer resourceType= new StringBuffer(EMPTY_STRING);				 
 		try{
 			if(resourceDescription.getResourceType().size() >0){			 
@@ -293,7 +295,7 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 						for (Iterator<?> rdfTypeIterator = resource.getBRO_ResourceInstance().getRDFTypes().iterator(); rdfTypeIterator
 								.hasNext();) {
 							DefaultOWLNamedClass  defaultOWLNamedClass= (DefaultOWLNamedClass) rdfTypeIterator.next();
-						    resourceType.append(BSM_ONTOIDS[3]).append(SLASH_STRING);							 
+						    resourceType.append(latestLocalOntologyID).append(SLASH_STRING);							 
 							resourceType.append(defaultOWLNamedClass.getBrowserText());
 							resourceType.append(GT_SEPARATOR_STRING);
 						} 

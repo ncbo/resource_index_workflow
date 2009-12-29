@@ -28,7 +28,7 @@ public class ArrayExpressAccessTool extends AbstractXmlResourceAccessTool {
 	private static final Double[] AE_WEIGHTS  = {1.0, 0.8, 1.0};
 	
 	// OntoID associated for reported annotations
-	private static final String[] AE_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "1123"};
+	private static final String[] AE_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "1132"};
 	
 	private static Structure AE_STRUCTURE = new Structure(AE_ITEMKEYS, AE_RESOURCEID, AE_WEIGHTS, AE_ONTOIDS);
 	private static String AE_MAIN_ITEMKEY = "name";
