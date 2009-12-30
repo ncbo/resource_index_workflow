@@ -276,7 +276,9 @@ public class DrugBankAccessTool  extends ResourceAccessTool {
 									//checks not equal to start with # and equal to Function:, Process, Biological Process, Component or cellular Component
 									if(!line.startsWith(STARTINGPOINT_)&& (line.startsWith(FUNCTION_) || line.startsWith(PROCESS_) || line.startsWith(BIOPROCESS_) || line.startsWith(COMPONENT_) || line.startsWith(CELLCOMPONENT_))){
 										//appends value with comma separator
-										category+=line.split(COLON_STRING)[1].trim()+COMMA_STRING;
+										if(!line.endsWith(NOTAVAILABLE_)){
+											category+=line.split(COLON_STRING)[1].trim()+COMMA_STRING;
+										}
 									}else if(line.startsWith(STARTINGPOINT_)){
 										//checks equal to start with #
 										break;

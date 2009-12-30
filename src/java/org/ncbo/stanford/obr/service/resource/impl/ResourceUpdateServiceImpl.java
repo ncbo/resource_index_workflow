@@ -64,7 +64,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 					i++;
 				}
 				element = new Element(elementCompleteInfo[0], eltStructure);
-				if (elementTableDao.addEntry(element)){
+				if (this.addElement(element)){
 					nbElement ++;
 				}
 				line = in.readLine();

@@ -194,7 +194,7 @@ public class PathwayCommonsAccessTool extends ResourceAccessTool {
 						organismName = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(organismName, PC_ONTOIDS[1], null);
 						// if mapping concepts are null or empty then log message for it.
 						if(organismName == null || organismName.trim().length()== 0){
-							logger.error("Cannot map Organism  '" + organismName + "' to local concept id." );
+							logger.error("Cannot map Organism  '" + mypathway.getORGANISM().getNAME() + "' to local concept id." );
 							
 						}
 					} 
