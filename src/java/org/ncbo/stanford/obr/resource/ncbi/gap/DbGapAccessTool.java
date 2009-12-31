@@ -52,17 +52,15 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 	//Database name for E-Utils.
 	private static final String GAP_EUTILS_DB 	= "gap";
 	
-	//Optra: 
 	//Query terms for E-Utils .This terms get all elements for gap data for GAP 
 	private static final String GAP_EUTILS_TERM =  "1[s_discriminator]";	 
-	//->
-	
+		
 	// The set of context names
-	private static final String[] GAP_ITEMKEYS = {	"study_name",							"study_disease_list_MSH",		"study_disease_list_SNOMEDCT",		"study_disease_list_13578"	};
+	private static final String[] GAP_ITEMKEYS = {	"study_name",							"study_disease_list_msh",		"study_disease_list_snomedct",		"study_disease_list_ncit"	};
 	// Weight associated to a context
 	private static final Double[] GAP_WEIGHTS  = {	1.0,									1.0,							1.0,								1.0							};
 	// OntoID associated for reported annotations (MSH ontology : 1351, SNOMEDCT : 1353, NCI Thesaurus :1032)
-	private static final String[] GAP_ONTOIDS  = {	Structure.FOR_CONCEPT_RECOGNITION,		"1351",							"SNOMEDCT",							"1032"						}; 
+	private static final String[] GAP_ONTOIDS  = {	Structure.FOR_CONCEPT_RECOGNITION,		"1351",							"1353",							"1032"						}; 
 	
 	// Structure for GAP Access tool 
 	private static final Structure GAP_STRUCTURE = new Structure(GAP_ITEMKEYS, GAP_RESOURCEID, GAP_WEIGHTS, GAP_ONTOIDS);

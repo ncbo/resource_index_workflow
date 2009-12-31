@@ -61,8 +61,8 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 	private static final String[] PCM_ITEMKEYS = { "MeSHHeadingList", "MeSHTermList", "PharmActionList",					"SynonymList"};
 	// Weight associated to a context
 	private static final Double[] PCM_WEIGHTS  = { 1.0, 	 		      1.0,  		 0.8,							    0.9};
-	// OntoID associated for reported annotations
-	private static final String[] PCM_ONTOIDS  = { "MSH", 		      "MSH",         Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
+	// OntoID associated for reported annotations(MSH ontology : 1351)
+	private static final String[] PCM_ONTOIDS  = { "1351", 		      "1351",         Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
 	
 	// Structure for GEO Access tool 
 	private static final Structure PCM_STRUCTURE = new Structure(PCM_ITEMKEYS, PCM_RESOURCEID, PCM_WEIGHTS, PCM_ONTOIDS);
