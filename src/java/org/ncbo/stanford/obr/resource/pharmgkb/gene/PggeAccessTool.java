@@ -32,7 +32,7 @@ public class PggeAccessTool extends ResourceAccessTool {
 	private static String PGGE_MAIN_ITEMKEY      = "geneName";
 	
 	public PggeAccessTool(){
-		super(PGGE_NAME, PGGE_RESOURCEID, PGGE_STRUCTURE );
+		super(PGGE_NAME, PGGE_RESOURCEID, PGGE_STRUCTURE);
 		try {
 			this.getToolResource().setResourceURL(new URL(PGGE_URL));
 			this.getToolResource().setResourceLogo(new URL(PGGE_LOGO));

@@ -35,7 +35,8 @@ public class GetPgkbDiseaseData {
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetPgkbDiseaseData.class);
 	//attributes
-	private static String PERL_SCRIPT_PATH =new File(ClassLoader.getSystemResource("org/ncbo/stanford/obr/resource/pharmgkb/disease/diseases.pl" ).getFile()).getAbsolutePath();
+	private static String PERL_SCRIPT_PATH =new File(GetPgkbDiseaseData.class.getResource( "diseases.pl" ).getFile()).getAbsolutePath();
+	
 	private static String COMMAND                 = "perl " +PERL_SCRIPT_PATH; 
 	Hashtable<String, Hashtable<String, Hashtable<Integer, String>>> diseaseData      = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();	//<diseaseAccession, Hashtable of attribut-value couple>
 	Hashtable<String, Hashtable<Integer, String>> diseaseAttribute = new Hashtable<String, Hashtable<Integer, String>>();	//<attributName, value> (a value could be a map)
@@ -76,7 +77,7 @@ public class GetPgkbDiseaseData {
 	        outputGobbler.start();
 	        
             int exitValue = process.waitFor();
-            logger.info("ExitValue: " + exitValue);        
+            //logger.info("ExitValue: " + exitValue);        
 
 	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
 			
@@ -208,7 +209,7 @@ public class GetPgkbDiseaseData {
 	        outputGobbler.start();
 	        
             int exitValue = process.waitFor();
-            System.out.println("ExitValue: " + exitValue);        
+           // System.out.println("ExitValue: " + exitValue);        
 
 	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
 			

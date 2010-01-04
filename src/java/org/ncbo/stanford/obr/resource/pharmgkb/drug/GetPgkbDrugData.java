@@ -34,7 +34,7 @@ public class GetPgkbDrugData {
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetPgkbDrugData.class);
 	//attributes
-	private static String PERL_SCRIPT_PATH =new File(ClassLoader.getSystemResource("org/ncbo/stanford/obr/resource/pharmgkb/drug/drugs.pl" ).getFile()).getAbsolutePath();
+	private static String PERL_SCRIPT_PATH =new File(GetPgkbDrugData.class.getResource("drugs.pl" ).getFile()).getAbsolutePath();
 	private static String COMMAND                = "perl " +PERL_SCRIPT_PATH;
 	Hashtable<String, Hashtable<String, Hashtable<Integer, String>>> drugData        = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();	//<geneAccession, Hashtable of attribut-value couple>
 	Hashtable<String, Hashtable<Integer, String>> drugAttribute   = new Hashtable<String, Hashtable<Integer, String>>();	//<attributName, value> (a value could be a map)
@@ -77,7 +77,7 @@ public class GetPgkbDrugData {
 	        outputGobbler.start();
 	        
             int exitValue = process.waitFor();
-            logger.info("ExitValue: " + exitValue);        
+            //logger.info("ExitValue: " + exitValue);        
 
 	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
 			
@@ -222,7 +222,7 @@ public class GetPgkbDrugData {
 	        outputGobbler.start();
 	        
             int exitValue = process.waitFor();
-            System.out.println("ExitValue: " + exitValue);        
+            //System.out.println("ExitValue: " + exitValue);        
 
 	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
 			

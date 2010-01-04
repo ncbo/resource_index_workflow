@@ -16,7 +16,6 @@ import obs.obr.populate.Structure;
  * @version OBR v1
  * @date    15-May-2009
  */
-
 public class PgdiAccessTool extends ResourceAccessTool {
 	
 	private static final String PGDI_URL         = "http://www.pharmgkb.org/";
