@@ -88,13 +88,13 @@ public interface ResourceUpdateService {
 	public String mapTermsToVirtualLocalConceptIDs(String terms, String virtualOntologyID, String splitString);
 
 	/**
-	 * This method gets concept for given term name for given local ontology id
+	 * This method gets concept for given term name for given virtual ontology id
 	 * 
-	 * @param localOntologyID
+	 * @param virtualOntologyID
 	 * @param termName
 	 * @return
 	 */
-	public String getLocalConceptIdByPrefNameAndOntologyId(String localOntologyID, String termName);
+	public String getLocalConceptIdByPrefNameAndOntologyId(String virtualOntologyID, String termName);
 	
 	/**
 	 * Adds new entry for given @code Element in element table.

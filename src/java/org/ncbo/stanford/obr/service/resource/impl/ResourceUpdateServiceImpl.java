@@ -94,8 +94,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		AbstractObrDao.resourceTableDao.updateDictionaryID(resource);
 	}
 
-	public int numberOfEntry() {
-		// TODO Auto-generated method stub
+	public int numberOfEntry() {		 
 		return elementTableDao.numberOfEntry();
 	} 
 
@@ -247,8 +246,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * (non-Javadoc)
 	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLocalConceptIdByPrefNameAndOntologyId(java.lang.String, java.lang.String)
 	 */
-	public String getLocalConceptIdByPrefNameAndOntologyId(String localOntologyID, String termName){
-		return commonObsDao.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID, termName);
+	public String getLocalConceptIdByPrefNameAndOntologyId(String virtualOntologyID, String termName){
+	   String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+	   
+	   return commonObsDao.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID, termName);
 	}
 	
 	

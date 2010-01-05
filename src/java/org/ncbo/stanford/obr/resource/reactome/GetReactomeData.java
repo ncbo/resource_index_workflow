@@ -3,9 +3,9 @@ package org.ncbo.stanford.obr.resource.reactome;
 import java.util.HashSet;
 
 import javax.xml.namespace.QName;
- 
+
 import obs.obr.populate.Element;
-import obs.obr.populate.Resource; 
+import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
@@ -19,6 +19,7 @@ import org.apache.axis.encoding.ser.EnumDeserializerFactory;
 import org.apache.axis.encoding.ser.EnumSerializerFactory;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 import org.reactome.cabig.domain.CatalystActivity;
 import org.reactome.cabig.domain.Complex;
 import org.reactome.cabig.domain.DatabaseCrossReference;
@@ -60,24 +61,25 @@ import org.reactome.servlet.ReactomeRemoteException;
  *
  */
 
-public class GetReactomeData {
+public class GetReactomeData implements StringHelper{
 	
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetReactomeData.class);
 
 	//attributes	
 	private final Object[] EMPTY_ARG = new Object[]{};
-    private final String SERVICE_URL_NAME="http://www.reactome.org:8080/caBIOWebApp/services/caBIOService";
-    private Service caBIOService;
+    private static final String SERVICE_URL_NAME="http://www.reactome.org:8080/caBIOWebApp/services/caBIOService";
+    private static final String SCHEMA_NAMESPACE_URI ="http://www.reactome.org/caBIOWebApp/schema";
+    private static final String DEFAULT_SCHEMA_NAMESPACE_URI ="http://www.w3.org/2001/XMLSchema";
     
-	Resource  resource       = null;
-	Structure basicStructure = null;
-	String    resourceID     = "";
+    private Service caBIOService;
+     
+	private Structure basicStructure = null;
+	private String    resourceID     = EMPTY_STRING;
 	ResourceAccessTool tool  = null;
 		
 	//constructor
-	public GetReactomeData(Resource myResource, ResourceAccessTool tool){
-		this.resource       = myResource;
+	public GetReactomeData(Resource myResource, ResourceAccessTool tool){	 
 		this.basicStructure = myResource.getResourceStructure();
 		this.resourceID     = myResource.getResourceID();
 		this.tool           = tool;		 
@@ -136,38 +138,38 @@ public class GetReactomeData {
 		         if(elementStructure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) ||
 		        		 elementStructure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION) ){	
 		        	 // get name
-		        	 if(contextName.equals(this.resourceID+"_"+"name")){
+		        	 if(contextName.equals(this.resourceID+UNDERSCORE_STRING+"name")){
 		        		 if(myEvent.getName()!=null || myEvent.getName().equals("null")){		        	 
 		        			 elementStructure.putContext(contextName,myEvent.getName());
 		        		 }else{
-		        			 elementStructure.putContext(contextName,"");
+		        			 elementStructure.putContext(contextName,EMPTY_STRING);
 		        		 }
 		        	 }
 		        	 // get participants
-		        	 if(contextName.equals(this.resourceID+"_"+"participants")){
+		        	 else if(contextName.equals(this.resourceID+UNDERSCORE_STRING+"participants")){
 		        		 HashSet<String> participants = getParticipants(localElementID);	
-		        		 String particpantList = "";
+		        		 String particpantList = EMPTY_STRING;
 		        		 if(participants!=null){		        
 		        			 for(String name : participants){
-		        				 if(!particpantList.equals("")){
-		        					 particpantList += "> "+name;
+		        				 if(!particpantList.equals(EMPTY_STRING)){
+		        					 particpantList += GT_SEPARATOR_STRING+name;
 		        				 }else{
 		        					 particpantList += name;
 		        				 }
 		        	         } 		 
 		        			 elementStructure.putContext(contextName, particpantList);
 		        		 }else{
-		        			 elementStructure.putContext(contextName,"");
+		        			 elementStructure.putContext(contextName,EMPTY_STRING);
 		        		 }
 		        	 }
 		        	 // get text description
-		        	 if(contextName.equals(this.resourceID+"_"+"summation")){
-		        		 String summationList = "";
+		        	 else if(contextName.equals(this.resourceID+UNDERSCORE_STRING+"summation")){
+		        		 String summationList = EMPTY_STRING;
 		        		 if(myEvent.getSummation()!=null){		        
 		        			 for(Summation sum : myEvent.getSummation()){
 		        				 if(sum.getText()!=null){
-		        					 if(!summationList.equals("")){		        				 
-		        						 summationList += "> "+sum.getText();
+		        					 if(!summationList.equals(EMPTY_STRING)){		        				 
+		        						 summationList += GT_SEPARATOR_STRING+sum.getText();
 			        				 }else{
 			        					 summationList += sum.getText();
 			        				 }
@@ -175,7 +177,7 @@ public class GetReactomeData {
 		        	         } 		 
 		        			 elementStructure.putContext(contextName, summationList);
 		        		 }else{
-		        			 elementStructure.putContext(contextName,"");
+		        			 elementStructure.putContext(contextName,EMPTY_STRING);
 		        		 }
 		        	 }		        	 
 		         }else{
@@ -184,31 +186,31 @@ public class GetReactomeData {
 		        	 // handle the case where several concept ID will show up
 		        	 // Exceptions handling to be changed and logged
 		        	 // get GO annotations
-		        	 if(contextName.equals(this.resourceID+"_"+"goBiologicalProcess")){
+		        	 if(contextName.equals(this.resourceID+UNDERSCORE_STRING+"goBiologicalProcess")){
 		        		 try{
 		        			 if (myEvent.getGoBiologicalProcess()!=null){
 
 		        				 String localConceptID = tool.getResourceUpdateService().getLocalConceptIdByPrefNameAndOntologyId(elementStructure.getOntoID(contextName),myEvent.getGoBiologicalProcess().getName());
 		        				 elementStructure.putContext(contextName,localConceptID);
 		        			 }else{
-		        				 elementStructure.putContext(contextName,"");			    			 
+		        				 elementStructure.putContext(contextName,EMPTY_STRING);			    			 
 		        			 }
 		        		 }
 		        		 catch (Exception e) {
-		        			 elementStructure.putContext(contextName,"");
+		        			 elementStructure.putContext(contextName,EMPTY_STRING);
 		        		 }
 		        	 }
-		        	 if(contextName.equals(this.resourceID+"_"+"goCellCompartiment")){
+		        	 if(contextName.equals(this.resourceID+UNDERSCORE_STRING+"goCellCompartiment")){
 		        		 try{
 		        			 if (myEvent.getCompartment()!=null){
 		        				 String localConceptID = tool.getResourceUpdateService().getLocalConceptIdByPrefNameAndOntologyId(elementStructure.getOntoID(contextName),myEvent.getCompartment().getName());
 		        				 elementStructure.putContext(contextName,localConceptID);				        	
 		        			 }else{
-		        				 elementStructure.putContext(contextName,"");			    			 
+		        				 elementStructure.putContext(contextName,EMPTY_STRING);			    			 
 		        			 }
 		        		 }
 		        		 catch (Exception e) {
-		        			 elementStructure.putContext(contextName,"");
+		        			 elementStructure.putContext(contextName,EMPTY_STRING);
 		        		 }
 		        	 }
 		         }
@@ -220,7 +222,7 @@ public class GetReactomeData {
 		try{							
 			element = new Element(localElementID.toString(), elementStructure);		
 		}catch(BadElementStructureException e){
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}		
 		return element;
 	}
@@ -286,131 +288,131 @@ public class GetReactomeData {
     }
 	
     private void registerTypeMappings(Call call) {
-        QName instanceNotFoundModel = new QName("http://www.reactome.org/caBIOWebApp/schema", 
+        QName instanceNotFoundModel = new QName(SCHEMA_NAMESPACE_URI, 
                                                 "InstanceNotFoundException");
         call.registerTypeMapping(InstanceNotFoundException.class, instanceNotFoundModel,
                 new BeanSerializerFactory(InstanceNotFoundException.class, instanceNotFoundModel),
                 new BeanDeserializerFactory(InstanceNotFoundException.class, instanceNotFoundModel));
-        QName reactomeAxisFaultModel = new QName("http://www.reactome.org/caBIOWebApp/schema", 
+        QName reactomeAxisFaultModel = new QName(SCHEMA_NAMESPACE_URI, 
                                                  "ReactomeRemoteException");
         call.registerTypeMapping(ReactomeRemoteException.class, reactomeAxisFaultModel,
                 new BeanSerializerFactory(ReactomeRemoteException.class, reactomeAxisFaultModel),
                 new BeanDeserializerFactory(ReactomeRemoteException.class, reactomeAxisFaultModel));
-        QName CatalystActivityModel= new QName("http://www.reactome.org/caBIOWebApp/schema", 
+        QName CatalystActivityModel= new QName(SCHEMA_NAMESPACE_URI, 
                                                "CatalystActivity");
         call.registerTypeMapping(CatalystActivity.class, CatalystActivityModel,
               new BeanSerializerFactory(CatalystActivity.class, CatalystActivityModel),
               new BeanDeserializerFactory(CatalystActivity.class, CatalystActivityModel));
-        QName ComplexModel= new QName("http://www.reactome.org/caBIOWebApp/schema", 
+        QName ComplexModel= new QName(SCHEMA_NAMESPACE_URI, 
                                       "Complex");
         call.registerTypeMapping(Complex.class, ComplexModel,
               new BeanSerializerFactory(Complex.class, ComplexModel),
               new BeanDeserializerFactory(Complex.class, ComplexModel));
-        QName DatabaseCrossReferenceModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "DatabaseCrossReference");
+        QName DatabaseCrossReferenceModel= new QName(SCHEMA_NAMESPACE_URI, "DatabaseCrossReference");
         call.registerTypeMapping(DatabaseCrossReference.class, DatabaseCrossReferenceModel,
               new BeanSerializerFactory(DatabaseCrossReference.class, DatabaseCrossReferenceModel),
               new BeanDeserializerFactory(DatabaseCrossReference.class, DatabaseCrossReferenceModel));
-        QName EventModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Event");
+        QName EventModel= new QName(SCHEMA_NAMESPACE_URI, "Event");
         call.registerTypeMapping(Event.class, EventModel,
               new BeanSerializerFactory(Event.class, EventModel),
               new BeanDeserializerFactory(Event.class, EventModel));
-        QName EventEntityModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "EventEntity");
+        QName EventEntityModel= new QName(SCHEMA_NAMESPACE_URI, "EventEntity");
         call.registerTypeMapping(EventEntity.class, EventEntityModel,
               new BeanSerializerFactory(EventEntity.class, EventEntityModel),
               new BeanDeserializerFactory(EventEntity.class, EventEntityModel));
-        QName EventEntitySetModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "EventEntitySet");
+        QName EventEntitySetModel= new QName(SCHEMA_NAMESPACE_URI, "EventEntitySet");
         call.registerTypeMapping(EventEntitySet.class, EventEntitySetModel,
               new BeanSerializerFactory(EventEntitySet.class, EventEntitySetModel),
               new BeanDeserializerFactory(EventEntitySet.class, EventEntitySetModel));
-        QName GeneOntologyModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "GeneOntology");
+        QName GeneOntologyModel= new QName(SCHEMA_NAMESPACE_URI, "GeneOntology");
         call.registerTypeMapping(GeneOntology.class, GeneOntologyModel,
               new BeanSerializerFactory(GeneOntology.class, GeneOntologyModel),
               new BeanDeserializerFactory(GeneOntology.class, GeneOntologyModel));
-        QName GeneOntologyRelationshipModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "GeneOntologyRelationship");
+        QName GeneOntologyRelationshipModel= new QName(SCHEMA_NAMESPACE_URI, "GeneOntologyRelationship");
         call.registerTypeMapping(GeneOntologyRelationship.class, GeneOntologyRelationshipModel,
               new BeanSerializerFactory(GeneOntologyRelationship.class, GeneOntologyRelationshipModel),
               new BeanDeserializerFactory(GeneOntologyRelationship.class, GeneOntologyRelationshipModel));
-        QName GenomeEncodedEntityModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "GenomeEncodedEntity");
+        QName GenomeEncodedEntityModel= new QName(SCHEMA_NAMESPACE_URI, "GenomeEncodedEntity");
         call.registerTypeMapping(GenomeEncodedEntity.class, GenomeEncodedEntityModel,
               new BeanSerializerFactory(GenomeEncodedEntity.class, GenomeEncodedEntityModel),
               new BeanDeserializerFactory(GenomeEncodedEntity.class, GenomeEncodedEntityModel));
-        QName ModifiedResidueModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ModifiedResidue");
+        QName ModifiedResidueModel= new QName(SCHEMA_NAMESPACE_URI, "ModifiedResidue");
         call.registerTypeMapping(ModifiedResidue.class, ModifiedResidueModel,
               new BeanSerializerFactory(ModifiedResidue.class, ModifiedResidueModel),
               new BeanDeserializerFactory(ModifiedResidue.class, ModifiedResidueModel));
-        QName PathwayModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Pathway");
+        QName PathwayModel= new QName(SCHEMA_NAMESPACE_URI, "Pathway");
         call.registerTypeMapping(Pathway.class, PathwayModel,
               new BeanSerializerFactory(Pathway.class, PathwayModel),
               new BeanDeserializerFactory(Pathway.class, PathwayModel));
-        QName PolymerModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Polymer");
+        QName PolymerModel= new QName(SCHEMA_NAMESPACE_URI, "Polymer");
         call.registerTypeMapping(Polymer.class, PolymerModel,
               new BeanSerializerFactory(Polymer.class, PolymerModel),
               new BeanDeserializerFactory(Polymer.class, PolymerModel));
-        QName PublicationSourceModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "PublicationSource");
+        QName PublicationSourceModel= new QName(SCHEMA_NAMESPACE_URI, "PublicationSource");
         call.registerTypeMapping(PublicationSource.class, PublicationSourceModel,
               new BeanSerializerFactory(PublicationSource.class, PublicationSourceModel),
               new BeanDeserializerFactory(PublicationSource.class, PublicationSourceModel));
-        QName ReactionModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Reaction");
+        QName ReactionModel= new QName(SCHEMA_NAMESPACE_URI, "Reaction");
         call.registerTypeMapping(Reaction.class, ReactionModel,
               new BeanSerializerFactory(Reaction.class, ReactionModel),
               new BeanDeserializerFactory(Reaction.class, ReactionModel));
-        QName ReferenceChemicalModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceChemical");
+        QName ReferenceChemicalModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceChemical");
         call.registerTypeMapping(ReferenceChemical.class, ReferenceChemicalModel,
               new BeanSerializerFactory(ReferenceChemical.class, ReferenceChemicalModel),
               new BeanDeserializerFactory(ReferenceChemical.class, ReferenceChemicalModel));
-        QName ReferenceEntityModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceEntity");
+        QName ReferenceEntityModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceEntity");
         call.registerTypeMapping(ReferenceEntity.class, ReferenceEntityModel,
               new BeanSerializerFactory(ReferenceEntity.class, ReferenceEntityModel),
               new BeanDeserializerFactory(ReferenceEntity.class, ReferenceEntityModel));
-        QName ReferenceGeneModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceGene");
+        QName ReferenceGeneModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceGene");
         call.registerTypeMapping(ReferenceGene.class, ReferenceGeneModel,
               new BeanSerializerFactory(ReferenceGene.class, ReferenceGeneModel),
               new BeanDeserializerFactory(ReferenceGene.class, ReferenceGeneModel));
-        QName ReferenceProteinModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceProtein");
+        QName ReferenceProteinModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceProtein");
         call.registerTypeMapping(ReferenceProtein.class, ReferenceProteinModel,
               new BeanSerializerFactory(ReferenceProtein.class, ReferenceProteinModel),
               new BeanDeserializerFactory(ReferenceProtein.class, ReferenceProteinModel));
-        QName ReferenceRNAModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceRNA");
+        QName ReferenceRNAModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceRNA");
         call.registerTypeMapping(ReferenceRNA.class, ReferenceRNAModel,
               new BeanSerializerFactory(ReferenceRNA.class, ReferenceRNAModel),
               new BeanDeserializerFactory(ReferenceRNA.class, ReferenceRNAModel));
-        QName ReferenceSequenceModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "ReferenceSequence");
+        QName ReferenceSequenceModel= new QName(SCHEMA_NAMESPACE_URI, "ReferenceSequence");
         call.registerTypeMapping(ReferenceSequence.class, ReferenceSequenceModel,
               new BeanSerializerFactory(ReferenceSequence.class, ReferenceSequenceModel),
               new BeanDeserializerFactory(ReferenceSequence.class, ReferenceSequenceModel));
-        QName RegulationModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Regulation");
+        QName RegulationModel= new QName(SCHEMA_NAMESPACE_URI, "Regulation");
         call.registerTypeMapping(Regulation.class, RegulationModel,
               new BeanSerializerFactory(Regulation.class, RegulationModel),
               new BeanDeserializerFactory(Regulation.class, RegulationModel));
-        QName RegulationTypeModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "RegulationType");
+        QName RegulationTypeModel= new QName(SCHEMA_NAMESPACE_URI, "RegulationType");
         call.registerTypeMapping(RegulationType.class, RegulationTypeModel,
               new EnumSerializerFactory(RegulationType.class, RegulationTypeModel),
               new EnumDeserializerFactory(RegulationType.class, RegulationTypeModel));
-        QName RegulatorModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Regulator");
+        QName RegulatorModel= new QName(SCHEMA_NAMESPACE_URI, "Regulator");
         call.registerTypeMapping(Regulator.class, RegulatorModel,
               new BeanSerializerFactory(Regulator.class, RegulatorModel),
               new BeanDeserializerFactory(Regulator.class, RegulatorModel));
-        QName SmallMoleculeEntityModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "SmallMoleculeEntity");
+        QName SmallMoleculeEntityModel= new QName(SCHEMA_NAMESPACE_URI, "SmallMoleculeEntity");
         call.registerTypeMapping(SmallMoleculeEntity.class, SmallMoleculeEntityModel,
               new BeanSerializerFactory(SmallMoleculeEntity.class, SmallMoleculeEntityModel),
               new BeanDeserializerFactory(SmallMoleculeEntity.class, SmallMoleculeEntityModel));
-        QName SummationModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Summation");
+        QName SummationModel= new QName(SCHEMA_NAMESPACE_URI, "Summation");
         call.registerTypeMapping(Summation.class, SummationModel,
               new BeanSerializerFactory(Summation.class, SummationModel),
               new BeanDeserializerFactory(Summation.class, SummationModel));
-        QName TaxonModel= new QName("http://www.reactome.org/caBIOWebApp/schema", "Taxon");
+        QName TaxonModel= new QName(SCHEMA_NAMESPACE_URI, "Taxon");
         call.registerTypeMapping(Taxon.class, TaxonModel,
               new BeanSerializerFactory(Taxon.class, TaxonModel),
               new BeanDeserializerFactory(Taxon.class, TaxonModel));
         QName arrayModel = new QName("http://www.reactome.org/caBIOWebApp/services/caBIOService", "ArrayOf_xsd_anyType");
-        QName componentModel = new QName("http://www.w3.org/2001/XMLSchema", "anyType");
+        QName componentModel = new QName(DEFAULT_SCHEMA_NAMESPACE_URI, "anyType");
         call.registerTypeMapping(Object[].class, arrayModel,
                 new ArraySerializerFactory(Object.class, componentModel),
-                new ArrayDeserializerFactory(componentModel));
-        arrayModel = new QName("http://www.reactome.org/caBIOWebApp/schema", "ArrayOfAnyType");
-        componentModel = new QName("http://www.w3.org/2001/XMLSchema", "anyType");
+                new ArrayDeserializerFactory( ));
+        arrayModel = new QName(SCHEMA_NAMESPACE_URI, "ArrayOfAnyType");
+        componentModel = new QName(DEFAULT_SCHEMA_NAMESPACE_URI, "anyType");
         call.registerTypeMapping(Object.class, arrayModel,
                 new ArraySerializerFactory(Object.class, componentModel),
-                new ArrayDeserializerFactory(componentModel));        
+                new ArrayDeserializerFactory( ));        
     }
 }
