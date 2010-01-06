@@ -385,8 +385,9 @@ public class CommonObsDao extends AbstractObrDao {
 			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(1, localOntologyID);
 			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(2, termName);
 			ResultSet rSet = this.executeSQLQuery(getLocalConceptIdByPrefNameAndOntologyIdStatement);
-			rSet.first();
-			localConceptID = rSet.getString(1);
+			if(rSet.first()){
+				localConceptID = rSet.getString(1);
+			} 
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {
