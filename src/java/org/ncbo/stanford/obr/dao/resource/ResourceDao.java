@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.dao.AbstractObrDao; 
+import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -275,7 +275,7 @@ public class ResourceDao extends AbstractObrDao {
 			queryb.append("UPDATE ");
 			queryb.append(this.getTableSQLName());
 			queryb.append(" SET dictionary_id= (SELECT MAX(dictionary_id) FROM ");
-			queryb.append(DirectAnnotationDao.name(resource.getResourceID()));
+			queryb.append(ElementDao.name(resource.getResourceID()));
 			queryb.append(" ) WHERE ");
 			queryb.append("resource_id= '");
 			queryb.append(resource.getResourceID());
