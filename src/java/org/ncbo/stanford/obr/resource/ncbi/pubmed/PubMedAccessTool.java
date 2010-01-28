@@ -77,22 +77,22 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	private static Structure PM_STRUCTURE = new Structure(PM_ITEMKEYS, PM_RESOURCEID, PM_WEIGHTS, PM_ONTOIDS);
 	private static String PM_MAIN_ITEMKEY = "title";
 	
-	// Absolute path for folder containing pubmed xml files  	
-	private static final String PM_FOLDER = "E:\\projects\\kajal\\OBR-OBS\\PubMed\\xml_files\\";
-	//private static final String PM_FOLDER = "/ncbodata/OBR/resources/PubMed/";
-	 
-	private static final String PM_FILE_PREFIX_2009 = "medline09n";
+	// Absolute path for folder containing pubmed xml files	
+	private static final String PM_FOLDER = "/ncbodata/OBR/resources/PubMed/";
+		
 	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
-	private static final int PM_MAX_XML_NUMBER_2009 = 593;
-	
+		
 	// Start processing xml file number
-    private static final int START_XML_NUMBER = 593; //555 
+    private static final int START_XML_NUMBER = 593; //556 
 	
     // End processing xml file number
 	private static final int END_XML_NUMBER = 593; //617
 	
-	// All the zip files available here
+	// All the zip files available here. (have to connect to VPN)
 	private String PM_ZIP_URL = "ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/";
+	
+	//following is the url to see the latest files available for the particular year
+	// http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
 	
 	// lingpipe parser
 	private static MedlineParser medlineParser = new MedlineParser(true);	 
@@ -409,7 +409,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 		
 		for (int i= fromNumber; i<=upToNumber; i++){
 			try{				
-				xmlFile = new File(PM_FOLDER + getFilePrefix(i) + this.numberString(i) + ".xml");
+				xmlFile = new File(PM_FOLDER + PM_FILE_PREFIX_2010 + this.numberString(i) + ".xml");
 				logger.info("Updating " + this.getToolResource().getResourceID() + " elements with XML file: " + xmlFile.getName());
 				dbLoader = new MedlineDbLoader(this);
 				//parse using lingpipe SAX XML parser
@@ -424,19 +424,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 		}
 		return nbElement;
 	}
-	/**
-	 * This method return particular file prefix for particular file
-	 * @param fileNumber
-	 * @return
-	 */
-	private String getFilePrefix(int fileNumber){
-		
-		String filePrefix = PM_FILE_PREFIX_2009; 
-		if(fileNumber>PM_MAX_XML_NUMBER_2009){
-			filePrefix = PM_FILE_PREFIX_2010;
-		}
-		return filePrefix;
-	}
+	
 	/**
 	 * This method create number String from given number.
 	 * 
