@@ -79,14 +79,14 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	//All Zip Files name
 	private static final String[] arraersZip  = new String[]{"ucm084155.zip", "ucm083998.zip", "ucm083854.zip", "ucm085815.zip",
 															"ucm085799.zip", "ucm085789.zip", "ucm085782.zip", "UCM150386.zip",
-															"UCM173889.zip","UCM186489.zip"};
+															"UCM173889.zip","UCM186489.zip","UCM197919.zip"};
 	//execute workflow for AERS RAT by passing 'arraersZip' array index one by one
 	private static final String[] aersZip	  =	new String[]{arraersZip[3]};// value for this variable varies by execution 
 	
 	//All extracts Data Files name
 	private static final String[] arraersExtract =	new String[]{"aers_sgml_2007q1","aers_sgml_2007q2","aers_sgml_2007q3","aers_sgml_2007q4",
 		 														"aers_sgml_2008q1","aers_sgml_2008q2","aers_sgml_2008q3","aers_sgml_2008q4",
-		 														"aers_sgml_2009q1","aers_sgml_2009q2"};
+		 														"aers_sgml_2009_q1","aers_sgml_2009_q2","aers_sgml_2009_q3"};
 	//execute workflow for AERS RAT by passing 'arraersExtract' array index one by one
 	private static final String[] aersExtract =	new String[]{arraersExtract[3]};// value for this variable varies by execution
 	
