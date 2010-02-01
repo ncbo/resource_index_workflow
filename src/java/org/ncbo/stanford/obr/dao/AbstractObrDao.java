@@ -91,7 +91,20 @@ public abstract class AbstractObrDao implements StringHelper{
 		}
 		this.openPreparedStatements();
 	}
-	
+	public AbstractObrDao(String tableName){		 
+		this.createConnection();		
+		this.tableSQLName = tableName;
+		if(!this.exist(this.getTableSQLName())){
+			try{
+				//logger.info(this.creationQuery());
+				this.executeSQLUpdate(this.creationQuery());
+			}
+			catch (SQLException e) {
+				logger.error("** PROBLEM ** Cannot create SQL table " + this.getTableSQLName(), e);
+			}
+		}
+		this.openPreparedStatements();
+	}
 	/**
 	 * For OBS tables.
 	 * 
