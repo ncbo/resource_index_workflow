@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import obs.obr.populate.Element; 
+import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.bioontology.biositemaps.api.BioSitemap;
@@ -90,7 +90,7 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(BSM_LOGO));
 			this.getToolResource().setResourceElementURL(BSM_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(BSM_DESCRIPTION);	 
 	} 

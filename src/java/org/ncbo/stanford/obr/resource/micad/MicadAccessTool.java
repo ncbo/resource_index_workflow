@@ -2,12 +2,12 @@ package org.ncbo.stanford.obr.resource.micad;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import obs.obr.populate.Element; 
+import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
-import java.util.ArrayList;
 
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
@@ -20,9 +20,7 @@ import org.ncbo.stanford.obr.resource.ResourceAccessTool;
  */
 
 public class MicadAccessTool extends ResourceAccessTool {
-	
-	String EMPTY_STRING = "";
-	
+	 
 	private static final String MICAD_URL         = "http://www.micad.nih.gov/";
 	private static final String MICAD_NAME        = "MICAD";
 	private static final String MICAD_RESOURCEID  = "MICAD";

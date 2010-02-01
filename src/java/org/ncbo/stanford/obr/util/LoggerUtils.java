@@ -1,10 +1,10 @@
 package org.ncbo.stanford.obr.util;
 
 import java.util.Enumeration;
- 
+
 import org.apache.log4j.Appender;
-import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
 
 /**
  * This utility class is used for creating log4j loggers.

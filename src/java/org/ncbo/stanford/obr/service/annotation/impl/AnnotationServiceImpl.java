@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
-import obs.common.beans.DictionaryBean; 
+import obs.common.beans.DictionaryBean;
 import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
-import org.ncbo.stanford.obr.dao.obs.CommonObsDao;
+import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
@@ -39,7 +39,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 			HashSet<String> stopwords) {
 		int nbAnnotation;
 		// gets the latest dictionary from OBS_DVT
-		DictionaryBean dictionary = commonObsDao.getLastDictionaryBean();
+		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
 
 		// processes direct mgrep annotations
 		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
@@ -69,18 +69,18 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		File dictionaryFile;
 		try {
 			if (withCompleteDictionary) {
-				dictionaryFile = new File(CommonObsDao
+				dictionaryFile = new File(DictionaryDao
 						.completeDictionaryFileName(dictionary));
 			} else {
-				dictionaryFile = new File(CommonObsDao
+				dictionaryFile = new File(DictionaryDao
 						.dictionaryFileName(dictionary));
 			}
 			if (dictionaryFile.createNewFile()) {
 				logger.info("Re-creation of the dictionaryFile...");
 				if (withCompleteDictionary) {
-					commonObsDao.writeDictionaryFile(dictionaryFile);
+					dictionaryDao.writeDictionaryFile(dictionaryFile);
 				} else {
-					commonObsDao.writeDictionaryFile(dictionaryFile, dictionary
+					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
 							.getDictionaryID());
 				}
 			}
@@ -230,8 +230,8 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
-				boolean isNewVersionOntlogy = commonObsDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
-				String localOntologyID = commonObsDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
+				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
+				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
 				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
 			}
 			

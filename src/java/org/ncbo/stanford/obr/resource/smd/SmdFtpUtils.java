@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * SmdFtpUtils is utility class for SMD FTP site
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author kyadav
  * @version $$
  */
-public class SmdFtpUtils {
+public class SmdFtpUtils implements StringHelper{
 
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(SmdFtpUtils.class);
@@ -44,7 +45,7 @@ public class SmdFtpUtils {
 	private static final String FTP_USERNAME = "anonymous";
 
 	// Default password for FTP site
-	private static final String FTP_PASSWORD = "";
+	private static final String FTP_PASSWORD = EMPTY_STRING;
 
 	// Meta data file name prefix.
 	private static final String META_FILE_PREFIX = "exptset_";

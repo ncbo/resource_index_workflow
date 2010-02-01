@@ -11,11 +11,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 /**
  * This class is used to access thr OMIM resource on the basis of a eUtils tool. 
@@ -54,7 +54,7 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(OMIM_LOGO));
 			this.getToolResource().setResourceElementURL(OMIM_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(OMIM_DESCRIPTION);
 	}

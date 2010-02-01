@@ -16,6 +16,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.pharmgkb.disease.GetPgkbDiseaseData;
 import org.ncbo.stanford.obr.resource.pharmgkb.gene.GetPgkbGeneData;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * This class enables to get pharmgkb data related to a drug
@@ -29,7 +30,7 @@ import org.ncbo.stanford.obr.resource.pharmgkb.gene.GetPgkbGeneData;
  *
  */
 
-public class GetPgkbDrugData {
+public class GetPgkbDrugData implements StringHelper{
 	
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetPgkbDrugData.class);
@@ -41,7 +42,7 @@ public class GetPgkbDrugData {
 	Hashtable<Integer, String>   attributeValues = new Hashtable<Integer, String>();
 	
 	Structure basicStructure = null;
-	String    resourceID = ""; 
+	String    resourceID = EMPTY_STRING; 
 	
 	//constructor
 	public GetPgkbDrugData(Resource myResource){	
@@ -105,9 +106,9 @@ public class GetPgkbDrugData {
 								attributeName   = dataMatcher.group(1);
 								attributeValues = new Hashtable<Integer, String>();
 								
-								if(!dataMatcher.group(2).equals("")){ // simple case in which we have atributeName: value on one line
+								if(!dataMatcher.group(2).equals(EMPTY_STRING)){ // simple case in which we have atributeName: value on one line
 									String value = null;
-									value = dataMatcher.group(2).replaceFirst(" ", "");
+									value = dataMatcher.group(2).replaceFirst(" ", EMPTY_STRING);
 									attributeValues.put(1, value);	
 								}else{
 									attributeNumber = 0;
@@ -136,7 +137,7 @@ public class GetPgkbDrugData {
 				// for each attribute
 				GetPgkbGeneData    myGeneExtractor    = new GetPgkbGeneData();
 				GetPgkbDiseaseData myDiseaseExtractor = new GetPgkbDiseaseData();
-				String attInString = "";
+				String attInString = EMPTY_STRING;
 				
 				for (String contextName: elementStructure.getContextNames()){
 					boolean attributeHasValue = false;
@@ -144,10 +145,10 @@ public class GetPgkbDrugData {
 						if (contextName.equals(this.resourceID+"_"+att)){
 							attributeHasValue = true;
 							// transform repetitive element (hashtables) in a string with > as a separator.
-							attInString = "";
+							attInString = EMPTY_STRING;
 							Hashtable<Integer, String> valueTable = drugAttribute.get(att);
 							for (Integer valueNb :valueTable.keySet()){
-								if (!attInString.equals("")){ // not the first of the list
+								if (!attInString.equals(EMPTY_STRING)){ // not the first of the list
 									// specific case of gene => we want to store gene symbol and not the PharmGKB localElementID
 									if(att.equals("drugRelatedGenes")){
 										attInString = attInString+"> "+myGeneExtractor.getGeneSymbolByGenePgkbLocalID(valueTable.get(valueNb));
@@ -183,7 +184,7 @@ public class GetPgkbDrugData {
 					}
 					// to avoid null value in the structure
 					if (!attributeHasValue){
-						elementStructure.putContext(contextName,"");
+						elementStructure.putContext(contextName,EMPTY_STRING);
 					}			
 				}
 				//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -199,13 +200,13 @@ public class GetPgkbDrugData {
 			myDrug = new Element(drugAccession, elementStructure);
 
 		}catch(BadElementStructureException e){
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		return myDrug;
 	}
 	
 	public String getDrugNameByDrugLocalID(String drugLocalID) {
-		String drugName = "";
+		String drugName = EMPTY_STRING;
 		
 		Runtime runtime = Runtime.getRuntime();
 		Process process = null;
@@ -227,7 +228,7 @@ public class GetPgkbDrugData {
 	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
 			
 			try {
-				drugName = ""; 				
+				drugName = EMPTY_STRING; 				
 				Pattern dataPattern  = Pattern.compile("^drugName: (.*)$");
 				
 				if(!lines.keySet().isEmpty()){

@@ -11,11 +11,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 /**
  * GeoAccessTool is responsible for getting data elements for 
@@ -89,7 +89,7 @@ public class GeoAccessTool extends AbstractNcbiResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(GEO_LOGO));
 			this.getToolResource().setResourceElementURL(GEO_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(GEO_DESCRIPTION);	 
 	}

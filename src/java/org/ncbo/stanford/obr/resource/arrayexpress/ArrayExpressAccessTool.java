@@ -45,7 +45,7 @@ public class ArrayExpressAccessTool extends AbstractXmlResourceAccessTool {
 			this.getToolResource().setResourceElementURL(AE_ELT_URL);
 		} 
 		catch (MalformedURLException e) {
-			logger.error("", e);			 
+			logger.error(EMPTY_STRING, e);			 
 		}
 		this.getToolResource().setResourceDescription(AE_DESCRIPTION);
 	}

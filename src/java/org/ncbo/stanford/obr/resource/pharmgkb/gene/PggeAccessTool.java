@@ -4,10 +4,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
  * extract genes from PharmGKB. 
@@ -38,7 +38,7 @@ public class PggeAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(PGGE_LOGO));
 			this.getToolResource().setResourceElementURL(PGGE_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(PGGE_DESCRIPTION);
 	}

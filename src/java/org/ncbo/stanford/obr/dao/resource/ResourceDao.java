@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao; 
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -42,7 +43,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 public class ResourceDao extends AbstractObrDao {
 
 	// Table suffix string
-	private static final String TABLE_SUFIX = "resource";
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.resource.table.suffix");
 
 	// Prepared statement for adding new entry.
 	private static PreparedStatement addEntryStatement;
@@ -61,7 +62,7 @@ public class ResourceDao extends AbstractObrDao {
 	 * Default constructor 
 	 */
 	private ResourceDao() {
-		super("", TABLE_SUFIX);
+		super(EMPTY_STRING, TABLE_SUFFIX);
 	}
 
 	@Override
@@ -101,15 +102,15 @@ public class ResourceDao extends AbstractObrDao {
 		hasEntryStatement.close();
 	}
 
-	private static class ResourceTableHolder {
-		private final static ResourceDao OBR_RT_INSTANCE = new ResourceDao();
+	private static class ResourceDaoHolder {
+		private final static ResourceDao RESOURCE_DAO_INSTANCE = new ResourceDao();
 	}
 
 	/**
 	 * Returns a ResourceDao object by creating one if a singleton not already exists.
 	 */
 	public static ResourceDao getInstance(){
-		return ResourceTableHolder.OBR_RT_INSTANCE;
+		return ResourceDaoHolder.RESOURCE_DAO_INSTANCE;
 	}
 
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 

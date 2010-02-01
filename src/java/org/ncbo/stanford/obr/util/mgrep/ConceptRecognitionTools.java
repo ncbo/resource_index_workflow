@@ -4,9 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import org.ncbo.stanford.obr.util.FileResourceParameters;
-
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 
 public class ConceptRecognitionTools {
 	

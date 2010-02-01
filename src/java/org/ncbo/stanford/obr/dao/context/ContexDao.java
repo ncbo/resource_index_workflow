@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao; 
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -28,13 +28,13 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  */
 public class ContexDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = MessageUtils.getMessage("obr.context.table.suffix");
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.context.table.suffix");
 
 	private static PreparedStatement addEntryStatement;
 	private static PreparedStatement getContextIDByContextNameStatement;
 	
 	private ContexDao() {
-		super("", TABLE_SUFIX);
+		super(EMPTY_STRING, TABLE_SUFFIX);		 
 	}
 
 	@Override
@@ -61,16 +61,16 @@ public class ContexDao extends AbstractObrDao {
 		getContextIDByContextNameStatement.close();
 	}
 
-	private static class ContextTableHolder {
-		private final static ContexDao OBR_CTX_INSTANCE = new ContexDao();
+	private static class ContexDaoHolder {
+		private final static ContexDao CONTEXT_DAO_INSTANCE = new ContexDao();
 	}
 
 	/**
 	 * Returns a ContexDao object by creating one if a singleton not already exists.
 	 */
 	public static ContexDao getInstance(){
-		return ContextTableHolder.OBR_CTX_INSTANCE;
-	}
+		return ContexDaoHolder.CONTEXT_DAO_INSTANCE;
+	} 
 
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
 	

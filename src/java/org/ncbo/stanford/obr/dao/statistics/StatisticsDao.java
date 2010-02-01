@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -35,7 +36,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  */
 public class StatisticsDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = "statistics";
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.statistics.table.suffix");
 
 	private static PreparedStatement addEntryStatement;
 	private static PreparedStatement getOntolgyIDsForResourceStatement;
@@ -44,7 +45,7 @@ public class StatisticsDao extends AbstractObrDao {
 	
 		
 	private StatisticsDao() {
-		super("", TABLE_SUFIX);
+		super(EMPTY_STRING, TABLE_SUFFIX);
 	}
 
 	@Override

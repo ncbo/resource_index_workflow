@@ -1,11 +1,13 @@
 package org.ncbo.stanford.obr.util;
 
+import org.ncbo.stanford.obr.util.helper.StringHelper;
+
 /**
  * 
  * @author Kuladip Yadav
  *
  */
-public class StringUtilities { 
+public class StringUtilities implements StringHelper { 
 	/**
 	 * Removes special characters before inserting the text in the DB. 
 	 */
@@ -22,7 +24,7 @@ public class StringUtilities {
 	public static String[] splitSecure(String string, String regexp){
 		String[] stringTab = string.split(regexp);
 		for (int i = 0; i<stringTab.length; i++){
-			if(stringTab[i]==null) stringTab[i]= "";
+			if(stringTab[i]==null) stringTab[i]=  EMPTY_STRING;
 		}
 		return stringTab;
 	}

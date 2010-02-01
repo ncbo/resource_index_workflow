@@ -5,10 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.util.FileResourceParameters;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 
 public class TestResourceAccessTool extends ResourceAccessTool {
 

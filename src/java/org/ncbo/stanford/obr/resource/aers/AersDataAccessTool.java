@@ -110,7 +110,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 			loadSafetyReportsSpecificatonProperities();			
 			
 		}catch (MalformedURLException e) {
-			logger.error("", e);			 
+			logger.error(EMPTY_STRING, e);			 
 		}
 		this.getToolResource().setResourceDescription(AERS_DESCRIPTION);
 	}

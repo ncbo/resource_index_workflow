@@ -11,11 +11,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class CddAccessTool extends AbstractNcbiResourceAccessTool{
 			this.getToolResource().setResourceElementURL(CDD_ELT_URL);
 			this.getToolResource().setResourceDescription(CDD_DESCRIPTION);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}		
 	}
 	

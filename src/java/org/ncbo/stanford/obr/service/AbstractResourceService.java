@@ -1,15 +1,15 @@
 package org.ncbo.stanford.obr.service;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.index.IndexDao;
-import org.ncbo.stanford.obr.dao.obs.CommonObsDao;
 import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
-public abstract class AbstractResourceService implements StringHelper{	
+public abstract class AbstractResourceService implements DaoFactory, StringHelper{	
 	
 	// Logger for AbstractResourceService 
 	protected static Logger logger = Logger.getLogger(AbstractResourceService.class);
@@ -20,11 +20,7 @@ public abstract class AbstractResourceService implements StringHelper{
 	protected static DirectAnnotationDao directAnnotationTableDao;
 	protected static ExpandedAnnotationDao expandedAnnotationTableDao;
 	protected static IndexDao indexTableDao;
-	
-	// OBS tables dao
-	protected static CommonObsDao commonObsDao = CommonObsDao.getInstance();
-	
-	 
+	  
 	public AbstractResourceService(ResourceAccessTool resourceAccessTool) {
 		super();
 		

@@ -40,7 +40,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  */
 public class ExpandedAnnotationDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = MessageUtils.getMessage("obr.expanded.annotation.table.suffix");
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.expanded.annotation.table.suffix");
 	
 	private PreparedStatement addEntryStatement; 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
@@ -50,14 +50,14 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * The suffix that will be added for AnnotationTable is "_EAT".
 	 */
 	public ExpandedAnnotationDao(String resourceID) {
-		super(resourceID, TABLE_SUFIX);
+		super(resourceID, TABLE_SUFFIX);
 	}
 
 	/**
 	 * Returns the SQL table name for a given resourceID 
 	 */
 	public static String name(String resourceID){
-		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFIX;
+		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFFIX;
 	}
 	
 	@Override

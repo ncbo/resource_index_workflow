@@ -15,11 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 
 /**

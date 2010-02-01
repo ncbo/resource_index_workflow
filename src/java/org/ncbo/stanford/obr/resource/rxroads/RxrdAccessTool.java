@@ -11,15 +11,14 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import obs.obr.populate.Element;
+import obs.obr.populate.Structure;
+import obs.obr.populate.Element.BadElementStructureException;
+
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.context.ContexDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.MessageUtils;
- 
-import obs.obr.populate.Element;
- 
-import obs.obr.populate.Structure;
-import obs.obr.populate.Element.BadElementStructureException;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 
@@ -73,7 +72,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceElementURL(RXRD_ELT_URL); 
 		}
 		catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(RXRD_DESCRIPTION);
 	}
@@ -222,7 +221,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 			//System.out.println(getElementDataStatement);
 			getElementDataStatement.setInt(1, localElementID);
 			ResultSet rSet = this.executeSQLQuery(getElementDataStatement);
-			//String summary = "";
+			//String summary = EMPTY_STRING;
 			
 			while(rSet.next()){
 				// extract data and
@@ -232,14 +231,14 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				if(rSet.getString(1)!=null){
 					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), rSet.getString(1));
 				}else{
-					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), "");
+					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), EMPTY_STRING);
 				}
 				/*
 				//summary				
 				if(rSet.getString(2)!=null){
-					summary = rSet.getString(2).replaceFirst("<br .>", "");
-					summary = summary.replaceFirst("^DESCRIPTION.*?:\\s*", "");
-					summary = summary.replaceFirst("^DESCRIPTION", "");
+					summary = rSet.getString(2).replaceFirst("<br .>", EMPTY_STRING);
+					summary = summary.replaceFirst("^DESCRIPTION.*?:\\s*", EMPTY_STRING);
+					summary = summary.replaceFirst("^DESCRIPTION", EMPTY_STRING);
 					summary = summary.replaceAll("\\s{2,}", "\\s");					
 				}
 				elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[1]), summary);
@@ -249,7 +248,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				if(rSet.getString(2)!=null){
 					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[1]), rSet.getString(2));					
 				}else{
-					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[1]), "");
+					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[1]), EMPTY_STRING);
 				}
 							
 				// granting organisation
@@ -257,7 +256,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				if(rSet.getString(4)!=null){
 					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[3]), rSet.getString(4));	
 				}else{
-					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[3]), "");	
+					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[3]), EMPTY_STRING);	
 				}			
 				*/					
 			}
@@ -272,9 +271,9 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		}
 		// insert the new filled structure in a new element
 		try{
-			myElement = new Element(localElementID+"", elementStructure);
+			myElement = new Element(localElementID+EMPTY_STRING, elementStructure);
 		}catch(BadElementStructureException e){
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		return myElement;
 	}

@@ -3,10 +3,9 @@ package org.ncbo.stanford.obr.dao.obs.map;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 /**
@@ -20,17 +19,28 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class MapDao extends AbstractObrDao{
-
-	private static ConceptDao conceptDao = ConceptDao.getInstance();
-	private static OntologyDao ontologyDao = OntologyDao.getInstance();
-
+public class MapDao extends AbstractObsDao{
+	
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.map.table.suffix");
+ 
 	private PreparedStatement addEntryStatement;
 
-	protected MapDao() {
-		super(ObsSchemaEnum.MAPPING_TABLE.getTableSQLName());
+	private MapDao() {
+		super(TABLE_SUFFIX);
 
 	}
+	
+	private static class MapDaoHolder {
+		private final static MapDao MAP_DAO_INSTANCE = new MapDao();
+	}
+
+	/**
+	 * Returns a ConceptTable object by creating one if a singleton not already exists.
+	 */
+	public static MapDao getInstance(){
+		return MapDaoHolder.MAP_DAO_INSTANCE;
+	}
+	
 	public static String name(String resourceID){		
 		return ObsSchemaEnum.MAPPING_TABLE.getTableSQLName();
 	}
@@ -61,7 +71,7 @@ public class MapDao extends AbstractObrDao{
 		"concept_id INT(11) NOT NULL, " +
 		"mapped_concept_id INT(11) NOT NULL, " +
 		"mapping_type VARCHAR(246) NOT NULL, " +
-		//"UNIQUE (localConceptID, mappedLocalConceptID, mappingType), " +
+		"UNIQUE (concept_id, mapped_concept_id ), " +
 		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +

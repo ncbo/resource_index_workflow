@@ -3,11 +3,11 @@ package org.ncbo.stanford.obr.service.resource;
 import java.io.File;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.exception.ResourceFileException;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.exception.ResourceFileException;
 
 /**
  * @author Kuladip Yadav

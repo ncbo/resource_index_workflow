@@ -124,7 +124,7 @@ public abstract class AbstractXmlResourceAccessTool extends ResourceAccessTool {
 	}
 	
 	protected static String evaluateAsString(String expression, Node node){
-		String s = "";
+		String s = EMPTY_STRING;
 		try {
 			toolXpath.reset();
 			s = (String)toolXpath.evaluate(expression, node, javax.xml.xpath.XPathConstants.STRING);

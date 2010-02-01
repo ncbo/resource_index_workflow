@@ -87,7 +87,7 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(GAP_LOGO));
 			this.getToolResource().setResourceElementURL(GAP_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(GAP_DESCRIPTION);	 
 	}

@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * <p>
@@ -87,7 +88,7 @@ public class Messages {
 	 * <code>MessageFormat</code> used to perform parameter substitution.
 	 * </p>
 	 */
-	private MessageFormat format = new MessageFormat("");
+	private MessageFormat format = new MessageFormat(StringHelper.EMPTY_STRING);
 
 	/**
 	 * <p>

@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 
 /**
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  *
  */
 
-public class GetPgkbGeneList {
+public class GetPgkbGeneList implements StringHelper{
 	
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetPgkbGeneList.class);
@@ -50,7 +51,7 @@ public class GetPgkbGeneList {
 			//InputStream results = process.getInputStream();
 
 			BufferedReader resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String resultLine = "";
+			String resultLine = EMPTY_STRING;
 			try {
 				Pattern genePattern = Pattern.compile("^(PA\\d*), Gene, (.*), ([0-1]{1}), ([0-1]{1}), ([0-1]{1}), .*$");				
 				while((resultLine = resultReader.readLine()) != null) {
@@ -83,7 +84,7 @@ public class GetPgkbGeneList {
 				resultReader.close();
 			}
 			BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			// String line2 = "";
+			// String line2 = EMPTY_STRING;
 			try {
 				//while((line2 = reader2.readLine()) != null) {
 					// process
@@ -93,7 +94,7 @@ public class GetPgkbGeneList {
 				errorReader.close();
 			}
 		} catch(IOException ioe) {
-			logger.error("", ioe);
+			logger.error(EMPTY_STRING, ioe);
 		}
 		// GET GENE WITH pharmacodynamic significance
 		try {
@@ -101,7 +102,7 @@ public class GetPgkbGeneList {
 			//InputStream results = process.getInputStream();
 
 			BufferedReader resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String resultLine = "";
+			String resultLine = EMPTY_STRING;
 			try {
 				Pattern genePattern = Pattern.compile("^(PA\\d*), Gene, (.*), ([0-1]{1}), ([0-1]{1}), ([0-1]{1}), .*$");				
 				while((resultLine = resultReader.readLine()) != null) {
@@ -134,7 +135,7 @@ public class GetPgkbGeneList {
 				resultReader.close();
 			}
 			BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			// String line2 = "";
+			// String line2 = EMPTY_STRING;
 			try {
 				//while((line2 = reader2.readLine()) != null) {
 					// process
@@ -144,7 +145,7 @@ public class GetPgkbGeneList {
 				errorReader.close();
 			}
 		} catch(IOException ioe) {
-			logger.error("", ioe);
+			logger.error(EMPTY_STRING, ioe);
 		}
 		return geneList;
 	}

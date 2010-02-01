@@ -12,11 +12,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
-import obs.obr.populate.Element; 
+import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
  * SmdAccessTool is responsible for getting data elements for 
@@ -104,7 +104,7 @@ public class SmdAccessTool extends  ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(SMD_LOGO));
 			this.getToolResource().setResourceElementURL(SMD_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(SMD_DESCRIPTION);	 
 	}
@@ -349,7 +349,7 @@ public class SmdAccessTool extends  ResourceAccessTool {
 			resultReader.close(); 
 			
 		}catch (Exception e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		return organismMap;
 	}
@@ -366,7 +366,7 @@ public class SmdAccessTool extends  ResourceAccessTool {
 		try {
 			process = runtime.exec(command);
 		}catch (Exception e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		return process;
 	}

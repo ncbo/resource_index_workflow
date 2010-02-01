@@ -5,10 +5,11 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+
 import edu.wustl.utill.CaNanoLabContextDetail;
 import edu.wustl.utill.CaNanoLabUtility;
 import gov.nih.nci.cananolab.domain.particle.NanoparticleSample;

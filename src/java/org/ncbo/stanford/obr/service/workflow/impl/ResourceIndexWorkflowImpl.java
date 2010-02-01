@@ -3,10 +3,10 @@ package org.ncbo.stanford.obr.service.workflow.impl;
 import obs.common.beans.IsaContextBean;
 import obs.common.beans.MappingContextBean;
 import obs.common.beans.MgrepContextBean;
-import obs.common.beans.ReportedContextBean; 
-import obs.common.utils.ExecutionTimer; 
+import obs.common.beans.ReportedContextBean;
+import obs.common.utils.ExecutionTimer;
 import obs.common.utils.Utilities;
-import obs.obr.populate.ObrWeight; 
+import obs.obr.populate.ObrWeight;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
@@ -15,6 +15,7 @@ import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.LoggerUtils;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * 
@@ -55,7 +56,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow {
 				tool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();
-				logger.info("");
+				logger.info(StringHelper.EMPTY_STRING);
 				logger.info("Start processing Resource " + tool.getToolResource().getResourceName() + "....");
 				timer.start();
 				resourceProcessing(tool);

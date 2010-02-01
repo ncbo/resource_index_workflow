@@ -1,18 +1,19 @@
 package org.ncbo.stanford.obr.resource.micad;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
-import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
-//import obs.common.utils.LoggerUtils;
-//import org.apache.log4j.Logger;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 
-public class MicadReadWeb {
+import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
+
+public class MicadReadWeb implements StringHelper {
 	
 	protected static Logger logger = Logger.getLogger(MicadReadWeb.class);
 
@@ -51,7 +52,7 @@ public class MicadReadWeb {
 	//attributes	
 	Resource  resource       = null;
 	Structure basicStructure = null;
-	String    resourceID     = "";
+	String    resourceID     = EMPTY_STRING;
 	ResourceAccessTool tool  = null;
 		
 	//constructor
@@ -235,9 +236,9 @@ public class MicadReadWeb {
 		{
 			if(parts[i]!=null)
 			{
-				parts[i]=parts[i].replaceAll("\\<.*?>","");
-				parts[i]=parts[i].replace("[PubMed]","");
-				parts[i]=parts[i].replace("/div>","");
+				parts[i]=parts[i].replaceAll("\\<.*?>", EMPTY_STRING);
+				parts[i]=parts[i].replace("[PubMed]", EMPTY_STRING);
+				parts[i]=parts[i].replace("/div>", EMPTY_STRING);
 			}
 		}
 		

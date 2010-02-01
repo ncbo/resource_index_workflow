@@ -47,7 +47,7 @@ public class ClinicalTrialsAccessTool extends AbstractXmlResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(CT_LOGO));
 			this.getToolResource().setResourceElementURL(CT_ELT_URL);
 		}catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		
 		this.getToolResource().setResourceDescription(CT_DESCRIPTION);

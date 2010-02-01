@@ -1,10 +1,12 @@
 package org.ncbo.stanford.obr.dao.obs.ontology;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -24,14 +26,31 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class OntologyDao extends AbstractObrDao{
+public class OntologyDao extends AbstractObsDao{
+	
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.ontology.table.suffix");
 
 	private PreparedStatement addEntryStatement;	
-	
-	protected OntologyDao() {		
-		super(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
-	}
+	private static PreparedStatement getLatestLocalOntologyIDStatement;
+	private static PreparedStatement hasNewVersionOfOntologyStatement;
+	private static PreparedStatement getLocalConceptIdByPrefNameAndOntologyIdStatement;
 
+	
+	private OntologyDao() {		
+		super(TABLE_SUFFIX);
+	} 
+	
+	private static class OntologyDaoHolder {
+		private final static OntologyDao ONTOLOGY_DAO_INSTANCE = new OntologyDao();
+	}
+	
+	/**
+	 * Returns a OntologyTable object by creating one if a singleton not already exists.
+	 */
+	public static OntologyDao getInstance(){
+		return OntologyDaoHolder.ONTOLOGY_DAO_INSTANCE;
+	}
+	
 	public static String name(String resourceID){		
 		return ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName();
 	}
@@ -46,15 +65,20 @@ public class OntologyDao extends AbstractObrDao{
 		"description VARCHAR(246) NOT NULL, " +
 		"status INT(11) NOT NULL, " +
 		"virtual_ontology_id VARCHAR(246) NOT NULL, " +
-		"format VARCHAR(32) DEFAULT NULL, "+		
-		"INDEX X_" + this.getTableSQLName() + "_virtualOntologyID (virtual_ontology_id)" +
+		"format VARCHAR(32) DEFAULT NULL, "+
+		"dictionary_id SMALLINT NOT NULL, " +
+		"INDEX X_" + this.getTableSQLName() + "_virtualOntologyID (virtual_ontology_id), " +
+		"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName() + "(id)" +
 		");";
 	}
 	
 	@Override
 	protected void openPreparedStatements() {
 		super.openPreparedStatements();
-		this.openAddEntryStatement();		
+		this.openAddEntryStatement();	
+		this.openGetLatestLocalOntologyIDStatement();
+		this.openHasNewVersionOfOntologyStatement();
+		this.openGetLocalConceptIdByPrefNameAndOntologyId();
 	}
 	
 	@Override
@@ -99,6 +123,138 @@ public class OntologyDao extends AbstractObrDao{
 		}
 		return inserted;	
 	}
+	
+	/**************************Methos on ontology Table***************************************/
+
+	/**
+	 * 
+	 */
+	private void openGetLatestLocalOntologyIDStatement() {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_ontology_id FROM ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" where virtual_ontology_id= ? order by id DESC;");
+		 
+		getLatestLocalOntologyIDStatement = this.prepareSQLStatement(queryb.toString());		
+	}
+	
+	/**
+	 * @param virtualOntologyID
+	 * @return
+	 */
+	public String getLatestLocalOntologyID(String virtualOntologyID) {
+		String localOntologyID= null;
+		try {
+			ResultSet rSet;			 
+			getLatestLocalOntologyIDStatement.setString(1, virtualOntologyID);
+			rSet = this.executeSQLQuery(getLatestLocalOntologyIDStatement);
+			 
+			if(rSet.first()){
+				localOntologyID=rSet.getString(1); 
+			} 
+			
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetLatestLocalOntologyIDStatement();
+			 
+			return this.getLatestLocalOntologyID(virtualOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get local ontology ID for "+virtualOntologyID+". Empty set returned.", e);
+		}
+		return localOntologyID;
+	}
+	
+	private void openHasNewVersionOfOntologyStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT DISTINCT local_ontology_id, dictionary_id FROM ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" OT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" CT, ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(" TT WHERE TT.concept_id = CT.id AND  CT.ontology_id=OT.id");
+		queryb.append(" AND OT.virtual_ontology_id= ? order BY OT.id DESC;");
+		 
+		hasNewVersionOfOntologyStatement = this.prepareSQLStatement(queryb.toString());	
+	}
+
+	/**
+	 * Check the new version for given virtualOntologyID present which is not processed(not annotated )
+	 * by given resourceID.
+	 * 
+	 * @param ontoID
+	 * @param resourceID
+	 * @return
+	 */
+	public boolean hasNewVersionOfOntology(String virtualOntologyID, String resourceID) {
+	 
+		int dictionaryID= 0;
+		try {
+			ResultSet rSet;			 
+			hasNewVersionOfOntologyStatement.setString(1, virtualOntologyID);
+			rSet = this.executeSQLQuery(hasNewVersionOfOntologyStatement);
+			 
+			if(rSet.first()){				 
+				dictionaryID = rSet.getInt(2);
+			} 
+			rSet.close();
+			 
+			if(dictionaryID >0){
+				if(dictionaryID > resourceTableDao.getDictionaryID(resourceID)){
+					return true;
+				}
+			} 
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openHasNewVersionOfOntologyStatement();
+			 
+			return this.hasNewVersionOfOntology(virtualOntologyID, resourceID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get local ontology ID for "+virtualOntologyID+". Empty set returned.", e);
+		}
+		return false;
+	
+	}
+
+	private void openGetLocalConceptIdByPrefNameAndOntologyId(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_concept_id ");
+		queryb.append("FROM ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(" TT, ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(" CT, ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" OT WHERE TT.concept_id= CT.id AND CT.ontology_id=OT.id AND ");
+		queryb.append("TT.is_preferred=true AND OT.local_ontology_id=? AND TT.name=?;");		 
+		getLocalConceptIdByPrefNameAndOntologyIdStatement = this.prepareSQLStatement(queryb.toString());
+	}
+
+	public String getLocalConceptIdByPrefNameAndOntologyId(String localOntologyID, String termName){
+		String localConceptID = EMPTY_STRING;
+		try {
+			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(1, localOntologyID);
+			getLocalConceptIdByPrefNameAndOntologyIdStatement.setString(2, termName);
+			ResultSet rSet = this.executeSQLQuery(getLocalConceptIdByPrefNameAndOntologyIdStatement);
+			if(rSet.first()){
+				localConceptID = rSet.getString(1);
+			} 
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetLocalConceptIdByPrefNameAndOntologyId();
+			return this.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID,termName);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get localConceptID from "+this.getTableSQLName()+" for localConceptID: "+ localConceptID +" and termName: "+termName+". EmptySet returned.", e);
+		}
+		return localConceptID;
+	}
+	
+	
 	public static class OntologyEntry{
 
 		private int id;
@@ -200,15 +356,5 @@ public class OntologyDao extends AbstractObrDao{
 			return sb.toString();
 		}
 	}
-	private static class OntologyTableHolder {
-		private final static OntologyDao OBS_ONTOLOGY_INSTANCE = new OntologyDao();
-	}
-	
-	/**
-	 * Returns a OntologyTable object by creating one if a singleton not already exists.
-	 */
-	public static OntologyDao getInstance(){
-		return OntologyTableHolder.OBS_ONTOLOGY_INSTANCE;
-	}
-	
+	 
 }

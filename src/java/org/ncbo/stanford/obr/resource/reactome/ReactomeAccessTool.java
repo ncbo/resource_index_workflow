@@ -5,10 +5,10 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
  * extract reaction and pathway from Reactome. 
@@ -45,7 +45,7 @@ public class ReactomeAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(REAC_LOGO));
 			this.getToolResource().setResourceElementURL(REAC_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 	}
 

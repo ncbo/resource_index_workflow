@@ -3,9 +3,8 @@ package org.ncbo.stanford.obr.dao.obs.concept;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -20,17 +19,29 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class ConceptDao extends AbstractObrDao{
+public class ConceptDao extends AbstractObsDao {
+	
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.concept.table.suffix");
 		
-	private static OntologyDao ontologyDao = OntologyDao.getInstance();
 	private PreparedStatement addEntryStatement;
 	
-	protected ConceptDao() {
-		super(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+	private ConceptDao() {
+		super(TABLE_SUFFIX);
 
 	}
 	public static String name(String resourceID){		
-		return ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName();
+		return OBS_PREFIX + TABLE_SUFFIX;
+	}
+	
+	private static class ConceptDaoHolder {
+		private final static ConceptDao CONCEPT_DAO_INSTANCE = new ConceptDao();
+	}
+
+	/**
+	 * Returns a ConceptTable object by creating one if a singleton not already exists.
+	 */
+	public static ConceptDao getInstance(){
+		return ConceptDaoHolder.CONCEPT_DAO_INSTANCE;
 	}
 	
 	@Override
@@ -39,7 +50,7 @@ public class ConceptDao extends AbstractObrDao{
 		"id INT(11) NOT NULL PRIMARY KEY, " +		
 		"local_concept_id VARCHAR(246) NOT NULL UNIQUE, " +
 		"ontology_id INT(11) NOT NULL, " +
-		"is_toplevel TINY NOT NULL, " +
+		"is_toplevel BOOL NOT NULL, " +
 		"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"INDEX X_" + this.getTableSQLName() +"_isTopLevel (is_toplevel)" +
 	");";
@@ -55,6 +66,7 @@ public class ConceptDao extends AbstractObrDao{
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		
 	}
+	
 	@Override
 	protected void openAddEntryStatement(){
 		StringBuffer queryb = new StringBuffer();
@@ -63,6 +75,7 @@ public class ConceptDao extends AbstractObrDao{
 		queryb.append(" (id, local_concept_id, ontology_id, is_toplevel) VALUES (?,?,?,?);");
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
+		
 	public boolean addEntry(ConceptEntry entry){
 		boolean inserted = false;
 		try {
@@ -86,6 +99,7 @@ public class ConceptDao extends AbstractObrDao{
 		}
 		return inserted;	
 	}
+	
 	public static class ConceptEntry{
 		
 		private int id;
@@ -138,15 +152,5 @@ public class ConceptDao extends AbstractObrDao{
 			sb.append("]");
 			return sb.toString();
 		}		
-	}	
-	private static class ConceptTableHolder {
-		private final static ConceptDao OBS_CONCEPT_INSTANCE = new ConceptDao();
-	}
-
-	/**
-	 * Returns a ConceptTable object by creating one if a singleton not already exists.
-	 */
-	public static ConceptDao getInstance(){
-		return ConceptTableHolder.OBS_CONCEPT_INSTANCE;
-	}
+	}	 
 }

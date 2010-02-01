@@ -11,6 +11,7 @@ import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 
 public class MicadReadCsv {
@@ -29,7 +30,7 @@ public class MicadReadCsv {
 	//attributes	
 	Resource  resource       = null;
 	Structure basicStructure = null;
-	String    resourceID     = "";
+	String    resourceID     = StringHelper.EMPTY_STRING;
 	ResourceAccessTool tool  = null;
 		
 	//constructor

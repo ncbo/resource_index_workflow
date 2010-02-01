@@ -14,6 +14,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * This class main task is to fetch contextKeys values from context and create a element.
@@ -59,7 +60,7 @@ public class GetCananoLabData {
 
                 String val = nanoData.get(weight);
                 if (val == null) {
-                    val = "";
+                    val = StringHelper.EMPTY_STRING;
                 }
 
                 if (contextName.equals("CANANO_Sample")) {

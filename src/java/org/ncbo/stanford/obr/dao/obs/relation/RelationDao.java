@@ -3,10 +3,9 @@ package org.ncbo.stanford.obr.dao.obs.relation;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 /**
@@ -20,17 +19,28 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class RelationDao extends AbstractObrDao{
-
-	private static ConceptDao conceptDao = ConceptDao.getInstance();
-	private static OntologyDao ontologyDao = OntologyDao.getInstance();
-
+public class RelationDao extends AbstractObsDao{
+  
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.relation.table.suffix");
+	
 	private PreparedStatement addEntryStatement;
 
-	protected RelationDao() {
-		super(ObsSchemaEnum.IS_A_PARENT_TABLE.getTableSQLName());
+	private RelationDao() {
+		super(TABLE_SUFFIX);
 
 	}
+	
+	private static class RelationDaoHolder {
+		private final static RelationDao RELATION_DAO_INSTANCE = new RelationDao();
+	}
+
+	/**
+	 * Returns a ConceptTable object by creating one if a singleton not already exists.
+	 */
+	public static RelationDao getInstance(){
+		return RelationDaoHolder.RELATION_DAO_INSTANCE;
+	}
+	
 	public static String name(String resourceID){		
 		return ObsSchemaEnum.IS_A_PARENT_TABLE.getTableSQLName();
 	}

@@ -159,7 +159,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 		for (String term : termsArray) {
 			try {
-				concepts.addAll(commonObsDao.mapStringToLocalConceptIDs(term.trim(),localOntologyID));
+				concepts.addAll(termDao.mapStringToLocalConceptIDs(term.trim(),localOntologyID));
 			} catch (Exception e) {				 
 				logger.error("** PROBLEM ** Non Valid Local Ontology ID "+ localOntologyID, e );
 			}
@@ -195,7 +195,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 		for (String term : terms) {
 			try {
-				concepts.addAll(commonObsDao.mapStringToLocalConceptIDs(term.trim(),localOntologyID));
+				concepts.addAll(termDao.mapStringToLocalConceptIDs(term.trim(),localOntologyID));
 			} catch (Exception e) {				 
 				logger.error("** PROBLEM ** Non Valid Local Ontology ID "+ localOntologyID );
 			}
@@ -221,7 +221,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public String mapTermsToVirtualLocalConceptIDs(String terms,
 			String virtualOntologyID, String splitString) {
-		String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+		String localOntologyID= ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
 		
 		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID, splitString );
 		 
@@ -233,7 +233,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#mapTermsToVirtualLocalConceptIDs(java.util.HashSet, java.lang.String, java.lang.String)
 	 */
 	public String mapTermsToVirtualLocalConceptIDs(java.util.HashSet<String> terms, String virtualOntologyID ) {
-		String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+		String localOntologyID= ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
 		
 		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID);
 		 
@@ -247,9 +247,9 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLocalConceptIdByPrefNameAndOntologyId(java.lang.String, java.lang.String)
 	 */
 	public String getLocalConceptIdByPrefNameAndOntologyId(String virtualOntologyID, String termName){
-	   String localOntologyID= commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+	   String localOntologyID= ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
 	   
-	   return commonObsDao.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID, termName);
+	   return ontologyDao.getLocalConceptIdByPrefNameAndOntologyId(localOntologyID, termName);
 	}
 	
 	
@@ -350,6 +350,6 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLatestLocalOntologyID(java.lang.String)
 	 */
 	public String getLatestLocalOntologyID(String virtualOntologyID) {
-		return commonObsDao.getLatestLocalOntologyID(virtualOntologyID );
+		return ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
 	}
 }

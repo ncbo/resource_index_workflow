@@ -5,10 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
-import obs.common.files.FileParameters; 
+import obs.common.files.FileParameters;
 import obs.obr.populate.Structure;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 public class GoldminerAccessTool extends ResourceAccessTool {
 
@@ -33,7 +33,7 @@ public class GoldminerAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(GM_LOGO));
 			this.getToolResource().setResourceElementURL(GM_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(GM_DESCRIPTION);
 	}

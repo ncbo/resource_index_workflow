@@ -11,10 +11,10 @@ import java.util.HashSet;
 
 import javax.xml.rpc.ServiceException;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-  
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 public abstract class AbstractNcbiResourceAccessTool extends ResourceAccessTool {
 

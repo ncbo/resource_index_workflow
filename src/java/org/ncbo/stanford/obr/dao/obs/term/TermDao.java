@@ -1,12 +1,14 @@
 package org.ncbo.stanford.obr.dao.obs.term;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
+import org.ncbo.stanford.obr.util.StringUtilities;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 /**
@@ -20,18 +22,31 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class TermDao extends AbstractObrDao{
-
-	private static ConceptDao conceptDao = ConceptDao.getInstance();
-	private static OntologyDao ontologyDao = OntologyDao.getInstance();
-
+public class TermDao extends AbstractObsDao{
+	
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.term.table.suffix");
+ 
 	private PreparedStatement addEntryStatement;
+	private PreparedStatement exactMapStringToLocalConceptIDsStatement;
 
 
-	protected TermDao() {
-		super(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+	private TermDao() {
+		super(TABLE_SUFFIX);
 
 	}
+	
+	private static class TermDaoHolder {
+		private final static TermDao TERM_DAO_INSTANCE = new TermDao ();
+	}
+
+	/**
+	 * Returns a TermTable object by creating one if a singleton not already exists.
+	 */
+	public static TermDao getInstance(){
+		return TermDaoHolder.TERM_DAO_INSTANCE;
+	}
+
+	
 	public static String name(String resourceID){		
 		return ObsSchemaEnum.TERM_TABLE.getTableSQLName();
 	}
@@ -39,7 +54,8 @@ public class TermDao extends AbstractObrDao{
 	@Override
 	protected void openPreparedStatements() {
 		super.openPreparedStatements();
-		this.openAddEntryStatement();		
+		this.openAddEntryStatement();	
+		this.openExactMapStringToLocalConceptIDsStatement();		 
 	}
 
 	@Override
@@ -47,6 +63,7 @@ public class TermDao extends AbstractObrDao{
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		
 	}	
+
 	@Override
 	protected void openAddEntryStatement(){
 		StringBuffer queryb = new StringBuffer();
@@ -55,6 +72,7 @@ public class TermDao extends AbstractObrDao{
 		queryb.append(" (id, name, concept_id, is_preferred, dictionary_id) VALUES (?,?,?,?,?);");
 		addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
+	
 	@Override
 	protected String creationQuery() {
 		//need to change this query for dictionary_id
@@ -62,19 +80,18 @@ public class TermDao extends AbstractObrDao{
 		"id INT(11) NOT NULL PRIMARY KEY, " +
 		"name TEXT NOT NULL, " +
 		"concept_id INT(11) NOT NULL, " +
-		"is_preferred TINYINT(1) NOT NULL, " +
-		"dictionary_id INT(11) NOT NULL, " +
+		"is_preferred TINYINT(1) NOT NULL, " +		 
 		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"FOREIGN KEY (dictionary_id) REFERENCES " + ontologyDao.getTableSQLName() + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"INDEX X_" + getTableSQLName() +"_termName (name(255)), " +
 		"INDEX X_" + getTableSQLName() +"_isPreferred (is_preferred)" +
 		");";
 	}
+	
 	public boolean addEntry(TermEntry entry){
 		boolean inserted = false;
 		try {
 			addEntryStatement.setInt(1, entry.getId());
-			addEntryStatement.setString(2, AbstractObrDao.escapeLine(entry.getName()));
+			addEntryStatement.setString(2, StringUtilities.escapeLine(entry.getName()));
 			addEntryStatement.setString(3, entry.getConceptID());
 			addEntryStatement.setBoolean(4, entry.isPreferred());
 			addEntryStatement.setInt(5, entry.getDictionaryID());
@@ -91,6 +108,62 @@ public class TermDao extends AbstractObrDao{
 		}
 		return inserted;	
 	}
+	
+/******************* Term Table related query*********************/
+	
+	private void openExactMapStringToLocalConceptIDsStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append(mapStringQueries());
+		queryb.append(" AND ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(".name=? AND local_ontology_id=?;");
+		exactMapStringToLocalConceptIDsStatement = this.prepareSQLStatement(queryb.toString());
+	} 
+	
+	private String mapStringQueries(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_concept_id FROM ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(", ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(", ");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(" WHERE ");
+		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(".concept_id=");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(".id AND ");
+		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(".ontology_id=");
+		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(".id");
+		return queryb.toString();
+	}
+	
+	public HashSet<String> mapStringToLocalConceptIDs(String s, String localOntologyID){
+		HashSet<String> localConceptIDs = new HashSet<String>();
+		try {
+			ResultSet rSet;			 
+			exactMapStringToLocalConceptIDsStatement.setString(1, s);
+			exactMapStringToLocalConceptIDsStatement.setString(2, localOntologyID);
+			rSet = this.executeSQLQuery(exactMapStringToLocalConceptIDsStatement);
+			 
+			 
+			while(rSet.next()){
+				localConceptIDs.add(rSet.getString(1));
+			}
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openExactMapStringToLocalConceptIDsStatement();
+			 
+			return this.mapStringToLocalConceptIDs(s, localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get concepts from "+this.getTableSQLName()+" that map string: "+ s +" in ontology: "+localOntologyID+". Empty set returned.", e);
+		}
+		return localConceptIDs;
+	} 
 
 	public static class TermEntry{
 

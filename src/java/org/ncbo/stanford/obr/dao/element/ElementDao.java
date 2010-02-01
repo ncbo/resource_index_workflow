@@ -18,6 +18,7 @@ import obs.obr.populate.Structure;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
+import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -47,7 +48,7 @@ import com.mysql.jdbc.exceptions.MySQLSyntaxErrorException;
  */
 public class ElementDao extends AbstractObrDao {
 
-	private static final String TABLE_SUFIX = "_element";
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.element.table.suffix");
 	
 	private ArrayList<String> contextNames;
 	
@@ -60,7 +61,7 @@ public class ElementDao extends AbstractObrDao {
 	 * This constructor is used for the population and the update of the element tables (OBR_XX_ET)
 	 */	
 	public ElementDao(String resourceID, Structure structure) {
-		super(resourceID, TABLE_SUFIX);
+		super(resourceID, TABLE_SUFFIX);
 		this.contextNames = structure.getContextNames();
 		this.alterElementTable();
 		this.openAddEntryStatement();		 
@@ -70,7 +71,7 @@ public class ElementDao extends AbstractObrDao {
 	 * Returns the SQL table name for a given resourceID 
 	 */
 	public static String name(String resourceID){
-		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFIX;
+		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFFIX;
 	}
 	
 	@Override

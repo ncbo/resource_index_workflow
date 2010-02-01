@@ -3,6 +3,7 @@ package org.ncbo.stanford.obr.resource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+
 import obs.common.utils.Utilities;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;

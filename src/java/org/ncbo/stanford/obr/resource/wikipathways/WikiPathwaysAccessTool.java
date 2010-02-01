@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import obs.obr.populate.Element;
- 
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
@@ -73,7 +72,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(WP_LOGO));
 			this.getToolResource().setResourceElementURL(WP_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(WP_DESCRIPTION);	 
 	}

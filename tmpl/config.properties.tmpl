@@ -52,12 +52,13 @@ obr.expansion.distance=@obrexpansiondistance@
 ####################################################
 obs.schema.name=@obsschemaname@
 
-obs.ontology.table=obs_ontology
-obs.concept.table=obs_concept
-obs.dictionary.table=obs_dictionary
-obs.term.table=obs_term
-obs.map.table=obs_map
-obs.relation.table=obs_relation
+obs.tables.prefix=obs_
+
+obs.ontology.table.suffix=ontology
+obs.concept.table.suffix=concept
+obs.term.table.suffix=term
+obs.map.table.suffix=map
+obs.relation.table.suffix=relation
 
 ####################################################
 # Resource Index Schema/Tables properties 
@@ -70,8 +71,10 @@ obr.annotation.table.suffix=_annotation
 obr.expanded.annotation.table.suffix=_expanded_annotation
 obr.index.table.suffix=_index
 
+obr.dictionary.table.suffix=dictionary
 obr.resource.table.suffix=resource
 obr.context.table.suffix=context
+obr.statistics.table.suffix=statistics
 
 # Configuring database 
 obr.jdbc.url=@obrjdbcurl@

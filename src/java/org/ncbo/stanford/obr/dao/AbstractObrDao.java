@@ -14,9 +14,6 @@ import java.sql.Statement;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.context.ContexDao;
-import org.ncbo.stanford.obr.dao.resource.ResourceDao;
-import org.ncbo.stanford.obr.dao.statistics.StatisticsDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
@@ -41,12 +38,12 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * @created 20-Aug-2008
  *
  */
-public abstract class AbstractObrDao implements StringHelper{
+public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	
 	protected static Logger logger = Logger.getLogger(AbstractObrDao.class);
 	
 	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
-	
+		
 	// Database connection properties.
 	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
 	private static final String DATABASE_JDBC_DRIVER = MessageUtils.getMessage("obr.jdbc.driver");
@@ -66,11 +63,6 @@ public abstract class AbstractObrDao implements StringHelper{
 	private static File sqlLogFile;
 	
 	protected static final HashSet<String> EMPTY_SET = new HashSet<String>();
-	
-	// **** OBR tables
-	public static ContexDao contextTableDao = ContexDao.getInstance();
-	public static ResourceDao resourceTableDao = ResourceDao.getInstance();
-	public static StatisticsDao statisticsDao = StatisticsDao.getInstance();	 
 		
 	/**
 	 * Construct a new Table object and the corresponding DB table if does not exists.
@@ -91,6 +83,12 @@ public abstract class AbstractObrDao implements StringHelper{
 		}
 		this.openPreparedStatements();
 	}
+	
+	/**
+	 * 
+	 * 
+	 * @param tableName
+	 */
 	public AbstractObrDao(String tableName){		 
 		this.createConnection();		
 		this.tableSQLName = tableName;
@@ -402,14 +400,4 @@ public abstract class AbstractObrDao implements StringHelper{
 		}
 		return nbEntry;
 	}
-
-	/*********************************** UTILS *****************************/
-	
-	/**
-	 * Removes special characters before inserting the text in the DB. 
-	 */
-	public static String escapeLine(String termName){
-		return termName.replaceAll("\n|\r", " ");
-	}
-	
 }

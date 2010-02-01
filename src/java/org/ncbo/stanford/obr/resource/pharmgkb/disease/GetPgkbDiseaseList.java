@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 
 /**
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  *
  */
 
-public class GetPgkbDiseaseList {
+public class GetPgkbDiseaseList implements StringHelper {
 	
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(GetPgkbDiseaseList.class);
@@ -45,7 +46,7 @@ public class GetPgkbDiseaseList {
 			//InputStream results = process.getInputStream();
 
 			BufferedReader resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String resultLine = "";
+			String resultLine = EMPTY_STRING;
 			try {
 				Pattern diseasePattern = Pattern.compile("^(PA\\d*), Disease, (.*), ([0-1]{1}), ([0-1]{1}), ([0-1]{1}), .*$");				
 				while((resultLine = resultReader.readLine()) != null) {
@@ -76,7 +77,7 @@ public class GetPgkbDiseaseList {
 				resultReader.close();
 			}
 			BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			// String line2 = "";
+			// String line2 = EMPTY_STRING;
 			try {
 				//while((line2 = reader2.readLine()) != null) {
 					// process
@@ -86,7 +87,7 @@ public class GetPgkbDiseaseList {
 				errorReader.close();
 			}
 		} catch(IOException ioe) {
-			logger.error("", ioe);
+			logger.error(EMPTY_STRING, ioe);
 		}
 		return diseaseList;
 	}

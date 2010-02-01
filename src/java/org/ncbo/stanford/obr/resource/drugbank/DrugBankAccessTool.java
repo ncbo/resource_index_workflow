@@ -8,12 +8,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
-
 import obs.common.utils.UnzipUtils;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
+
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
  * DrugBankAccessTool is responsible for getting data elements for 

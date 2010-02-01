@@ -110,7 +110,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(PM_LOGO));
 			this.getToolResource().setResourceElementURL(PM_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error("", e);
+			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(PM_DESCRIPTION);
 		
