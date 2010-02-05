@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.dao.obs.relation;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -50,11 +51,13 @@ public class RelationDao extends AbstractObsDao{
 		super.openPreparedStatements();
 		this.openAddEntryStatement();		
 	}
+	
 	@Override
 	protected void closePreparedStatements() throws SQLException {
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		
 	}
+	
 	@Override
 	protected void openAddEntryStatement() {
 		StringBuffer queryb = new StringBuffer();
@@ -63,6 +66,7 @@ public class RelationDao extends AbstractObsDao{
 		queryb.append(" (id, concept_id, parent_concept_id, level) VALUES (?,?,?,?);");
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
+	
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
@@ -76,6 +80,7 @@ public class RelationDao extends AbstractObsDao{
 		"INDEX X_" + getTableSQLName() +"_level (level)" +
 		");";
 	}
+	
 	public boolean addEntry(RelationEntry entry){
 		boolean inserted = false;
 		try {
@@ -95,7 +100,31 @@ public class RelationDao extends AbstractObsDao{
 			logger.error(entry.toString());
 		}
 		return inserted;	
+	} 
+	
+	/**
+	 * Method loads the data entries from given file to relation table.
+	 * 
+	 * @param relationEntryFile File containing relation table entries.
+	 * @return Number of entries populated in relation table.
+	 */
+	public int populateSlaveRelationTableFromFile(File relationEntryFile) {
+		int nbInserted =0 ;
+		
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("LOAD DATA INFILE '");
+		queryb.append(relationEntryFile.getAbsolutePath());
+		queryb.append("' IGNORE INTO TABLE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");		
+		try{
+			 nbInserted = this.executeSQLUpdate(queryb.toString());			
+		} catch (SQLException e) {			 
+			logger.error("Problem in populating map table from file : " + relationEntryFile.getAbsolutePath(), e);
+		} 	
+		return nbInserted;
 	}
+	
 	public static class RelationEntry{
 		
 		private int id;
@@ -103,7 +132,7 @@ public class RelationDao extends AbstractObsDao{
 		private int parentConceptID;
 		private int level;
 				
-		protected RelationEntry(int id, int conceptID, int parentConceptID,
+		public RelationEntry(int id, int conceptID, int parentConceptID,
 				int level) {
 			this.id = id;
 			this.conceptID = conceptID;
@@ -147,5 +176,5 @@ public class RelationDao extends AbstractObsDao{
 			sb.append("]");
 			return sb.toString();
 		}		
-	}
+	} 
 }

@@ -3,19 +3,36 @@ package org.ncbo.stanford.obr.service.workflow;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
+ * A service interface {@code ResourceIndexWorkflow} is main interface for workflow execution
+ * it includes methods for populating slave obs tables and processing diffrent resource tools with 
+ * population of elements and indexing them using slave obs tables.
+ *  
  * @author Kuladip Yadav
- *
  */
 public interface ResourceIndexWorkflow {
 
 	/**
+	 * This method populates slave obs tables from master obs tables which includes
+	 * ontology table, concept table, term table, relation table and mapping table.
+	 * 
+	 * <p>This method compares slave and master ontology tables and populate newly added data in slave tables.
+	 */
+	public void populateObsSlaveTables();
+	
+	/**
+	 * This method includes complete resource index workflow. It process ressources and 
+	 * update elements for them and annotated them using obs tables.
+	 * 
+	 * <P>This methods process all the resources included in properties file.
 	 * 
 	 */
 	public void startResourceIndexWorkflow();
-	
+	 
 	/**
+	 * This method process individual resource and update elements for it.
+	 * Also it annotate that elements using obs tables and index them. 
 	 * 
-	 * @param tool
+	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
 	 */
-	public void resourceProcessing(ResourceAccessTool tool);
+	public void resourceProcessing(ResourceAccessTool resourceAccessTool);
 }

@@ -113,6 +113,17 @@
 				<filter token="obrrxrdjdbcusername" value="${obr.rxrd.jdbc.username}" />
 				<filter token="obrrxrdjdbcpassword" value="${obr.rxrd.jdbc.password}" />
 				
+				<!-- For rxrd resource access tool database 						-->
+				<filter token="obsmasterschemaname" value="${obs.master.schema.name}" />
+				<filter token="obsmasterschemahost" value="${obs.master.schema.host.name}" />
+				<filter token="obsmasterjdbcusername" value="${obs.master.jdbc.username}" />
+				<filter token="obsmasterjdbcpassword" value="${obs.master.jdbc.password}" />
+				<filter token="obsmasterontologystatuscomplete" value="${obs.master.ontology.status.complete}" />
+				 
+				<!-- For populate slave obs tables from master database.			r-->
+				<filter token="obsslavepopulate" value="${obs.slave.populate}" />
+				<filter token="obsslavedictionarylatest" value="${obs.slave.dictionary.latest}" />
+ 
 				<!-- Resource Index workflow parameter -->
 				<filter token="obrreinitializeall" value="${obr.reinitialize.all}" />
 				<filter token="obrreinitializeonlyannotation" value="${obr.reinitialize.only.annotation}" />

@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.dao.obs.map;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -77,6 +78,7 @@ public class MapDao extends AbstractObsDao{
 		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +
 		");";
 	}
+	
 	public boolean addEntry(MapEntry entry){
 		boolean inserted = false;
 		try {
@@ -96,6 +98,31 @@ public class MapDao extends AbstractObsDao{
 			logger.error(entry.toString());
 		}
 		return inserted;	
+	} 
+	
+	/**
+	 * Method loads the data entries from given file to map table.
+	 * 
+	 * @param mappingEntryFile File containing term table entries.
+	 * @return Number of entries populated in mapping table.
+	 */
+	public int populateSlaveMappingTableFromFile(File mappingEntryFile) {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("LOAD DATA INFILE '");
+		queryb.append(mappingEntryFile.getAbsolutePath());
+		queryb.append("' IGNORE INTO TABLE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");
+		
+		int nbInserted =0 ;
+		
+		try{
+			 nbInserted = this.executeSQLUpdate(queryb.toString());
+			
+		} catch (SQLException e) {			 
+			logger.error("Problem in populating map table from file : " + mappingEntryFile.getAbsolutePath(), e);
+		}	
+		return nbInserted;
 	}
 
 	public static class MapEntry{
@@ -106,7 +133,7 @@ public class MapDao extends AbstractObsDao{
 		private String mappingType;
 
 
-		protected MapEntry(int id, int conceptID, int mappedConceptID,
+		public MapEntry(int id, int conceptID, int mappedConceptID,
 				String mappingType) {
 			this.id = id;
 			this.conceptID = conceptID;
@@ -152,5 +179,5 @@ public class MapDao extends AbstractObsDao{
 			sb.append(")");
 			return sb.toString();
 		}
-	}
+	} 
 }

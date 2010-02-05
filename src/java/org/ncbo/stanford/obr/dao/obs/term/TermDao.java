@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.dao.obs.term;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,7 +70,7 @@ public class TermDao extends AbstractObsDao{
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, name, concept_id, is_preferred, dictionary_id) VALUES (?,?,?,?,?);");
+		queryb.append(" (id, name, concept_id, is_preferred) VALUES (?,?,?,?);");
 		addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
@@ -92,9 +93,9 @@ public class TermDao extends AbstractObsDao{
 		try {
 			addEntryStatement.setInt(1, entry.getId());
 			addEntryStatement.setString(2, StringUtilities.escapeLine(entry.getName()));
-			addEntryStatement.setString(3, entry.getConceptID());
-			addEntryStatement.setBoolean(4, entry.isPreferred());
-			addEntryStatement.setInt(5, entry.getDictionaryID());
+			addEntryStatement.setInt(3, entry.getConceptID());
+			addEntryStatement.setBoolean(4, entry.isPreferred());		
+	
 			this.executeSQLUpdate(addEntryStatement);
 			inserted = true;
 		}
@@ -107,9 +108,9 @@ public class TermDao extends AbstractObsDao{
 			logger.error(entry.toString());
 		}
 		return inserted;	
-	}
+	} 
 	
-/******************* Term Table related query*********************/
+	/******************* Term Table related query*********************/
 	
 	private void openExactMapStringToLocalConceptIDsStatement(){
 		StringBuffer queryb = new StringBuffer();
@@ -164,22 +165,43 @@ public class TermDao extends AbstractObsDao{
 		}
 		return localConceptIDs;
 	} 
+	
+	/**
+	 * Method loads the data entries from given file to term table.
+	 * 
+	 * @param termEntryFile File containing term table entries.
+	 * @return Number of entries populated in term table.
+	 */
+	public int populateSlaveTermTableFromFile(File termEntryFile) {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("LOAD DATA INFILE '");
+		queryb.append(termEntryFile.getAbsolutePath());
+		queryb.append("' IGNORE INTO TABLE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");		
+		int nbInserted =0;
+		try{
+			 nbInserted = this.executeSQLUpdate(queryb.toString());
+			
+		} catch (SQLException e) {			 
+			logger.error("Problem in populating term table from file : " + termEntryFile.getAbsolutePath(), e);
+		}	
+		return nbInserted;
+	}
 
 	public static class TermEntry{
 
 		private int id;
 		private String name;
-		private String conceptID;
-		private boolean isPreferred;
-		private int dictionaryID;
+		private int conceptID;
+		private boolean isPreferred;		 
 
-		protected TermEntry(int id, String name, String conceptID,
-				boolean isPreferred, int dictionaryID) {
+		public TermEntry(int id, String name, int conceptID,
+				boolean isPreferred) {
 			this.id = id;
 			this.name = name;
 			this.conceptID = conceptID;
-			this.isPreferred = isPreferred;
-			this.dictionaryID = dictionaryID;
+			this.isPreferred = isPreferred;			 
 		}
 
 		public int getId() {
@@ -194,10 +216,10 @@ public class TermDao extends AbstractObsDao{
 		public void setName(String name) {
 			this.name = name;
 		}
-		public String getConceptID() {
+		public int getConceptID() {
 			return conceptID;
 		}
-		public void setConceptID(String conceptID) {
+		public void setConceptID(int conceptID) {
 			this.conceptID = conceptID;
 		}
 		public boolean isPreferred() {
@@ -206,12 +228,7 @@ public class TermDao extends AbstractObsDao{
 		public void setPreferred(boolean isPreferred) {
 			this.isPreferred = isPreferred;
 		}
-		public int getDictionaryID() {
-			return dictionaryID;
-		}
-		public void setDictionaryID(int dictionaryID) {
-			this.dictionaryID = dictionaryID;
-		}
+		 
 		public String toString(){
 			StringBuffer sb = new StringBuffer();
 			sb.append("TermEntry: [");
@@ -221,11 +238,9 @@ public class TermDao extends AbstractObsDao{
 			sb.append(", ");
 			sb.append(this.conceptID);
 			sb.append(", ");
-			sb.append(this.isPreferred);
-			sb.append(", ");
-			sb.append(this.dictionaryID);
+			sb.append(this.isPreferred);			 
 			sb.append("]");
 			return sb.toString();
 		}
-	}
+	} 
 }

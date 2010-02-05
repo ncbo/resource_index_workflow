@@ -103,15 +103,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		}
 		this.openPreparedStatements();
 	}
-	/**
-	 * For OBS tables.
-	 * 
-	 * @param tableSQLName
-	 */
-	public AbstractObrDao(){		 
-		this.createConnection();
-		this.openPreparedStatements();
-	}
+	 
 	
 	private void createConnection(){
 		if(tableConnection == null){

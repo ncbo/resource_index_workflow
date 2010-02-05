@@ -50,8 +50,6 @@ obr.expansion.distance=@obrexpansiondistance@
 ####################################################
 # OBS Schema/Tables properties 
 ####################################################
-obs.schema.name=@obsschemaname@
-
 obs.tables.prefix=obs_
 
 obs.ontology.table.suffix=ontology
@@ -59,6 +57,19 @@ obs.concept.table.suffix=concept
 obs.term.table.suffix=term
 obs.map.table.suffix=map
 obs.relation.table.suffix=relation
+
+# Configuring master OBS database
+obs.master.schema.name=@obsmasterschemaname@
+obs.master.schema.host.name=@obsmasterschemahost@
+obs.master.jdbc.url=jdbc:mysql://@obsmasterschemahost@:3306/@obsmasterschemaname@
+obs.master.jdbc.username=@obsmasterjdbcusername@
+obs.master.jdbc.password=@obsmasterjdbcpassword@
+
+obs.master.ontology.status.complete=@obsmasterontologystatuscomplete@
+
+# Configure populate obs tables  
+obs.slave.populate=@obsslavepopulate@
+obs.slave.dictionary.latest=@obsslavedictionarylatest@
 
 ####################################################
 # Resource Index Schema/Tables properties 

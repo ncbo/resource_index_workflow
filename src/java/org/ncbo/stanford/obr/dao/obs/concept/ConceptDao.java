@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.dao.obs.concept;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -98,6 +99,29 @@ public class ConceptDao extends AbstractObsDao {
 			logger.error(entry.toString());
 		}
 		return inserted;	
+	} 	 
+	
+	/**
+	 * Method loads the data entries from given file to concept table
+	 * 
+	 * @param conceptEntryFile File containing concept table entries.
+	 * @return Number of entries populated in concept table.
+	 */
+	public int populateSlaveConceptTableFromFile(File conceptEntryFile) {
+		int nbInserted =0 ;
+		
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("LOAD DATA INFILE '");
+		queryb.append(conceptEntryFile.getAbsolutePath());
+		queryb.append("' IGNORE INTO TABLE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES"); 
+		try{
+			 nbInserted = this.executeSQLUpdate(queryb.toString());			
+		} catch (SQLException e) {			 
+			logger.error("Problem in populating concept table from file : " + conceptEntryFile.getAbsolutePath(), e);
+		} 	
+		return nbInserted;
 	}
 	
 	public static class ConceptEntry{
@@ -107,7 +131,7 @@ public class ConceptDao extends AbstractObsDao {
 		private int ontologyID;
 		private boolean isTopLevel;
 				
-		protected ConceptEntry(int id, String localConceptID, int ontologyID,
+		public ConceptEntry(int id, String localConceptID, int ontologyID,
 				boolean isToplevel) {
 			this.id = id;
 			this.localConceptID = localConceptID;

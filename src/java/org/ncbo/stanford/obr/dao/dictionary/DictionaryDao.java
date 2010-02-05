@@ -41,6 +41,7 @@ public class DictionaryDao extends AbstractObrDao {
 	
 	private static PreparedStatement addEntryStatement;
 	private static PreparedStatement getLastDictionaryBeanStatement;
+	private PreparedStatement numberOfEntryStatement;
 	
 	private DictionaryDao() {
 		super(EMPTY_STRING, TABLE_SUFFIX );
@@ -60,6 +61,7 @@ public class DictionaryDao extends AbstractObrDao {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();
 		this.openGetLastDictionaryBeanStatement();
+		this.openNumberOfEntryStatement();
 	}
 	
 	@Override
@@ -120,7 +122,7 @@ public class DictionaryDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT id, name, date_created  FROM ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" WHERE dictionaryID =(SELECT MAX(id) FROM ");
+		queryb.append(" WHERE id =(SELECT MAX(id) FROM ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(");");
 		getLastDictionaryBeanStatement = this.prepareSQLStatement(queryb.toString());
@@ -150,6 +152,34 @@ public class DictionaryDao extends AbstractObrDao {
 		}
 		return dictionary;
 	}
+	
+	
+	private void openNumberOfEntryStatement() {
+		String query = "SELECT COUNT(*) FROM " + this.getTableSQLName() + ";";
+		this.numberOfEntryStatement= this.prepareSQLStatement(query);
+	}
+	
+	/**
+	 * Returns the number of elements in the table (-1 if a problem occurs during the count). 
+	 */
+	public int numberOfEntry(){
+		int nbEntry = -1;
+		try{
+			ResultSet rSet = this.executeSQLQuery(numberOfEntryStatement);
+			rSet.first();
+			nbEntry = rSet.getInt(1);
+			rSet.close();
+		} 		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openNumberOfEntryStatement();
+			return this.numberOfEntry();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get number of entry on table " + this.getTableSQLName()+". -1 returned.", e);
+		}
+		return nbEntry;
+	}
+
 	
 	/*
 	 * Moving methods from ObsOntologiesAccessTool
