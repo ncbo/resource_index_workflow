@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
@@ -36,6 +37,7 @@ public class OntologyDao extends AbstractObsDao{
 	private static PreparedStatement hasNewVersionOfOntologyStatement;
 	private static PreparedStatement getLocalConceptIdByPrefNameAndOntologyIdStatement;
 	private static PreparedStatement getAllLocalOntologyIDsStatement;
+	private static PreparedStatement deleteEntriesFromOntologyStatement;
 	
 	private OntologyDao() {		
 		super(TABLE_SUFFIX);
@@ -81,12 +83,14 @@ public class OntologyDao extends AbstractObsDao{
 		this.openHasNewVersionOfOntologyStatement();
 		this.openGetLocalConceptIdByPrefNameAndOntologyId();
 		this.openGetAllLocalOntologyIDsStatement();
+		this.openDeleteEntriesFromOntologyStatement();
 	}
 	
 	@Override
 	protected void closePreparedStatements() throws SQLException {
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		
+		deleteEntriesFromOntologyStatement.close();
 	}
 	
 	@Override
@@ -309,8 +313,62 @@ public class OntologyDao extends AbstractObsDao{
 		
 		return localOntologyIDs;
 	}
+	/**
+	 * 
+	 */
+	private void openDeleteEntriesFromOntologyStatement(){
+		/*DELETE obs_ontology FROM obs_ontology WHERE obs_ontology.local_ontology_id=?; */
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" WHERE ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(".local_ontology_id=?");
+		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	/**
+	 * Deletes the rows for the given local_ontology_id.
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntology(String localOntologyID){
+		boolean deleted = false;
+		try{
+			deleteEntriesFromOntologyStatement.setString(1, localOntologyID);
+			executeSQLUpdate(deleteEntriesFromOntologyStatement);
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openDeleteEntriesFromOntologyStatement();
+			return this.deleteEntriesFromOntology(localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
 	
-	
+	public HashSet<String> getLocalOntologyIDs(){
+		// Query: SELECT DISTINCT local_ontology_id FROM obs_ontology
+		HashSet<String> localOntologyIDs = new HashSet<String>();
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT DISTINCT local_ontology_id FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(";");
+		try{
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			while(rSet.next()){
+				localOntologyIDs.add(rSet.getString(1));
+			}
+			rSet.close();
+			this.closeTableGenericStatement();
+		}		
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get localOntologyIDs from "+this.getTableSQLName()+".", e);
+		}
+		return localOntologyIDs;
+	}
 	public static class OntologyEntry{
 
 		private int id;

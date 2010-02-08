@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
+import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -28,7 +30,7 @@ public class TermDao extends AbstractObsDao{
  
 	private PreparedStatement addEntryStatement;
 	private PreparedStatement exactMapStringToLocalConceptIDsStatement;
-
+	private static PreparedStatement deleteEntriesFromOntologyStatement;
 
 	private TermDao() {
 		super(TABLE_SUFFIX);
@@ -55,13 +57,15 @@ public class TermDao extends AbstractObsDao{
 	protected void openPreparedStatements() {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();	
-		this.openExactMapStringToLocalConceptIDsStatement();		 
+		this.openExactMapStringToLocalConceptIDsStatement();
+		this.openDeleteEntriesFromOntologyStatement();
 	}
 
 	@Override
 	protected void closePreparedStatements() throws SQLException {
 		super.closePreparedStatements();
-		this.addEntryStatement.close();		
+		this.addEntryStatement.close();	
+		deleteEntriesFromOntologyStatement.close();
 	}	
 
 	@Override
@@ -187,7 +191,49 @@ public class TermDao extends AbstractObsDao{
 		}	
 		return nbInserted;
 	}
-
+	private void openDeleteEntriesFromOntologyStatement(){
+		/*DELETE obs_term FROM obs_term 
+		 	WHERE obs_term.concept_id IN (SELECT id FROM obs_concept 
+		 		WHERE obs_concept.ontology_id = (SELECT obs_ontology.id FROM obs_ontology 
+		 			WHERE obs_ontology.local_ontology_id = ?)); */
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" WHERE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(".concept_id IN ( ");
+		queryb.append("SELECT id FROM ");
+		queryb.append(ConceptDao.name(""));		
+		queryb.append("WHERE ");
+		queryb.append(ConceptDao.name(""));	
+		queryb.append(".ontology_id =( ");
+		queryb.append("SELECT id FROM ");
+		queryb.append(OntologyDao.name(""));
+		queryb.append(" WHERE local_ontology_id=?))");		
+		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	/**
+	 * Deletes the rows for the given local_ontology_id.
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntology(String localOntologyID){
+		boolean deleted = false;
+		try{
+			deleteEntriesFromOntologyStatement.setString(1, localOntologyID);
+			executeSQLUpdate(deleteEntriesFromOntologyStatement);
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openDeleteEntriesFromOntologyStatement();
+			return this.deleteEntriesFromOntology(localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
 	public static class TermEntry{
 
 		private int id;

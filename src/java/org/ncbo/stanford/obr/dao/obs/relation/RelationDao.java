@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
+import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -20,16 +22,17 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * 
  */
 public class RelationDao extends AbstractObsDao{
-  
+
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.relation.table.suffix");
-	
+
 	private PreparedStatement addEntryStatement;
+	private static PreparedStatement deleteEntriesFromOntologyStatement;
 
 	private RelationDao() {
 		super(TABLE_SUFFIX);
 
 	}
-	
+
 	private static class RelationDaoHolder {
 		private final static RelationDao RELATION_DAO_INSTANCE = new RelationDao();
 	}
@@ -40,7 +43,7 @@ public class RelationDao extends AbstractObsDao{
 	public static RelationDao getInstance(){
 		return RelationDaoHolder.RELATION_DAO_INSTANCE;
 	}
-	
+
 	public static String name(String resourceID){		
 		return OBS_PREFIX + TABLE_SUFFIX;
 	}
@@ -49,14 +52,16 @@ public class RelationDao extends AbstractObsDao{
 	protected void openPreparedStatements() {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();		
+		this.openDeleteEntriesFromOntologyStatement();
 	}
-	
+
 	@Override
 	protected void closePreparedStatements() throws SQLException {
 		super.closePreparedStatements();
-		this.addEntryStatement.close();		
+		this.addEntryStatement.close();
+		deleteEntriesFromOntologyStatement.close();
 	}
-	
+
 	@Override
 	protected void openAddEntryStatement() {
 		StringBuffer queryb = new StringBuffer();
@@ -65,7 +70,7 @@ public class RelationDao extends AbstractObsDao{
 		queryb.append(" (id, concept_id, parent_concept_id, level) VALUES (?,?,?,?);");
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
-	
+
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
@@ -79,7 +84,7 @@ public class RelationDao extends AbstractObsDao{
 		"INDEX X_" + getTableSQLName() +"_level (level)" +
 		");";
 	}
-	
+
 	public boolean addEntry(RelationEntry entry){
 		boolean inserted = false;
 		try {
@@ -100,7 +105,7 @@ public class RelationDao extends AbstractObsDao{
 		}
 		return inserted;	
 	} 
-	
+
 	/**
 	 * Method loads the data entries from given file to relation table.
 	 * 
@@ -109,7 +114,7 @@ public class RelationDao extends AbstractObsDao{
 	 */
 	public int populateSlaveRelationTableFromFile(File relationEntryFile) {
 		int nbInserted =0 ;
-		
+
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA INFILE '");
 		queryb.append(relationEntryFile.getAbsolutePath());
@@ -117,20 +122,63 @@ public class RelationDao extends AbstractObsDao{
 		queryb.append(this.getTableSQLName());
 		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");		
 		try{
-			 nbInserted = this.executeSQLUpdate(queryb.toString());			
+			nbInserted = this.executeSQLUpdate(queryb.toString());			
 		} catch (SQLException e) {			 
 			logger.error("Problem in populating map table from file : " + relationEntryFile.getAbsolutePath(), e);
 		} 	
 		return nbInserted;
 	}
+	private void openDeleteEntriesFromOntologyStatement(){
+		/*DELETE obs_relation FROM obs_term 
+		 	WHERE obs_relation.concept_id IN (SELECT id FROM obs_concept 
+		 		WHERE obs_concept.ontology_id = (SELECT obs_ontology.id FROM obs_ontology 
+		 			WHERE obs_ontology.local_ontology_id = ?)); */
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" WHERE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(".concept_id IN ( ");
+		queryb.append("SELECT id FROM ");
+		queryb.append(ConceptDao.name(""));		
+		queryb.append("WHERE ");
+		queryb.append(ConceptDao.name(""));	
+		queryb.append(".ontology_id =( ");
+		queryb.append("SELECT id FROM ");
+		queryb.append(OntologyDao.name(""));
+		queryb.append(" WHERE local_ontology_id=?))");		
+		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	/**
+	 * Deletes the rows for the given local_ontology_id.
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntology(String localOntologyID){
+		boolean deleted = false;
+		try{
+			deleteEntriesFromOntologyStatement.setString(1, localOntologyID);
+			executeSQLUpdate(deleteEntriesFromOntologyStatement);
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openDeleteEntriesFromOntologyStatement();
+			return this.deleteEntriesFromOntology(localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
 	
 	public static class RelationEntry{
-		
+
 		private int id;
 		private int conceptID;
 		private int parentConceptID;
 		private int level;
-				
+
 		public RelationEntry(int id, int conceptID, int parentConceptID,
 				int level) {
 			this.id = id;
