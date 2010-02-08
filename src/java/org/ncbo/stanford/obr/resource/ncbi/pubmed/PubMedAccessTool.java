@@ -83,10 +83,10 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
 		
 	// Start processing xml file number
-    private static final int START_XML_NUMBER = 593; //556 
+    private static final int START_XML_NUMBER = 617; //556 
 	
     // End processing xml file number
-	private static final int END_XML_NUMBER = 593; //617
+	private static final int END_XML_NUMBER = 617; //617
 	
 	// All the zip files available here. (have to connect to VPN)
 	private String PM_ZIP_URL = "ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/";
@@ -110,7 +110,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 			this.getToolResource().setResourceLogo(new URL(PM_LOGO));
 			this.getToolResource().setResourceElementURL(PM_ELT_URL);
 		} catch (MalformedURLException e) {
-			logger.error(EMPTY_STRING, e);
+			logger.error("", e);
 		}
 		this.getToolResource().setResourceDescription(PM_DESCRIPTION);
 		
