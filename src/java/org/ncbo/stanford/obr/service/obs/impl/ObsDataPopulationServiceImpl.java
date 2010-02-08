@@ -94,17 +94,17 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 */
 	public int populateConceptsSlaveData(List<String> localOntologyIDs) {
 		int numberOfConceptsAdded= 0;
-		File relationEntryFile = null;		
+		File conceptEntryFile = null;		
 		try{
 			// Writes concept entries to file from master concept table. 
-			relationEntryFile = obsMasterDao.writeMasterConceptEntries(localOntologyIDs); 
+			conceptEntryFile = obsMasterDao.writeMasterConceptEntries(localOntologyIDs); 
 			// load file entries into slave concept table. 
-			numberOfConceptsAdded = conceptDao.populateSlaveConceptTableFromFile(relationEntryFile);
+			numberOfConceptsAdded = conceptDao.populateSlaveConceptTableFromFile(conceptEntryFile);
 			logger.info("Number of concept entries added in slave concept table : " + numberOfConceptsAdded);
 		}finally {
 			 // Delete generated file.
-			 if(relationEntryFile!= null && relationEntryFile.exists()){
-				 relationEntryFile.delete();
+			 if(conceptEntryFile!= null && conceptEntryFile.exists()){
+				 conceptEntryFile.delete();
 			 }
 		}		
 		return numberOfConceptsAdded;

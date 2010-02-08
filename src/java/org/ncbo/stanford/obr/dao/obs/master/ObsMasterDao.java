@@ -326,11 +326,11 @@ public class ObsMasterDao implements DaoFactory{
 		
 		// Creating mysql command
 		StringBuffer command = new StringBuffer();
-		command.append("mysql  -h ");
+		command.append("mysql -h ");
 		command.append(MASTER_OBS_HOST_NAME);
 		command.append(" -u ");
 		command.append(MASTER_OBS_USER);
-		command.append("-p");
+		command.append(" -p");
 		command.append(MASTER_OBS_PASSWORD);
 		command.append(" ");
 		command.append(MASTER_OBS_SCEHMA_NAME);
@@ -342,7 +342,7 @@ public class ObsMasterDao implements DaoFactory{
 		// Bug with java when using the ">" redirection character, so we need to do like that:
 		String[] mysqlCommand = {"/bin/sh", "-c", command.toString()};				
 		//Unix command execution
-		logger.info("Executing Mysql command : " + mysqlCommand.toString());	 
+		logger.info("Executing Mysql command : " + command.toString());	 
 		Process p = Runtime.getRuntime().exec(mysqlCommand);
 		int exitValue = p.waitFor();
 		
