@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -49,7 +48,7 @@ public class TermDao extends AbstractObsDao{
 
 	
 	public static String name(String resourceID){		
-		return ObsSchemaEnum.TERM_TABLE.getTableSQLName();
+		return termDao.getTableSQLName();
 	}
 
 	@Override
@@ -116,7 +115,7 @@ public class TermDao extends AbstractObsDao{
 		StringBuffer queryb = new StringBuffer();
 		queryb.append(mapStringQueries());
 		queryb.append(" AND ");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(termDao.getTableSQLName());
 		queryb.append(".name=? AND local_ontology_id=?;");
 		exactMapStringToLocalConceptIDsStatement = this.prepareSQLStatement(queryb.toString());
 	} 
@@ -124,19 +123,19 @@ public class TermDao extends AbstractObsDao{
 	private String mapStringQueries(){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT local_concept_id FROM ");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(termDao.getTableSQLName());
 		queryb.append(", ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(", ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(termDao.getTableSQLName());
 		queryb.append(".concept_id=");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".id AND ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".ontology_id=");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".id");
 		return queryb.toString();
 	}

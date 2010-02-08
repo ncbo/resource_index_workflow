@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -61,7 +60,7 @@ public class StatisticsDao extends AbstractObrDao {
 					"mapping_annotations INT UNSIGNED," +
 					"UNIQUE (resource_id, ontology_id), " +
 					"FOREIGN KEY (resource_id) REFERENCES " + resourceTableDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (ontology_id) REFERENCES " + ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName()	+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +		
+					"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName()	+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +		
 				");";
 	}
 

@@ -11,7 +11,6 @@ import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -65,7 +64,7 @@ public class IndexDao extends AbstractObrDao {
 					"score FLOAT, " +
 					"UNIQUE (element_id, concept_id), " +
 					"FOREIGN KEY (element_id) REFERENCES " + ElementDao.name(this.resourceID)  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES " + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName() 		+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +												
+					"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() 		+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +												
 				");";
 	}
 	
@@ -100,7 +99,7 @@ public class IndexDao extends AbstractObrDao {
 		queryb.append("	,");
 			// sub query to get the conceptID from the localConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,?);");
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
@@ -243,7 +242,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(", ");
 		query.append(contextTableDao.getTableSQLName());
 		query.append(", ");
-		query.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		query.append(termDao.getTableSQLName());
 		query.append(" WHERE ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(".context_id=");
@@ -251,7 +250,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(".id AND ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(".term_id=");
-		query.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		query.append(termDao.getTableSQLName());
 		query.append(".id AND is_preferred=");
 		if (doneWithPreferredName){
 			query.append("true");	
@@ -356,20 +355,20 @@ public class IndexDao extends AbstractObrDao {
 		queryb.append(this.getTableSQLName());
 		queryb.append(".concept_id IN ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".ontology_id= ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".local_ontology_id=? ))");
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
@@ -402,9 +401,9 @@ public class IndexDao extends AbstractObrDao {
 		queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
 		queryb.append(this.getTableSQLName());		 	 
 		queryb.append(" AS IT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id = OT.id GROUP BY OT.id; ");
  		this.getIndexedAnnotationStatsStatement = this.prepareSQLStatement(queryb.toString());
 	}

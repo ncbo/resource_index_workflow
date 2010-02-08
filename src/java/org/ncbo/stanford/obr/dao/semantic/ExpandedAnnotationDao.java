@@ -8,7 +8,6 @@ import java.util.HashMap;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -78,11 +77,11 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					// Removed march 2009. Valid but too expensive in size. Not verified.
 					//"UNIQUE (elementID, conceptID, contextID, childConceptID, mappedConceptID, distantConceptID), " +				
 					"FOREIGN KEY (element_id) REFERENCES "         + ElementDao.name(this.resourceID)  + "(elementID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES "         + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (concept_id) REFERENCES "         + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (context_id) REFERENCES "         + contextTableDao.getTableSQLName()			 		+ "(contextID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (child_concept_id) REFERENCES "    + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (distant_concept_id) REFERENCES "  + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (child_concept_id) REFERENCES "    + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"INDEX X_" + this.getTableSQLName() +"parent_level (parent_level), " +
 					"INDEX X_" + this.getTableSQLName() +"mapping_type (mapping_type), " +
 					"INDEX X_" + this.getTableSQLName() +"distance (distance)," +
@@ -120,7 +119,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append("	,");
 			// sub query to get the conceptID from the localConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,");
 			// sub query to get the contextID from the contextName
@@ -130,17 +129,17 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append("	,");
 			// sub query to get the conceptID from the childConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,?,"); //level
 			// sub query to get the conceptID from the mappedConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,?,"); //mappingType
 			// sub query to get the conceptID from the distantConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append(",?,?)"); //distance					
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
@@ -211,9 +210,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT element_id, CT.id, context_id, DAT.concept_id, level, false FROM ");
 		queryb.append(table.getTableSQLName());
 		queryb.append(" AS DAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");		 
-		queryb.append(ObsSchemaEnum.IS_A_PARENT_TABLE.getTableSQLName());
+		queryb.append(relationDao.getTableSQLName());
 		queryb.append(" AS ISAPT WHERE CT.id = ISAPT.parent_concept_id AND DAT.concept_id = ISAPT.concept_id AND is_a_closure_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
@@ -252,9 +251,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, CT.id, context_id, DAT.concept_id, mapping_type, false FROM ");
 		queryb.append(table.getTableSQLName());
 		queryb.append(" AS DAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");	 
-		queryb.append(ObsSchemaEnum.MAPPING_TABLE.getTableSQLName());
+		queryb.append(mapDao.getTableSQLName());
 		queryb.append(" AS MAPT WHERE CT.id = MAPT.mapped_concept_id AND DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
@@ -294,20 +293,20 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(this.getTableSQLName());
 		queryb.append(".concept_id IN ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".ontology_id= ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".local_ontology_id=? ))");
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
@@ -348,9 +347,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
 		queryb.append(this.getTableSQLName());		 	 
 		queryb.append(" AS EAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.child_concept_id IS NOT NULL GROUP BY OT.id; ");
 		
 		try {			 			
@@ -384,9 +383,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
 		queryb.append(this.getTableSQLName());		 	 
 		queryb.append(" AS EAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.mapped_concept_id IS NOT NULL GROUP BY OT.id; ");
 		
 		try {			 			

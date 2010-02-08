@@ -17,7 +17,6 @@ import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -80,7 +79,7 @@ public class ElementDao extends AbstractObrDao {
 					"id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"local_element_id VARCHAR(255) NOT NULL UNIQUE, " +
 					"dictionary_id SMALLINT UNSIGNED, " +
-					"FOREIGN KEY (dictionary_id) REFERENCES " + ObsSchemaEnum.DICTIONARY_VERSION_TABLE.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
+					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
 				");";
 	}
 	

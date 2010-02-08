@@ -12,7 +12,6 @@ import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -78,7 +77,7 @@ public class ResourceDao extends AbstractObrDao {
 					"description TEXT, " +
 					"logo VARCHAR(255), " +	
 					"dictionary_id SMALLINT UNSIGNED, "+ 
-					"FOREIGN KEY (dictionary_id) REFERENCES " + ObsSchemaEnum.DICTIONARY_VERSION_TABLE.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
+					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
 				    ");";
 	}
 

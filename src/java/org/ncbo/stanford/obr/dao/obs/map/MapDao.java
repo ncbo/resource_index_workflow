@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
@@ -43,7 +42,7 @@ public class MapDao extends AbstractObsDao{
 	}
 	
 	public static String name(String resourceID){		
-		return ObsSchemaEnum.MAPPING_TABLE.getTableSQLName();
+		return OBS_PREFIX + TABLE_SUFFIX;
 	}
 
 	@Override

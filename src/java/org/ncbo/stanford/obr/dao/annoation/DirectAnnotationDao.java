@@ -10,7 +10,6 @@ import java.util.Iterator;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -81,10 +80,10 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"distance_done BOOL NOT NULL, " +
 					"indexing_done BOOL NOT NULL, " +
 					"FOREIGN KEY (element_id) REFERENCES "    + ElementDao.name(this.resourceID)        + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES "    + ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (concept_id) REFERENCES "    + conceptDao.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (term_id) REFERENCES "       + ObsSchemaEnum.TERM_TABLE.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
-					"FOREIGN KEY (dictionary_id) REFERENCES " + ObsSchemaEnum.DICTIONARY_VERSION_TABLE.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
+					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
+					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
 					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
 					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
 					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
@@ -124,7 +123,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("	,");
 			// sub query to get the conceptID from the localConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,");
 			// sub query to get the contextID from the contextName
@@ -180,7 +179,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("	,");
 			// sub query to get the conceptID from the localConceptID
 			queryb.append("(SELECT id FROM ");
-			queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" WHERE local_concept_id=?)");
 		queryb.append("	,");
 			// sub query to get the contextID from the contextName
@@ -317,11 +316,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		joinQuery.append(", false, false, false, false FROM ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP, ");
-		joinQuery.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		joinQuery.append(termDao.getTableSQLName());
 		joinQuery.append(" WHERE ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.term_id=");
-		joinQuery.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		joinQuery.append(termDao.getTableSQLName());
 		joinQuery.append(".id;");
 		try{
 			nbAnnotation = this.executeSQLUpdate(joinQuery.toString());
@@ -366,20 +365,20 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append(this.getTableSQLName());
 		queryb.append(".concept_id IN ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(".ontology_id= ( ");
 		queryb.append("SELECT ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" WHERE ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(".local_ontology_id=? ))");
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
@@ -419,11 +418,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append(" FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(",");		
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());		
+		queryb.append(termDao.getTableSQLName());		
 		queryb.append(" WHERE ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(".term_id=");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());		
+		queryb.append(termDao.getTableSQLName());		
 		queryb.append(".id AND ");
 		queryb.append(" name IN(");
 		for(Iterator<String> it = stopwords.iterator(); it.hasNext();){
@@ -466,9 +465,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
 		queryb.append(this.getTableSQLName());		 	 
 		queryb.append(" AS DAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL GROUP BY OT.id; ");
 		
 		try {			 			
@@ -500,9 +499,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
 		queryb.append(this.getTableSQLName());		 	 
 		queryb.append(" AS DAT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" AS OT WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND DAT.term_id IS NULL GROUP BY OT.id; ");
 		
 		try {			 			

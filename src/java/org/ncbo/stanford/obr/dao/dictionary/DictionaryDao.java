@@ -14,7 +14,6 @@ import java.util.Calendar;
 import obs.common.beans.DictionaryBean;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -232,7 +231,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 * @return The number of lines written in the given file.
 	 */
 	public int writeDictionaryFile(File file, int dictionaryID){
-		String query = "SELECT id, name FROM " + ObsSchemaEnum.TERM_TABLE.getTableSQLName() + this.blackListFilter()+ " AND dictionary_id=" + dictionaryID +";";
+		String query = "SELECT id, name FROM " + termDao.getTableSQLName() + this.blackListFilter()+ " AND dictionary_id=" + dictionaryID +";";
 		int nbLines = 0;
 		try{
 			ResultSet couplesSet = this.executeSQLQuery(query);
@@ -252,7 +251,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 * @return The number of lines written in the given file.
 	 */
 	public int writeDictionaryFile(File file){
-		String query = "SELECT id, name FROM " + ObsSchemaEnum.TERM_TABLE.getTableSQLName() + this.blackListFilter() + ";";
+		String query = "SELECT id, name FROM " + termDao.getTableSQLName() + this.blackListFilter() + ";";
 		int nbLines = 0;
 		try{
 			ResultSet couplesSet = this.executeSQLQuery(query);

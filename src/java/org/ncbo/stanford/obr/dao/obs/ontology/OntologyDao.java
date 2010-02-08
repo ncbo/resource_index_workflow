@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
-import org.ncbo.stanford.obr.enumeration.ObsSchemaEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -54,7 +53,7 @@ public class OntologyDao extends AbstractObsDao{
 	}
 	
 	public static String name(String resourceID){		
-		return ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName();
+		return ontologyDao.getTableSQLName();
 	}
 	
 	@Override
@@ -154,7 +153,7 @@ public class OntologyDao extends AbstractObsDao{
 	private void openGetLatestLocalOntologyIDStatement() {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT local_ontology_id FROM ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" where virtual_ontology_id= ? order by id DESC;");
 		 
 		getLatestLocalOntologyIDStatement = this.prepareSQLStatement(queryb.toString());		
@@ -191,11 +190,11 @@ public class OntologyDao extends AbstractObsDao{
 	private void openHasNewVersionOfOntologyStatement(){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT DISTINCT local_ontology_id, dictionary_id FROM ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" OT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" CT, ");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(termDao.getTableSQLName());
 		queryb.append(" TT WHERE TT.concept_id = CT.id AND  CT.ontology_id=OT.id");
 		queryb.append(" AND OT.virtual_ontology_id= ? order BY OT.id DESC;");
 		 
@@ -245,11 +244,11 @@ public class OntologyDao extends AbstractObsDao{
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT local_concept_id ");
 		queryb.append("FROM ");
-		queryb.append(ObsSchemaEnum.TERM_TABLE.getTableSQLName());
+		queryb.append(termDao.getTableSQLName());
 		queryb.append(" TT, ");
-		queryb.append(ObsSchemaEnum.CONCEPT_TABLE.getTableSQLName());
+		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" CT, ");
-		queryb.append(ObsSchemaEnum.ONTOLOGY_TABLE.getTableSQLName());
+		queryb.append(ontologyDao.getTableSQLName());
 		queryb.append(" OT WHERE TT.concept_id= CT.id AND CT.ontology_id=OT.id AND ");
 		queryb.append("TT.is_preferred=true AND OT.local_ontology_id=? AND TT.name=?;");		 
 		getLocalConceptIdByPrefNameAndOntologyIdStatement = this.prepareSQLStatement(queryb.toString());
