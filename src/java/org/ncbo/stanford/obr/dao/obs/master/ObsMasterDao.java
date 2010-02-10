@@ -357,5 +357,34 @@ public class ObsMasterDao implements DaoFactory{
 		}
 		return outputFile;		
 	}
+
+	/**
+	 * This method gets all the ontology versions available in ontology table
+	 *  
+	 * @return {@code List} of local ontology ids.
+	 */
+	public List<String> getAllLocalOntologyIDs() {
+		List<String> ontologyIDs = new ArrayList<String>();
+		StringBuffer selectQuery = new StringBuffer();
+		selectQuery.append("SELECT  OT.local_ontology_id FROM ");
+		selectQuery.append(ontologyDao.getTableSQLName());
+		selectQuery.append(" OT; ");
+		
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery(selectQuery.toString());
+			 
+			while(rSet.next()){
+				ontologyIDs.add(rSet.getString(1));
+			}
+		} 
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.getAllLocalOntologyIDs();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get ontology ids from master ontology table.", e);
+		}
+		
+		return ontologyIDs;
+	}
 	
 }

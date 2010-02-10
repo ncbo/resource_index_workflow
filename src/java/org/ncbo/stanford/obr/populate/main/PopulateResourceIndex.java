@@ -22,6 +22,8 @@ public class PopulateResourceIndex {
 		ResourceIndexWorkflow resourceIndexWorkflow = new ResourceIndexWorkflowImpl();
 		
 		boolean poluateSlaveTables = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.populate"));
+		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
+		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
 		
 		// Populate obs tables from master database 
 		if(poluateSlaveTables){	
@@ -29,7 +31,14 @@ public class PopulateResourceIndex {
 		}	
 		
 		// Populate resource index data
-	    resourceIndexWorkflow.startResourceIndexWorkflow();
+		if(processResources){
+			 resourceIndexWorkflow.startResourceIndexWorkflow();
+		}
+	   
+		// remove duplicates.
+		if(removeDuplicateOntologies){
+			resourceIndexWorkflow.removeOntologyDuplicates();
+		}
 
 	}
 

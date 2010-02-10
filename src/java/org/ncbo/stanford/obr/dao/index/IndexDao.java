@@ -10,6 +10,8 @@ import obs.obr.populate.ObrWeight;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
+import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -335,41 +337,23 @@ public class IndexDao extends AbstractObrDao {
 	}
 		
 	//********************************* DELETE FUNCTIONS *****************************************************/
-	
-	/**
-	 * Selecting the ontology id from OBS_OT table given local ontology id.
-	 * Selecting the concept id from OBS_CT table given ontology id.
-	 * Deleting concept id from OBR_IT table given concept id. 
-	 */
-	private void openDeleteEntriesFromOntologyStatement(){
-		/*DELETE OBR_IT FROM OBR_IT WHERE OBR_IT.conceptID IN (
-			SELECT OBS_CT.conceptID FROM OBS_CT
-				WHERE OBS_CT.ontologyID= (SELECT OBS_OT.ontologyID from OBS_OT
-					WHERE OBS_OT.localOntologyID=?)); */
-	    StringBuffer queryb = new StringBuffer();
-		queryb.append("DELETE ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(" FROM ");
+	  
+	private void openDeleteEntriesFromOntologyStatement(){	 
+		// Query Used :
+		//	DELETE IT FROM obr_tr_index IT, obs_concept CT, obs_ontology OT
+		//		WHERE IT.conept_id = CT.id
+		//			AND CT.ontology_id = OT.id
+		//			AND OT.local_ontology_id = ?;		
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE IT FROM ");
 		queryb.append(this.getTableSQLName());		
-		queryb.append(" WHERE ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(".concept_id IN ( ");
-		queryb.append("SELECT ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(".id ");
-		queryb.append("FROM ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" WHERE ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(".ontology_id= ( ");
-		queryb.append("SELECT ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(".id ");
-		queryb.append("FROM ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" WHERE ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(".local_ontology_id=? ))");
+		queryb.append(" IT, ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE IT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
+
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	

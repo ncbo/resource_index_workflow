@@ -23,4 +23,11 @@ public interface AnnotationService {
 	 * @return int - Number of annotations .
 	 */
 	public int resourceAnnotation(boolean withCompleteDictionary, HashSet<String> stopwords);
+	
+	/**
+	 * Method removes annotations for given ontology version.
+	 * 
+	 * @param localOntologyID String containing ontology version.
+	 */
+	public void removeAnnotations(String localOntologyID);
 }

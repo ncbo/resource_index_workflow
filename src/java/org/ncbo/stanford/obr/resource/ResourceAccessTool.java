@@ -293,6 +293,19 @@ public abstract class ResourceAccessTool implements StringHelper {
 	    return retValue.toString();
 	}
 	
-	 
+	/**
+	 * This method removes all the annotation for given ontology from annotation table,
+	 * expanded annotation table and indexing table for given ontology.
+	 * 
+	 * @param localOntologyID version of given ontology.
+	 */
+	public void removeOntology(String localOntologyID){
+		// Remove entries from indexing table  
+		indexationService.removeIndexation(localOntologyID);
+		// Remove entries from expanded annotation table  
+		semanticExpansionService.removeExpandedAnnotations(localOntologyID);
+		// Remove entries from annotation table.
+		annotationService.removeAnnotations(localOntologyID);
+	}
 	 
 }

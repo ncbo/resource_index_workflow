@@ -239,4 +239,13 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		return reportedAnnotations;
 	}
 
+	/**
+	 * Method removes annotations for given ontology version.
+	 * 
+	 * @param localOnotlogyID String containing ontology version.
+	 */
+	public void removeAnnotations(String localOntologyID) {
+		directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);		
+	}
+
 }

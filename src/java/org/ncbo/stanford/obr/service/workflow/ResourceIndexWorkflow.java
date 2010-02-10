@@ -35,4 +35,13 @@ public interface ResourceIndexWorkflow {
 	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
 	 */
 	public void resourceProcessing(ResourceAccessTool resourceAccessTool);
+	
+	/**
+	 * Deletes the ontology duplicates from the OBS slave tables and all the resource index tables.
+	 * which includes ontology table, concept table, term table, relation table and mapping table
+	 * and annotations tables for all resources.
+	 * 
+	 * <p>This method ensures to keep only the latest version of ontologies.	  
+	 */
+	public void removeOntologyDuplicates();
 }

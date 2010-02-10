@@ -32,7 +32,7 @@ public class ConceptDao extends AbstractObsDao {
 		super(TABLE_SUFFIX);
 
 	}
-	public static String name(String resourceID){		
+	public static String name(){		
 		return OBS_PREFIX + TABLE_SUFFIX;
 	}
 	
@@ -130,28 +130,24 @@ public class ConceptDao extends AbstractObsDao {
 	/**
 	 * 
 	 */
-	private void openDeleteEntriesFromOntologyStatement(){
-		/*DELETE obs_concept FROM obs_concept
-		  	WHERE obs_concept.ontology_id = select obs_ontology.id FROM obs_ontology 
-		  		WHERE obs_ontology.local_ontology_id = ?; */
+	private void openDeleteEntriesFromOntologyStatement(){		 
+		// Query used :
+		// DELETE CT FROM obs_concept CT, obs_ontology OT
+		//		WHERE CT.ontology_id = OT.id
+		//			AND OT.local_ontology_id = ?; 
+		
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("DELETE ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(" FROM ");
+		queryb.append("DELETE CT FROM ");
 		queryb.append(this.getTableSQLName());		
-		queryb.append(" WHERE ");
-		queryb.append(this.getTableSQLName());		
-		queryb.append(".ontology_id =(" );
-		queryb.append(" SELECT id FROM ");
-		queryb.append(OntologyDao.name(""));
-		queryb.append(" WHERE ");
-		queryb.append("local_ontology_id=?)");		
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());		
+		queryb.append(" OT WHERE CT.ontology_id = OT.id AND OT.local_ontology_id = ?;" );
 		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
 	/**
 	 * Deletes the rows for the given local_ontology_id.
-	 * @return True if the rows were successfully removed. 
+	 * @return true if the rows were successfully removed. 
 	 */
 	public boolean deleteEntriesFromOntology(String localOntologyID){
 		boolean deleted = false;

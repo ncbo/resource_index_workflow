@@ -11,7 +11,6 @@ public class IndexationServiceImpl extends AbstractResourceService implements In
 
 	public IndexationServiceImpl(ResourceAccessTool resourceAccessTool) {
 		super(resourceAccessTool);
-		// TODO Auto-generated constructor stub
 	} 
 
 	/**
@@ -28,6 +27,15 @@ public class IndexationServiceImpl extends AbstractResourceService implements In
 		timer.end();
 		logger.info("Indexation processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		return nbAnnotation;
+	}
+
+	/**
+	 * Method removes indexing done for given ontology version.
+	 * 
+	 * @param localOntologyID String containing ontology version.
+	 */
+	public void removeIndexation(String localOntologyID) {
+		 indexTableDao.deleteEntriesFromOntology(localOntologyID);		
 	}
 
 	 

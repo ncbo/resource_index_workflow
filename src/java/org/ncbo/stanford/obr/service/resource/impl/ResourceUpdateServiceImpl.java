@@ -15,7 +15,6 @@ import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.statistics.StatisticsDao.StatisticsEntry;
 import org.ncbo.stanford.obr.exception.ResourceFileException;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
@@ -83,7 +82,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * 
 	 */
 	public void addResource(Resource resource){
-		AbstractObrDao.resourceTableDao.addEntryOrUpdate(resource);
+		resourceTableDao.addEntryOrUpdate(resource);
 	}
 
 	/**
@@ -91,7 +90,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * 
 	 */
 	public void updateResourceForLatestDictionary(Resource resource) {
-		AbstractObrDao.resourceTableDao.updateDictionaryID(resource);
+		resourceTableDao.updateDictionaryID(resource);
 	}
 
 	public int numberOfEntry() {		 
@@ -107,8 +106,8 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		directAnnotationTableDao.reInitializeSQLTable();
 		expandedAnnotationTableDao.reInitializeSQLTable();
 		indexTableDao.reInitializeSQLTable();
-		AbstractObrDao.resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
-		AbstractObrDao.statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
+		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
+		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
 	}
 	
 	/**
@@ -286,10 +285,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		int mapping = 0;
 		
 		// Get resource id (primary key) from ResourceTable
-		int resource_id = AbstractObrDao.resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
+		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
 
 		// Get list of onltogyID used for indexing 
-		ArrayList<Integer> ontologyListFromStatsTables = AbstractObrDao.statisticsDao.getOntolgyIDsForResource(resource_id);
+		ArrayList<Integer> ontologyListFromStatsTables = statisticsDao.getOntolgyIDsForResource(resource_id);
 		
 		// Iterating for each ontologies
 		for (Integer ontologyID : indexedAnnotations.keySet()) {			
@@ -333,11 +332,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
-		int noOfEntiesUpdated=AbstractObrDao.statisticsDao.addEntries(entries);
+		int noOfEntiesUpdated=statisticsDao.addEntries(entries);
 		
 		// Remove non updated entries from stats table.
 		for (Integer integer : ontologyListFromStatsTables) {
-			AbstractObrDao.statisticsDao.deleteEntry(resource_id, integer);
+			statisticsDao.deleteEntry(resource_id, integer);
 		}
 		
 		logger.info("Number of entries added/updated in statistics table are :" + noOfEntiesUpdated);

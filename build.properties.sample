@@ -49,7 +49,12 @@ obs.master.ontology.status.complete=28
 obs.slave.populate=false
 obs.slave.dictionary.latest=false
 
+# Remove ontology from slave obs tables and all resources tables
+obs.slave.ontology.remove=false
+
 # Resource Index Workflow flags
+
+obr.resources.process=true
 
 # This flag used to  re initialized all tables for resources. 
 obr.reinitialize.all=false

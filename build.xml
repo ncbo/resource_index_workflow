@@ -123,8 +123,9 @@
 				<!-- For populate slave obs tables from master database.			r-->
 				<filter token="obsslavepopulate" value="${obs.slave.populate}" />
 				<filter token="obsslavedictionarylatest" value="${obs.slave.dictionary.latest}" />
- 
+				 
 				<!-- Resource Index workflow parameter -->
+				<filter token="obrresourcesprocess" value="${obr.resources.process}" />
 				<filter token="obrreinitializeall" value="${obr.reinitialize.all}" />
 				<filter token="obrreinitializeonlyannotation" value="${obr.reinitialize.only.annotation}" />
 				<filter token="obrupdateresource" value="${obr.update.resource}" />
@@ -134,6 +135,8 @@
 				<filter token="obrexpansiondistance" value="${obr.expansion.distance}" />
 				<filter token="obrlogfilename" value="${obr.app.logfile.name}" />
 				 
+				<!--Remove ontology from slave obs tables and all resources tables-->
+				<filter token="obsslaveontologyremove" value="${obs.slave.ontology.remove}" />
 			</filterset>
 		</copy>		 
 	</target> 

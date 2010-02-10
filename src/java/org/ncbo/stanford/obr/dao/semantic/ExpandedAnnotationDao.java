@@ -8,6 +8,8 @@ import java.util.HashMap;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
+import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -280,34 +282,20 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * Deleting concept id from OBR_EAT table given concept id. 
 	 */
 	private void openDeleteEntriesFromOntologyStatement(){
-		/*DELETE OBR_EAT FROM OBR_EAT WHERE OBR_EAT.conceptID IN (
-			SELECT OBS_CT.conceptID FROM OBS_CT
-				WHERE OBS_CT.ontologyID= (SELECT OBS_OT.ontologyID from OBS_OT
-					WHERE OBS_OT.localOntologyID=?)); */
+		// Query Used :
+		//	DELETE EAT FROM obr_tr_expanded_annotation EAT, obs_concept CT, obs_ontology OT
+		//		WHERE EAT.conept_id = CT.id
+		//			AND CT.ontology_id = OT.id
+		//			AND OT.local_ontology_id = ?;		
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("DELETE ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(" FROM ");
+		queryb.append("DELETE EAT FROM ");
 		queryb.append(this.getTableSQLName());		
-		queryb.append(" WHERE ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(".concept_id IN ( ");
-		queryb.append("SELECT ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(".id ");
-		queryb.append("FROM ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" WHERE ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(".ontology_id= ( ");
-		queryb.append("SELECT ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(".id ");
-		queryb.append("FROM ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" WHERE ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(".local_ontology_id=? ))");
+		queryb.append(" EAT, ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE EAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 		

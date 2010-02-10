@@ -65,4 +65,19 @@ public interface ObsDataPopulationService {
 	 * @return Number of mapping entries added in slave map table.
 	 */
 	public int populateMappingSlaveData(List<String> localOntologyIDs);
+	
+	/**
+	 * This method gets list of ontology versions present in master ontology id
+	 * 
+	 * @return {@code List} of local ontology id
+	 */
+	public List<String> getMasterSlaveLocalOntologyIDs(); 
+	
+	/**
+	 * This method removes given ontology version from all the obs slave tables
+	 * i.e. removes entries from table obs_ontology, obs_concept, obs_term, obs_relation, obs_map
+	 * 
+	 * @param localOntologyID ontology version to remove. 
+	 */
+	public void removeOntology(String localOntologyID);
 }

@@ -56,4 +56,15 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		return nbAnnotation;
 	}
 
+	/**
+	 * Method removes expanded annotations for given ontology version.Entries are remove from 
+	 * is a parent relation and mapping relation.
+	 * 
+	 * @param localOntologyID String containing ontology version.
+	 */ 
+	public void removeExpandedAnnotations(String localOntologyID) {
+		expandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+		
+	}
+
 }

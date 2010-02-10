@@ -24,4 +24,11 @@ public interface SemanticExpansionService {
 	 */
 	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
 
+	/**
+	 * Method removes expanded annotations for given ontology version.Entries are remove from 
+	 * is a parent relation and mapping relation.
+	 * 
+	 * @param localOntologyID String containing ontology version.
+	 */
+	public void removeExpandedAnnotations(String localOntologyID);
 }

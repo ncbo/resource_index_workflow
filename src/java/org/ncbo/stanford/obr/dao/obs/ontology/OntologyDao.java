@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import obs.common.beans.OntologyBean;
+
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
+import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.term.TermDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -33,11 +37,14 @@ public class OntologyDao extends AbstractObsDao{
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.ontology.table.suffix");
 
 	private PreparedStatement addEntryStatement;	
+	private static PreparedStatement getEntryStatement;
 	private static PreparedStatement getLatestLocalOntologyIDStatement;
 	private static PreparedStatement hasNewVersionOfOntologyStatement;
 	private static PreparedStatement getLocalConceptIdByPrefNameAndOntologyIdStatement;
 	private static PreparedStatement getAllLocalOntologyIDsStatement;
 	private static PreparedStatement deleteEntriesFromOntologyStatement;
+	private static PreparedStatement getAllOntologyBeansStatement;
+	
 	
 	private OntologyDao() {		
 		super(TABLE_SUFFIX);
@@ -54,8 +61,8 @@ public class OntologyDao extends AbstractObsDao{
 		return OntologyDaoHolder.ONTOLOGY_DAO_INSTANCE;
 	}
 	
-	public static String name(String resourceID){		
-		return ontologyDao.getTableSQLName();
+	public static String name(){		
+		return OBS_PREFIX + TABLE_SUFFIX;
 	}
 	
 	@Override
@@ -84,6 +91,8 @@ public class OntologyDao extends AbstractObsDao{
 		this.openGetLocalConceptIdByPrefNameAndOntologyId();
 		this.openGetAllLocalOntologyIDsStatement();
 		this.openDeleteEntriesFromOntologyStatement();
+		this.openGetEntryStatement();
+		this.openGetAllOntologyBeansStatement();
 	}
 	
 	@Override
@@ -148,16 +157,78 @@ public class OntologyDao extends AbstractObsDao{
 		return nbInserted;
 	} 
 	
+	private void openGetEntryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT name, version, description, status, virtual_ontology_id, format, dictionary_id FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" WHERE localOntologyID=?;");
+		getEntryStatement = this.prepareSQLStatement(queryb.toString());
+	} 
+	
+	
+	public OntologyEntry getEntry(String localOntologyID){
+		OntologyEntry entry = null;
+		try {
+			getEntryStatement.setString(1, localOntologyID);
+			ResultSet rSet = this.executeSQLQuery(getEntryStatement);
+			if(rSet.first()){
+				entry = new OntologyEntry(localOntologyID, rSet.getString(1), rSet.getString(2), rSet.getString(3),rSet.getInt(4), rSet.getString(5), rSet.getString(6), rSet.getInt(7));
+			}
+				
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetEntryStatement();
+			return this.getEntry(localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get ontology entry from "+this.getTableSQLName()+" with localOntologyID:"+ localOntologyID +". Null returned.", e);
+		}
+		return entry;
+	}
 	
 	/**************************Methods on ontology Table***************************************/
 
+	private void openGetAllOntologyBeansStatement() {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_ontology_id, name, version, virtual_ontology_id FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(";");
+		 
+		getAllOntologyBeansStatement = this.prepareSQLStatement(queryb.toString());		
+	}
+	
+	public List<OntologyBean>  getAllOntologyBeans(){	
+		List<OntologyBean> ontologyBeans = new ArrayList<OntologyBean>();
+		OntologyBean ontologyBean = null;
+		try {
+			 
+			ResultSet rSet = this.executeSQLQuery(getAllOntologyBeansStatement);
+			while(rSet.next()){
+				ontologyBean = new OntologyBean(rSet.getString(1), rSet.getString(2), rSet.getString(3), rSet.getString(4) );
+				ontologyBeans.add(ontologyBean);
+			} 	
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openGetAllOntologyBeansStatement();
+			return this.getAllOntologyBeans();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get ontology entries from "+this.getTableSQLName()+".Null returned.", e);
+		}
+		
+		return ontologyBeans;
+		
+	}
+	
 	/**
 	 * 
 	 */
 	private void openGetLatestLocalOntologyIDStatement() {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT local_ontology_id FROM ");
-		queryb.append(ontologyDao.getTableSQLName());
+		queryb.append(this.getTableSQLName());
 		queryb.append(" where virtual_ontology_id= ? order by id DESC;");
 		 
 		getLatestLocalOntologyIDStatement = this.prepareSQLStatement(queryb.toString());		
@@ -194,11 +265,11 @@ public class OntologyDao extends AbstractObsDao{
 	private void openHasNewVersionOfOntologyStatement(){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT DISTINCT local_ontology_id, dictionary_id FROM ");
-		queryb.append(ontologyDao.getTableSQLName());
+		queryb.append(this.getTableSQLName());
 		queryb.append(" OT, ");
-		queryb.append(conceptDao.getTableSQLName());
+		queryb.append(ConceptDao.name());
 		queryb.append(" CT, ");
-		queryb.append(termDao.getTableSQLName());
+		queryb.append(TermDao.name());
 		queryb.append(" TT WHERE TT.concept_id = CT.id AND  CT.ontology_id=OT.id");
 		queryb.append(" AND OT.virtual_ontology_id= ? order BY OT.id DESC;");
 		 
@@ -248,11 +319,11 @@ public class OntologyDao extends AbstractObsDao{
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT local_concept_id ");
 		queryb.append("FROM ");
-		queryb.append(termDao.getTableSQLName());
+		queryb.append(TermDao.name());
 		queryb.append(" TT, ");
-		queryb.append(conceptDao.getTableSQLName());
+		queryb.append(ConceptDao.name());
 		queryb.append(" CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
+		queryb.append(this.getTableSQLName());
 		queryb.append(" OT WHERE TT.concept_id= CT.id AND CT.ontology_id=OT.id AND ");
 		queryb.append("TT.is_preferred=true AND OT.local_ontology_id=? AND TT.name=?;");		 
 		getLocalConceptIdByPrefNameAndOntologyIdStatement = this.prepareSQLStatement(queryb.toString());
@@ -330,7 +401,8 @@ public class OntologyDao extends AbstractObsDao{
 	}
 	/**
 	 * Deletes the rows for the given local_ontology_id.
-	 * @return True if the rows were successfully removed. 
+	 * 
+	 * @return true if the rows were successfully removed. 
 	 */
 	public boolean deleteEntriesFromOntology(String localOntologyID){
 		boolean deleted = false;
@@ -349,6 +421,11 @@ public class OntologyDao extends AbstractObsDao{
 		return deleted;
 	}
 	
+	/**
+	 * This method gives Set of all the ontology versions i.e local ontology ids present  in obs_ontology
+	 *
+	 * @return {@code Set} of local ontology ids
+	 */
 	public HashSet<String> getLocalOntologyIDs(){
 		// Query: SELECT DISTINCT local_ontology_id FROM obs_ontology
 		HashSet<String> localOntologyIDs = new HashSet<String>();
@@ -368,9 +445,9 @@ public class OntologyDao extends AbstractObsDao{
 			logger.error("** PROBLEM ** Cannot get localOntologyIDs from "+this.getTableSQLName()+".", e);
 		}
 		return localOntologyIDs;
-	}
+	}	
+	
 	public static class OntologyEntry{
-
 		private int id;
 		private String localOntologyID;
 		private String name;
@@ -386,6 +463,21 @@ public class OntologyDao extends AbstractObsDao{
 				String virtualOntologyID, String format, int dictionaryID) {
 			super();
 			this.id = id;
+			this.localOntologyID = localOntologyID;
+			this.name = name;
+			this.version = version;
+			this.description = description;
+			this.status = status;
+			this.virtualOntologyID = virtualOntologyID;
+			this.format = format;
+			this.dictionaryID = dictionaryID;
+		}	 
+		
+
+		public OntologyEntry(String localOntologyID, String name,
+				String version, String description, int status,
+				String virtualOntologyID, String format, int dictionaryID) {
+			super(); 
 			this.localOntologyID = localOntologyID;
 			this.name = name;
 			this.version = version;
@@ -520,6 +612,10 @@ public class OntologyDao extends AbstractObsDao{
 		 */
 		public void setDictionaryID(int dictionaryID) {
 			this.dictionaryID = dictionaryID;
+		}
+		
+		public OntologyBean getOntologyBean(){
+			return new OntologyBean(this.localOntologyID, this.name, this.version, this.virtualOntologyID);
 		}
 		
 		public String toString(){
