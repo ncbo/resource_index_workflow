@@ -82,7 +82,11 @@ public class MapDao extends AbstractObsDao{
 		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +
 		");";
 	}
-	
+
+	/**
+	 * Add a new entry in corresponding(here, obs_map) SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
 	public boolean addEntry(MapEntry entry){
 		boolean inserted = false;
 		try {
@@ -169,6 +173,11 @@ public class MapDao extends AbstractObsDao{
 		return deleted;
 	}
 	
+	/**
+	 * This class is representation for obs_map table entry.
+	 * @author k.palanisamy
+	 *
+	 */
 	public static class MapEntry{
 
 		private int id;

@@ -91,6 +91,10 @@ public class TermDao extends AbstractObsDao{
 		");";
 	}
 	
+	/**
+	 * Add a new entry in corresponding(here, obs_term) SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
 	public boolean addEntry(TermEntry entry){
 		boolean inserted = false;
 		try {
@@ -230,6 +234,12 @@ public class TermDao extends AbstractObsDao{
 		}
 		return deleted;
 	}
+	
+	/**
+	 * This class is representation for obs_term table entry.
+	 * @author k.palanisamy
+	 *
+	 */
 	public static class TermEntry{
 
 		private int id;

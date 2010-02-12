@@ -41,7 +41,7 @@ public class StatisticsDao extends AbstractObrDao {
 	private static PreparedStatement getOntolgyIDsForResourceStatement;
 	private static PreparedStatement deleteEntryStatement;
 	private static PreparedStatement deleteStatisticsForResourceStatement;
-	
+	private static PreparedStatement deleteEntriesFromOntologyStatement;
 		
 	private StatisticsDao() {
 		super(EMPTY_STRING, TABLE_SUFFIX);
@@ -71,6 +71,7 @@ public class StatisticsDao extends AbstractObrDao {
 		this.openGetOntolgyIDsForResourceStatement();
 		this.openDeleteEntryStatement();
 		this.openDeleteStatisticsForResourceStatement();
+		this.openDeleteEntriesFromOntologyStatement();
 	}
 
 	@Override
@@ -80,6 +81,7 @@ public class StatisticsDao extends AbstractObrDao {
 		getOntolgyIDsForResourceStatement.close();
 		deleteEntryStatement.close();
 		deleteStatisticsForResourceStatement.close();
+		deleteEntriesFromOntologyStatement.close();
 	}
 
 	private static class ContextTableHolder {
@@ -266,9 +268,44 @@ public class StatisticsDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for resourceID: " +resourceID + ". False returned.", e);
 		}
 		return deleted;
+	}	
+	
+	private void openDeleteEntriesFromOntologyStatement(){
+		/*DELETE STAT FROM obs_statistics STAT,obs_ontology OT
+		 	WHERE STAT.ontology_id = OT.id and OT.local_ontology_id = ? 
+		 */
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE STAT FROM");
+		queryb.append(this.getTableSQLName());			
+		queryb.append(" STAT, ");
+		queryb.append(ontologyDao.getTableSQLName());
+		queryb.append(" OT, ");
+		queryb.append(" WHERE ");
+		queryb.append(" STAT.ontology_id = OT.id and OT.local_ontology_id=? ");		
+		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
- 
-
+	
+	/**
+	 * Deletes the rows for the given local_ontology_id.
+	 * 
+	 * @return true if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntology(String localOntologyID){
+		boolean deleted = false;
+		try{
+			deleteEntriesFromOntologyStatement.setString(1, localOntologyID);
+			executeSQLUpdate(deleteEntriesFromOntologyStatement);
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openDeleteEntriesFromOntologyStatement();
+			return this.deleteEntriesFromOntology(localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
 	/********************************* ENTRY CLASS *****************************************************/
 
 	/**

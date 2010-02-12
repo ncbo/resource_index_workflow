@@ -84,7 +84,11 @@ public class RelationDao extends AbstractObsDao{
 		"INDEX X_" + getTableSQLName() +"_level (level)" +
 		");";
 	}
-
+	
+	/**
+	 * Add a new entry in corresponding(here, obs_relation) SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
 	public boolean addEntry(RelationEntry entry){
 		boolean inserted = false;
 		try {
@@ -168,6 +172,11 @@ public class RelationDao extends AbstractObsDao{
 		return deleted;
 	}
 	
+	/**
+	 * This class is representation for obs_relaiton table entry.
+	 * @author k.palanisamy
+	 *
+	 */
 	public static class RelationEntry{
 
 		private int id;

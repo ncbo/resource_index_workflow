@@ -111,6 +111,10 @@ public class OntologyDao extends AbstractObsDao{
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
+	/**
+	 * Add a new entry in corresponding(here, obs_ontology) SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
 	public boolean addEntry(OntologyEntry entry){
 		boolean inserted = false;
 		try {
@@ -447,6 +451,11 @@ public class OntologyDao extends AbstractObsDao{
 		return localOntologyIDs;
 	}	
 	
+	/**
+	 * This class is representation for obs_ontology table entry.
+	 * @author k.palanisamy
+	 *
+	 */
 	public static class OntologyEntry{
 		private int id;
 		private String localOntologyID;

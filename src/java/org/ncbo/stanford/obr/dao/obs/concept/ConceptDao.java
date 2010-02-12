@@ -80,7 +80,11 @@ public class ConceptDao extends AbstractObsDao {
 		queryb.append(" (id, local_concept_id, ontology_id, is_toplevel) VALUES (?,?,?,?);");
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
-		
+	
+	/**
+	 * Add a new entry in corresponding(here, obs_concept) SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
 	public boolean addEntry(ConceptEntry entry){
 		boolean inserted = false;
 		try {
@@ -165,6 +169,12 @@ public class ConceptDao extends AbstractObsDao {
 		}
 		return deleted;
 	}
+	
+	/**
+	 * This class is representation for obs_concept table entry.
+	 * @author k.planisamy
+	 *
+	 */
 	public static class ConceptEntry{
 		
 		private int id;
