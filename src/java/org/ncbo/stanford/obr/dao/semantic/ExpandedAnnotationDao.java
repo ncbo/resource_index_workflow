@@ -190,32 +190,22 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * Returns the number of isaClosure annotations created in the corresponding _EAT.
 	 */
 	public int isaClosureExpansion(DirectAnnotationDao table){
-		int nbAnnotation;
-		/* INSERT OBR_TR_EAT (elementID, conceptID, contextID, childConceptID, level, indexingDone) 
-		SELECT elementID, CT2.conceptID, contextID, DAT.conceptID, level, false
-			FROM OBR_TR_DAT AS DAT, OBS_CT AS CT1, OBS_CT AS CT2, OBS_ISAPT AS ISAPT
-				WHERE CT2.localConceptID = ISAPT.parentLocalConceptID
-				AND CT1.localConceptID = ISAPT.localConceptID
-				AND OBR_TR_DAT.conceptID = CT1.conceptID AND isaClosureDone = false; */
-
-		//TODO : check that discussion with Nigam sept 2009
-		/* INSERT OBR_TR_EAT (elementID, conceptID, contextID, childConceptID, level, indexingDone) 
-		SELECT elementID, CT2.conceptID, contextID, DAT.conceptID, level, false
-			FROM OBR_TR_DAT AS DAT, OBS_CT AS CT1, OBS_CT AS CT2, OBS_ISAPT AS ISAPT
-				WHERE CT2.conceptID = ISAPT.parentConceptID
-				AND OBR_TR_DAT.conceptID = ISAPT.conceptID AND isaClosureDone = false; */
-
+		int nbAnnotation;		 
+		// Query Used :
+		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done)
+		//			SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false 
+		//				FROM obr_gm_annotation AS DAT, obs_relation AS ISAPT 
+		//				WHERE DAT.concept_id = ISAPT.concept_id
+		//					AND is_a_closure_done = false; 
 		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT element_id, CT.id, context_id, DAT.concept_id, level, false FROM ");
+		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false FROM ");
 		queryb.append(table.getTableSQLName());
-		queryb.append(" AS DAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");		 
+		queryb.append(" AS DAT, ");			 
 		queryb.append(relationDao.getTableSQLName());
-		queryb.append(" AS ISAPT WHERE CT.id = ISAPT.parent_concept_id AND DAT.concept_id = ISAPT.concept_id AND is_a_closure_done = false;");
+		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND is_a_closure_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
@@ -240,23 +230,23 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * Returns the number of mapping annotations created in the corresponding _EAT.
 	 */
 	public int mappingExpansion(DirectAnnotationDao table){
-		int nbAnnotation;
-		/* INSERT OBR_TR_EAT (elementID, conceptID, contextID, mappedConceptID, mappingType, indexingDone) 
-				SELECT elementID, CT2.conceptID, contextID, MAPT.conceptID, mappingType, false
-    				FROM OBR_TR_DAT AS DAT, OBS_CT AS CT1, OBS_CT AS CT2, OBS_MAPT AS MAPT
-    					WHERE CT2.localConceptID = MAPT.mappedLocalConceptID
-    					AND CT1.localConceptID = MAPT.localConceptID
-    					AND OBR_TR_DAT.conceptID = CT1.conceptID AND mappingDone = false; */		
+		int nbAnnotation;	 
+		// Query Used :
+		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done)
+		//			SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, level, false 
+		//				FROM obr_gm_annotation AS DAT, obs_map AS MAPT 
+		//				WHERE DAT.concept_id = MAPT.concept_id
+		//					AND mapping_done = false ;
+		
+		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, CT.id, context_id, DAT.concept_id, mapping_type, false FROM ");
+		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false FROM ");
 		queryb.append(table.getTableSQLName());
-		queryb.append(" AS DAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");	 
+		queryb.append(" AS DAT, ");		
 		queryb.append(mapDao.getTableSQLName());
-		queryb.append(" AS MAPT WHERE CT.id = MAPT.mapped_concept_id AND DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
+		queryb.append(" AS MAPT WHERE DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
