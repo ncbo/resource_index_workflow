@@ -62,6 +62,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		logger.info("Population of slave data from master obs database completed.");
 		timer.end();		
 		logger.info("Population of slave data processed in : " + timer.millisecondsToTimeString(timer.duration()));
+		// Release the master database connection.
+		obsMasterDao.closeConnection();
 	}
  
 	/**

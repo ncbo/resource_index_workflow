@@ -23,8 +23,7 @@
 		<include name="*.jar"/>
 		<exclude name="com.noelios.restlet.ext.httpclient_*.jar"/>
 		<exclude name="commons-httpclient-3.1.jar"/>			
-		<exclude name="oro-2.0.8.jar"/>
-		<exclude name="orphanNodesAlg.jar"/>		 
+		<exclude name="oro-2.0.8.jar"/>		 
 		<exclude name="OntologyAccess*.jar"/>
 	</fileset>	
 	<fileset id="protege.jars" dir="${protege.lib.dir}">

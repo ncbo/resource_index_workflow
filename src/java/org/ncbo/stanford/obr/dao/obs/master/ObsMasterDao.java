@@ -92,6 +92,33 @@ public class ObsMasterDao implements DaoFactory{
 	}
 	
 	/**
+	 * This method release the connection 
+	 * 
+	 */
+	public void closeConnection(){
+		 try{
+			 if(tableStatement!= null) {
+				 tableStatement.close();	
+				 tableStatement= null;
+			 } 
+		 }catch (Exception e) {
+			logger.error("Problem in closing statement " , e); 
+		} finally{
+			try{
+				if(masterTableConnection!= null){
+					masterTableConnection.close();
+					masterTableConnection=null;
+				}
+			}catch (SQLException e) {
+				logger.error("Problem in closing connection " , e); 
+			}
+			
+			 
+		}
+		 
+	}
+	
+	/**
 	 * Reopens the DB connection if closed and reopens all the prepared statement for all instances of sub-classes.
 	 */
 	private static void reOpenConnectionIfClosed(){
