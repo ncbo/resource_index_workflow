@@ -3,6 +3,8 @@
  */
 package org.ncbo.stanford.obr.service.semantic;
 
+import java.util.List;
+
 /**
  * @author Kuladip Yadav
  *
@@ -25,10 +27,10 @@ public interface SemanticExpansionService {
 	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
 
 	/**
-	 * Method removes expanded annotations for given ontology version.Entries are remove from 
+	 * Method removes expanded annotations for given ontology versions.Entries are remove from 
 	 * is a parent relation and mapping relation.
 	 * 
-	 * @param localOntologyID String containing ontology version.
+	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
-	public void removeExpandedAnnotations(String localOntologyID);
+	public void removeExpandedAnnotations(List<String> localOntologyIDs);
 }

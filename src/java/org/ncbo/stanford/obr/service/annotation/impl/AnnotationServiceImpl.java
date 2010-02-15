@@ -3,6 +3,7 @@ package org.ncbo.stanford.obr.service.annotation.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 
 import obs.common.beans.DictionaryBean;
 import obs.common.utils.ExecutionTimer;
@@ -240,12 +241,12 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	}
 
 	/**
-	 * Method removes annotations for given ontology version.
+	 * Method removes annotations for given ontology versions.
 	 * 
-	 * @param localOnotlogyID String containing ontology version.
+	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
-	public void removeAnnotations(String localOntologyID) {
-		directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);		
+	public void removeAnnotations(List<String> localOntologyIDs) {
+		directAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs);		
 	}
 
 }

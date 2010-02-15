@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
@@ -384,6 +385,45 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyID: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
+	
+	/**
+	 * Deletes the rows corresponding to annotations done with a concept in the given list of localOntologyIDs.
+	 * 
+	 * @param {@code List} of local ontology ids
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
+		boolean deleted = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE DAT FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" DAT, ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
+		
+		for (String localOntologyID : localOntologyIDs) {
+			queryb.append("'");
+			queryb.append(localOntologyID);
+			queryb.append("', ");
+		}
+		queryb.delete(queryb.length()-2, queryb.length());
+		queryb.append(");");
+
+		try{			 
+			this.executeSQLUpdate(queryb.toString() );
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.deleteEntriesFromOntologies(localOntologyIDs);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyIDs: "+ localOntologyIDs+". False returned.", e);
 		}
 		return deleted;
 	}

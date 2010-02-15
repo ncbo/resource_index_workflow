@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
@@ -236,8 +237,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		//			SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, level, false 
 		//				FROM obr_gm_annotation AS DAT, obs_map AS MAPT 
 		//				WHERE DAT.concept_id = MAPT.concept_id
-		//					AND mapping_done = false ;
-		
+		//					AND mapping_done = false ;		
 		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
@@ -258,7 +258,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot execute the isa transitive closure on table " + this.getTableSQLName() +". 0 returned", e);
+			logger.error("** PROBLEM ** Cannot execute the mapping expansion query on table " + this.getTableSQLName() +". 0 returned", e);
 			nbAnnotation = 0;
 		}
 		return nbAnnotation;
@@ -306,6 +306,45 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyID: "+ localOntologyID+". False returned.", e);
+		}
+		return deleted;
+	}
+	
+	/**
+	 * Deletes the rows corresponding to expanded annotations done with a concept in the given list of localOntologyIDs.
+	 * 
+	 * @param {@code List} of local ontology ids
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
+		boolean deleted = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE EAT FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" EAT, ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE EAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
+		
+		for (String localOntologyID : localOntologyIDs) {
+			queryb.append("'");
+			queryb.append(localOntologyID);
+			queryb.append("', ");
+		}
+		queryb.delete(queryb.length()-2, queryb.length());
+		queryb.append(");");
+
+		try{			 
+			this.executeSQLUpdate(queryb.toString() );
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.deleteEntriesFromOntologies(localOntologyIDs);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyIDs: "+ localOntologyIDs+". False returned.", e);
 		}
 		return deleted;
 	}

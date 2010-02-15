@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -234,14 +235,20 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				}
 			}
 		}
+				 
+		// remove from obr tables.
+		logger.info("Removing dulicate ontology version from obr tables started");	
+		removeOntologiesFromOBRTables(new ArrayList<String>(ontologiesToRemove));
+		logger.info("Removing dulicate ontology version from obr tables completed");	
 		// Iterating each duplicate ontology version and remove from obr and obs tables.
+		
+		logger.info("Removing dulicate ontology version from obs slave tables started");	
 		for (String localOntologyID : ontologiesToRemove) {
-			logger.info("Removing ontology version :" + localOntologyID);
-			// remove from obr tables.			 
-			removeOntologyFromOBRTables(localOntologyID);
+			logger.info("Removing ontology version :" + localOntologyID);			 
 			// remove ontology from obs slave database.
 			obsDataPopulationService.removeOntology(localOntologyID);
 		} 
+		logger.info("Removing dulicate ontology version from obs slave tables completed.");	
 		timer.end();
 		
 		logger.info("Remove dupicate ontologies completed in: "
@@ -253,7 +260,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * 
 	 * @param localOntologyID ontology version
 	 */
-	private void removeOntologyFromOBRTables(String localOntologyID){
+	private void removeOntologiesFromOBRTables(List<String> localOntologyIDs){
 		// gets all resource ids for processing, 
 		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
 				.getMessage("obr.resource.ids"), ",");
@@ -268,7 +275,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();	 
-				resourceAccessTool.removeOntology(localOntologyID); 
+				resourceAccessTool.removeOntologies(localOntologyIDs); 
 				
 			} catch (Exception e) {
 				logger.error(

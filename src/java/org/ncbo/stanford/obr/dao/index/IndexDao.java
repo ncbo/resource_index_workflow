@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import obs.obr.populate.ObrWeight;
 
@@ -377,6 +378,45 @@ public class IndexDao extends AbstractObrDao {
 		}
 		return deleted;
 	}
+	
+	/**
+	 * Deletes the rows for indexing done with a concept in the given list of localOntologyIDs.
+	 * 
+	 * @param {@code List} of local ontology ids
+	 * @return True if the rows were successfully removed. 
+	 */
+	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
+		boolean deleted = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE IT FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" IT, ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT, ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE IT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
+		
+		for (String localOntologyID : localOntologyIDs) {
+			queryb.append("'");
+			queryb.append(localOntologyID);
+			queryb.append("', ");
+		}
+		queryb.delete(queryb.length()-2, queryb.length());
+		queryb.append(");");
+
+		try{			 
+			this.executeSQLUpdate(queryb.toString() );
+			deleted = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {			 
+			return this.deleteEntriesFromOntologies(localOntologyIDs);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for localOntologyIDs: "+ localOntologyIDs+". False returned.", e);
+		}
+		return deleted;
+	}	
 	
 	//**********************************Statistics Method****************
 	

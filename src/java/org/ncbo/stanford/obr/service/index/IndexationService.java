@@ -3,6 +3,8 @@
  */
 package org.ncbo.stanford.obr.service.index;
 
+import java.util.List;
+
 import obs.obr.populate.ObrWeight;
 
 /**
@@ -23,10 +25,10 @@ public interface IndexationService {
 	public int indexation(ObrWeight weights);
 	
 	/**
-	 * Method removes indexing done for given ontology version.
+	 * Method removes indexing done for given ontology versions.
 	 * 
-	 * @param localOntologyID String containing ontology version.
+	 * @param {@code List} of localOntologyID String containing ontology version.
 	 */
-	public void removeIndexation(String localOntologyID);
+	public void removeIndexation(List<String> localOntologyID);
 
 }

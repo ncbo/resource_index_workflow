@@ -1,5 +1,7 @@
 package org.ncbo.stanford.obr.service.index.impl;
 
+import java.util.List;
+
 import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.ObrWeight;
 
@@ -30,14 +32,11 @@ public class IndexationServiceImpl extends AbstractResourceService implements In
 	}
 
 	/**
-	 * Method removes indexing done for given ontology version.
+	 * Method removes indexing done for given ontology versions.
 	 * 
-	 * @param localOntologyID String containing ontology version.
+	 * @param {@code List} of localOntologyID containing ontology versions.
 	 */
-	public void removeIndexation(String localOntologyID) {
-		 indexTableDao.deleteEntriesFromOntology(localOntologyID);		
-	}
-
-	 
-
+	public void removeIndexation(List<String> localOntologyIDs) {
+		 indexTableDao.deleteEntriesFromOntologies(localOntologyIDs);		
+	} 
 }

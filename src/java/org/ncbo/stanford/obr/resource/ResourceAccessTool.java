@@ -3,6 +3,7 @@ package org.ncbo.stanford.obr.resource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 
 import obs.common.utils.Utilities;
 import obs.obr.populate.Resource;
@@ -294,18 +295,18 @@ public abstract class ResourceAccessTool implements StringHelper {
 	}
 	
 	/**
-	 * This method removes all the annotation for given ontology from annotation table,
+	 * This method removes all the annotation for given ontology versions from annotation table,
 	 * expanded annotation table and indexing table for given ontology.
 	 * 
-	 * @param localOntologyID version of given ontology.
+	 * @param {@code List} of localOntologyID containing version of given ontology.
 	 */
-	public void removeOntology(String localOntologyID){
+	public void removeOntologies(List<String> localOntologyIDs){
 		// Remove entries from indexing table  
-		indexationService.removeIndexation(localOntologyID);
+		indexationService.removeIndexation(localOntologyIDs);
 		// Remove entries from expanded annotation table  
-		semanticExpansionService.removeExpandedAnnotations(localOntologyID);
+		semanticExpansionService.removeExpandedAnnotations(localOntologyIDs);
 		// Remove entries from annotation table.
-		annotationService.removeAnnotations(localOntologyID);
+		annotationService.removeAnnotations(localOntologyIDs);
 	}
 	 
 }

@@ -218,7 +218,7 @@ public class ObsMasterDao implements DaoFactory{
 			selectQuery.append(localOntologyID);
 			selectQuery.append(", ");
 		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length()-1);
+		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
 		selectQuery.append(");");
 		
 		try {		
@@ -251,7 +251,7 @@ public class ObsMasterDao implements DaoFactory{
 			selectQuery.append(localOntologyID);
 			selectQuery.append(", ");
 		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length()-1);
+		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
 		selectQuery.append(");");	
 		
 		try {			 						
@@ -283,7 +283,7 @@ public class ObsMasterDao implements DaoFactory{
 			selectQuery.append(localOntologyID);
 			selectQuery.append(", ");
 		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length()-1);
+		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
 		selectQuery.append("); ");	
 		
 		try {		
@@ -317,7 +317,7 @@ public class ObsMasterDao implements DaoFactory{
 			selectQuery.append(localOntologyID);
 			selectQuery.append(", ");
 		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length()-1);
+		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
 		selectQuery.append("); ");		
 		
 		try {	

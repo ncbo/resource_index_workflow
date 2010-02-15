@@ -1,6 +1,7 @@
 package org.ncbo.stanford.obr.service.annotation;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Service for processing direct annotations
@@ -25,9 +26,9 @@ public interface AnnotationService {
 	public int resourceAnnotation(boolean withCompleteDictionary, HashSet<String> stopwords);
 	
 	/**
-	 * Method removes annotations for given ontology version.
+	 * Method removes annotations for given ontology versions.
 	 * 
-	 * @param localOntologyID String containing ontology version.
+	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
-	public void removeAnnotations(String localOntologyID);
+	public void removeAnnotations(List<String> localOntologyIDs);
 }
