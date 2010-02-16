@@ -134,6 +134,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		if (Boolean
 				.parseBoolean(MessageUtils.getMessage("obr.update.resource"))) {
 			int nbElement = resourceAccessTool.updateResourceContent();
+			resourceAccessTool.updateResourceUpdateInfo();
+			
 			toolLogger.info("Resource "
 					+ resourceAccessTool.getToolResource().getResourceName()
 					+ " updated with " + nbElement + " elements.");
@@ -184,11 +186,13 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ nbIndexedAnnotation
 				+ " new indexed annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".");
-
-		// Update resource table entry for latest DictionaryID for DAT table
-		resourceAccessTool.updateResourceTableDictionaryID();		
+				
 		// Update obr_statistics table.
 		resourceAccessTool.calculateObrStatistics();
+		
+		// Update resource table entry for latest DictionaryID and 
+		resourceAccessTool.updateResourceWorkflowInfo();
+		
 		timer.end();
 		toolLogger.info("Resource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " processed in: "

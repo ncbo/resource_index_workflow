@@ -260,15 +260,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void addResourceTableEntry(){
 		this.resourceUpdateService.addResource(this.getToolResource());
 	}
-
-	/**
-	 * Update resource table with latest dictionayID
-	 * 
-	 */
-	public void updateResourceTableDictionaryID() {
-		resourceUpdateService.updateResourceForLatestDictionary(this.getToolResource());
-	} 
-	
+   
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
@@ -307,6 +299,25 @@ public abstract class ResourceAccessTool implements StringHelper {
 		semanticExpansionService.removeExpandedAnnotations(localOntologyIDs);
 		// Remove entries from annotation table.
 		annotationService.removeAnnotations(localOntologyIDs);
+	}
+
+	/**
+	 * Method update resource table with total number of element and update date.
+	 *   
+	 * @return boolean  {@code true} if updated successfully.
+	 */
+	public boolean updateResourceUpdateInfo() {
+		return resourceUpdateService.updateResourceUpdateInfo(this.getToolResource());
+	}
+
+	/**
+	 * Method update resource table after completion of resource workflow.
+	 * It includes updation of dictionary and date for resource workflow completed.
+	 * 
+	 * @return boolean {@code true} if updated successfully.
+	 */
+	public boolean updateResourceWorkflowInfo() {		 
+		return resourceUpdateService.updateResourceWorkflowInfo(this.getToolResource());
 	}
 	 
 }

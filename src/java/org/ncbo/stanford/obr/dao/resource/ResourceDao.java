@@ -11,7 +11,6 @@ import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -56,6 +55,8 @@ public class ResourceDao extends AbstractObrDao {
 	private static PreparedStatement getDictioanryIDStatement;
 	// Prepared statement for removing entry for specific resource.
 	private static PreparedStatement resetDictionaryStatement;
+	// Prepared statement for removing entry for specific resource.
+	private static PreparedStatement updateNumberOfElementAndDateStatement;
 	
 	/**
 	 * Default constructor 
@@ -77,6 +78,9 @@ public class ResourceDao extends AbstractObrDao {
 					"description TEXT, " +
 					"logo VARCHAR(255), " +	
 					"dictionary_id SMALLINT UNSIGNED, "+ 
+					"total_element BIGINT, " +
+					"date_created DATETIME, " +
+					"date_workflow_completed DATETIME, " +
 					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
 				    ");";
 	}
@@ -90,6 +94,7 @@ public class ResourceDao extends AbstractObrDao {
 		this.openHasEntryStatement();
 		this.openGetDictioanryIDStatement();
 		this.openResetDictionaryStatement();
+		this.openUpdateNumberOfElementAndDateStatement();
 	}
 
 	@Override
@@ -263,30 +268,32 @@ public class ResourceDao extends AbstractObrDao {
 	} 
 	
 	/**
-	 * Update table with dictionaryID with latest dictionaryID from DAT table 
-	 * for given resource.
+	 * Update table with given dictionary id and also update date_workflow_completed with current date.
+	 * 
+	 * @param resource 
+	 * @param dictionaryID 
 	 * 
 	 * @return True if the entry was updated to the SQL table.
 	 */
-	public boolean updateDictionaryID(Resource resource){
+	public boolean updateDictionaryAndWorkflowDate(Resource resource, int dictionaryID){
 		boolean updated = false;
 		try {
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("UPDATE ");
 			queryb.append(this.getTableSQLName());
-			queryb.append(" SET dictionary_id= (SELECT MAX(dictionary_id) FROM ");
-			queryb.append(ElementDao.name(resource.getResourceID()));
-			queryb.append(" ) WHERE ");
+			queryb.append(" SET dictionary_id=");
+			queryb.append(dictionaryID);
+			queryb.append(", date_workflow_completed= NOW() WHERE ");
 			queryb.append("resource_id= '");
 			queryb.append(resource.getResourceID());
-			queryb.append("' ;");
+			queryb.append("';");
 			
 			this.executeSQLUpdate(queryb.toString());			
 			logger.info("Resource entry updated with latest dictionary ID.");
 			updated = true;
 		}
 		catch (MySQLNonTransientConnectionException e) {			 
-			return this.updateDictionaryID(resource);
+			return this.updateDictionaryAndWorkflowDate(resource, dictionaryID);
 		}		 
 		catch (SQLException e) {			 
 			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
@@ -309,6 +316,41 @@ public class ResourceDao extends AbstractObrDao {
 		boolean updated = false;
 		try{
 			resetDictionaryStatement.setString(1, resourceID);
+			this.executeSQLUpdate(resetDictionaryStatement);
+			updated = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {
+			this.openResetDictionaryStatement();
+			return this.resetDictionary(resourceID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
+		}
+		return updated;
+	}
+	
+	protected void openUpdateNumberOfElementAndDateStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("UPDATE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" SET total_element= ?, last_update_date= NOW() WHERE ");
+		queryb.append("resource_id= ? ;");
+		updateNumberOfElementAndDateStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+	/**
+	 * This method update number of entries present in element table for given resource and
+	 * also update last_update_date column with current date.
+	 * 
+	 * @param resourceID 
+	 * @param numberOfElements 
+	 * @return boolean {@code true} if updated successfully.
+	 */
+	public boolean updateNumberOfElementAndDate(String resourceID, int numberOfElements){
+		boolean updated = false;
+		try{
+			updateNumberOfElementAndDateStatement.setInt(1, numberOfElements);
+			updateNumberOfElementAndDateStatement.setString(2, resourceID);
 			this.executeSQLUpdate(resetDictionaryStatement);
 			updated = true;
 		}		

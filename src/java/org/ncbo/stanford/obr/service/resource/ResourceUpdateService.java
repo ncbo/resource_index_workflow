@@ -21,12 +21,7 @@ public interface ResourceUpdateService {
 	 * @param toolResource
 	 */
 	public void addResource(Resource toolResource);
-
-	/**
-	 * @param toolResource
-	 */
-	public void updateResourceForLatestDictionary(Resource toolResource);
-
+ 
 	/**
 	 * @param resourceFile
 	 * @return
@@ -124,14 +119,33 @@ public interface ResourceUpdateService {
 
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
-	 * for current resource.
+	 * for a resource.
 	 * 
 	 */
 	public void calculateObrStatistics();
 	
 	/**
-	 * @param virtualOntologyID
-	 * @return
+	 * This method gets latest version of ontology for given virtual ontology id
+	 * 
+	 * @param virtualOntologyID 
+	 * @return String of latest version of ontology.
 	 */
-	public String getLatestLocalOntologyID(String virtualOntologyID); 
+	public String getLatestLocalOntologyID(String virtualOntologyID);
+
+	/**
+	 * Method update resource table with total number of element and update date.
+	 * 
+	 * @param resource {@code Resource} to be updated. 
+	 * @return boolean  {@code true} if updated successfully.
+	 */
+	public boolean updateResourceUpdateInfo(Resource resource);
+
+	/**
+	 * Method update resource table after completion of resource workflow.
+	 * It includes updation of dictionary and date for resource workflow completed.
+	 * 
+	 * @param resource {@code Resource} to be updated. 
+	 * @return boolean {@code true} if updated successfully.
+	 */
+	public boolean updateResourceWorkflowInfo(Resource resource); 
 }

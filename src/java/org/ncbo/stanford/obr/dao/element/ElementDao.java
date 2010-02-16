@@ -221,6 +221,32 @@ public class ElementDao extends AbstractObrDao {
 	}
 	
 	/**
+	 * This method gives total number of elements presents currently in element table.
+	 * 
+	 * @return
+	 */
+	public int getTotalNumberOfElement(){
+		int totalNumberOfElement = 0;
+		
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT COUNT(ET.id) FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" ET;");
+		 
+		try {
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			if(rSet.first()){
+				totalNumberOfElement = rSet.getInt(1);
+			}  
+			rSet.close();
+		}
+		catch (SQLException e) {
+			logger.error("Problem in getting number of " + this.getTableSQLName() + ". Null returned.", e);			 
+		}
+		return totalNumberOfElement;
+	}
+	
+	/**
 	 * Returns the value of a given context for a given element in the table.
 	 */
 	public String getContextValueByContextName(String localElementID, String contextName){

@@ -239,8 +239,10 @@ public class OntologyDao extends AbstractObsDao{
 	}
 	
 	/**
-	 * @param virtualOntologyID
-	 * @return
+	 * This method gets latest version of ontology for given virtual ontology id
+	 * 
+	 * @param virtualOntologyID 
+	 * @return String of latest version of ontology.
 	 */
 	public String getLatestLocalOntologyID(String virtualOntologyID) {
 		String localOntologyID= null;

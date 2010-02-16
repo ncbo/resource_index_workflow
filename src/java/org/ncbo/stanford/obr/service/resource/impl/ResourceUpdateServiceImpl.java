@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import obs.common.beans.DictionaryBean;
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -84,15 +85,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public void addResource(Resource resource){
 		resourceTableDao.addEntryOrUpdate(resource);
 	}
-
-	/**
-	 * Update resource table with latest dictionayID
-	 * 
-	 */
-	public void updateResourceForLatestDictionary(Resource resource) {
-		resourceTableDao.updateDictionaryID(resource);
-	}
-
+ 
 	public int numberOfEntry() {		 
 		return elementTableDao.numberOfEntry();
 	} 
@@ -278,11 +271,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		
-		int indexed = 0;
-		int mgrep = 0;
-		int reported = 0;
-		int isA = 0;
-		int mapping = 0;
+		int indexed;
+		int mgrep;
+		int reported;
+		int isA ;
+		int mapping;
 		
 		// Get resource id (primary key) from ResourceTable
 		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
@@ -344,11 +337,39 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 	} 
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.ncbo.stanford.obr.service.resource.ResourceUpdateService#getLatestLocalOntologyID(java.lang.String)
+	/**
+	 * This method gets latest version of ontology for given virtual ontology id
+	 * 
+	 * @param virtualOntologyID 
+	 * @return String of latest version of ontology.
 	 */
 	public String getLatestLocalOntologyID(String virtualOntologyID) {
 		return ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
+	}
+
+	/**
+	 * Method update resource table with total number of element and update date.
+	 * 
+	 * @param resource {@code Resource} to be updated. 
+	 * @return boolean {@code true} if updated successfully.
+	 */
+	public boolean updateResourceUpdateInfo(Resource resource) {
+		// TODO Auto-generated method stub
+		int totalElements = elementTableDao.getTotalNumberOfElement();
+		return resourceTableDao.updateNumberOfElementAndDate(resource.getResourceID(), totalElements);
+		
+	}
+
+	/**
+	 * Method update resource table after completion of resource workflow.
+	 * It includes updation of dictionary id and date for resource workflow completed.
+	 * 
+	 * @param resource {@code Resource} to be updated. 
+	 * @return boolean {@code true} if updated successfully.
+	 */
+	public boolean updateResourceWorkflowInfo(Resource resource) {		
+		 DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
+		 return resourceTableDao.updateDictionaryAndWorkflowDate(resource, dictionary.getDictionaryID());
+		
 	}
 }
