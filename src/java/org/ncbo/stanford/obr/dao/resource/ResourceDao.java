@@ -31,6 +31,9 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * <li> description 	TEXT
  * <li> logo 			VARCHAR(255)
  * <li> dictionary_id            SMALLINT UNSIGNED
+ * <li> total_element BIGINT
+ * <li> last_update_date DATETIME
+ * <li> workflow_completed_date DATETIME
  * </ul>
  *  
  * @author kyadav
@@ -64,6 +67,10 @@ public class ResourceDao extends AbstractObrDao {
 	private ResourceDao() {
 		super(EMPTY_STRING, TABLE_SUFFIX);
 	}
+	
+	public static String name(){		
+		return OBR_PREFIX + TABLE_SUFFIX;
+	}
 
 	@Override
 	protected String creationQuery(){
@@ -79,8 +86,8 @@ public class ResourceDao extends AbstractObrDao {
 					"logo VARCHAR(255), " +	
 					"dictionary_id SMALLINT UNSIGNED, "+ 
 					"total_element BIGINT, " +
-					"date_created DATETIME, " +
-					"date_workflow_completed DATETIME, " +
+					"last_update_date DATETIME, " +
+					"workflow_completed_date DATETIME, " +
 					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
 				    ");";
 	}
@@ -268,7 +275,7 @@ public class ResourceDao extends AbstractObrDao {
 	} 
 	
 	/**
-	 * Update table with given dictionary id and also update date_workflow_completed with current date.
+	 * Update table with given dictionary id and also update workflow_completed_date with current date.
 	 * 
 	 * @param resource 
 	 * @param dictionaryID 
@@ -283,7 +290,7 @@ public class ResourceDao extends AbstractObrDao {
 			queryb.append(this.getTableSQLName());
 			queryb.append(" SET dictionary_id=");
 			queryb.append(dictionaryID);
-			queryb.append(", date_workflow_completed= NOW() WHERE ");
+			queryb.append(", workflow_completed_date= NOW() WHERE ");
 			queryb.append("resource_id= '");
 			queryb.append(resource.getResourceID());
 			queryb.append("';");
@@ -351,7 +358,7 @@ public class ResourceDao extends AbstractObrDao {
 		try{
 			updateNumberOfElementAndDateStatement.setInt(1, numberOfElements);
 			updateNumberOfElementAndDateStatement.setString(2, resourceID);
-			this.executeSQLUpdate(resetDictionaryStatement);
+			this.executeSQLUpdate(updateNumberOfElementAndDateStatement);
 			updated = true;
 		}		
 		catch (MySQLNonTransientConnectionException e) {

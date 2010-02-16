@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.dao.resource.ResourceDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -47,6 +49,10 @@ public class StatisticsDao extends AbstractObrDao {
 		super(EMPTY_STRING, TABLE_SUFFIX);
 	}
 
+	public static String name(){		
+		return OBR_PREFIX + TABLE_SUFFIX;
+	}
+	
 	@Override
 	protected String creationQuery(){
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
@@ -59,8 +65,8 @@ public class StatisticsDao extends AbstractObrDao {
 					"isa_annotations INT UNSIGNED," +
 					"mapping_annotations INT UNSIGNED," +
 					"UNIQUE (resource_id, ontology_id), " +
-					"FOREIGN KEY (resource_id) REFERENCES " + resourceTableDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName()	+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +		
+					"FOREIGN KEY (resource_id) REFERENCES " + ResourceDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					"FOREIGN KEY (ontology_id) REFERENCES " + OntologyDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE" +		
 				");";
 	}
 
@@ -278,7 +284,7 @@ public class StatisticsDao extends AbstractObrDao {
 		queryb.append("DELETE STAT FROM");
 		queryb.append(this.getTableSQLName());			
 		queryb.append(" STAT, ");
-		queryb.append(ontologyDao.getTableSQLName());
+		queryb.append(OntologyDao.name());
 		queryb.append(" OT, ");
 		queryb.append(" WHERE ");
 		queryb.append(" STAT.ontology_id = OT.id and OT.local_ontology_id=? ");		
