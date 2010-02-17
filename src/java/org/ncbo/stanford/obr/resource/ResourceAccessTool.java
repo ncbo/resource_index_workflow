@@ -16,6 +16,8 @@ import org.ncbo.stanford.obr.service.annotation.AnnotationService;
 import org.ncbo.stanford.obr.service.annotation.impl.AnnotationServiceImpl;
 import org.ncbo.stanford.obr.service.index.IndexationService;
 import org.ncbo.stanford.obr.service.index.impl.IndexationServiceImpl;
+import org.ncbo.stanford.obr.service.obs.ontology.OntologyService;
+import org.ncbo.stanford.obr.service.obs.ontology.impl.OntologyServiceImpl;
 import org.ncbo.stanford.obr.service.resource.ResourceUpdateService;
 import org.ncbo.stanford.obr.service.resource.impl.ResourceUpdateServiceImpl;
 import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
@@ -41,6 +43,8 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public static final String RESOURCE_NAME_PREFIX = "OBR_RESOURCE_";	
 	private Resource toolResource;
 	private String toolName;
+	
+	protected static OntologyService ontlogyService= OntologyServiceImpl.getInstance();
 	
 	protected ResourceUpdateService resourceUpdateService;
 	protected AnnotationService annotationService;
