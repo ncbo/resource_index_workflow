@@ -31,7 +31,6 @@ import org.ncbo.stanford.obr.util.helper.StringHelper;
  * @created 21-Nov-2008
  *
  */
-
 public class GetUniprotGOAnnotations implements StringHelper{
 	
 	// Logger for this class
@@ -76,6 +75,9 @@ public class GetUniprotGOAnnotations implements StringHelper{
 				Pattern annotPattern    = Pattern.compile("^(.*)\\t(.*)\\t(.*)\\t(.*)\\t(.*)$");		
 
 				while((resultLine = resultReader.readLine()) != null) {
+					if(resultLine.trim().equals(EMPTY_STRING)){
+						continue;
+					}
 					String localElementID = EMPTY_STRING;
 					String geneSymbol     = EMPTY_STRING;
 					String proteinName    = EMPTY_STRING;
@@ -132,7 +134,7 @@ public class GetUniprotGOAnnotations implements StringHelper{
 						boolean attributeHasValue = false;
 						
 						for (String att : protAnnotAttribute2.keySet()){
-							if (contextName.equals(this.resourceID+"_"+att)){
+							if (contextName.equals(this.resourceID+UNDERSCORE_STRING+att)){
 								// not an existing annotation
 								if(basicStructure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) ||
 										basicStructure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){				
@@ -144,23 +146,19 @@ public class GetUniprotGOAnnotations implements StringHelper{
 									String localConceptID           = EMPTY_STRING;
 									String localExistingAnnotations = protAnnotAttribute2.get(att);
 									String localConceptIDs          = EMPTY_STRING;
-									String[] splittedAnnotations    = localExistingAnnotations.split("> ");
+									String[] splittedAnnotations    = localExistingAnnotations.split(GT_SEPARATOR_STRING);
 									// translate conceptIDs used in the resource in OBR localConceptID
 									for (int i=0;i<splittedAnnotations.length;i++){			
 										try{
-											String localConceptID_rightPart = splittedAnnotations[i];
-											if (localConceptID_rightPart.charAt(0)==' '){
-												localConceptID_rightPart = localConceptID_rightPart.substring(1);
-											}
-											 																		
-											localConceptID = localConceptID_leftPart + localConceptID_rightPart;//localConceptID_leftPart+"/"+localConceptID_rightPart;
+											String localConceptID_rightPart = splittedAnnotations[i].trim();		
+											localConceptID = localConceptID_leftPart + SLASH_STRING+ localConceptID_rightPart;//localConceptID_leftPart+"/"+localConceptID_rightPart;
 											  
 										}catch (Exception e) {
 											logger.error("** PROBLEM ** Problem with the management of the conceptID used in the resource to reported in the OBR", e);
 										}
 										if(localConceptID!=EMPTY_STRING){
 											if(localConceptIDs!=EMPTY_STRING){
-												localConceptIDs+="> "+localConceptID;
+												localConceptIDs+=GT_SEPARATOR_STRING+localConceptID;
 											}else{
 												localConceptIDs+=localConceptID;
 											}

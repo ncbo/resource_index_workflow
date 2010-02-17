@@ -1,14 +1,12 @@
-/**
- * 
- */
 package org.ncbo.stanford.obr.service.obs.ontology.impl;
 
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.service.obs.ontology.OntologyService;
 
 /**
+ * This service interface provides different functionality related to slave ontology tables. 
+ * 
  * @author Kuladip Yadav
- *
  */
 public class OntologyServiceImpl implements OntologyService, DaoFactory {
 

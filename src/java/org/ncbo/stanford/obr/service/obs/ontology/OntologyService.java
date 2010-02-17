@@ -1,9 +1,8 @@
-/**
- * 
- */
 package org.ncbo.stanford.obr.service.obs.ontology;
 
 /**
+ * This service interface provides different functionality related to slave ontology tables. 
+ * 
  * @author Kuladip Yadav
  *
  */

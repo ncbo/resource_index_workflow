@@ -138,6 +138,13 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 		return annotList;
 	}	
 	
+	/**
+	 * This method creates map of latest version of ontology with contexts as key.
+	 * It uses virtual ontology ids associated with contexts. 
+	 * 
+	 * @param structure {@code Structure} for given resource
+	 * @return {@code HashMap} of latest local ontology id with context as key.
+	 */
 	public HashMap<String, String>  createLocalOntologyIDMap(Structure structure){
 		HashMap<String, String> localOntologyIDMap = new HashMap<String, String>();
 		String virtualOntologyID;
