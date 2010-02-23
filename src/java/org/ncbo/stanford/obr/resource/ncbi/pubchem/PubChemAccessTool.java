@@ -19,6 +19,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 
@@ -85,6 +86,11 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 			logger.error("Malformed URL Exception", e);
 		}
 		this.getToolResource().setResourceDescription(PCM_DESCRIPTION);	 
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

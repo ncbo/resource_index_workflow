@@ -13,6 +13,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -101,6 +102,11 @@ public class DrugBankAccessTool  extends ResourceAccessTool {
 			logger.error("** PROBLEM ** Setting resource URL, Logo or ElementURL ", e);
 		}
 		this.getToolResource().setResourceDescription(DBK_DESCRIPTION);
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 	
 	@Override

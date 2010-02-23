@@ -12,6 +12,7 @@ import obs.obr.populate.Structure;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.context.ContexDao.ContextEntry;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
 import org.ncbo.stanford.obr.service.annotation.impl.AnnotationServiceImpl;
 import org.ncbo.stanford.obr.service.index.IndexationService;
@@ -50,6 +51,9 @@ public abstract class ResourceAccessTool implements StringHelper {
 	protected AnnotationService annotationService;
 	protected SemanticExpansionService semanticExpansionService;
 	protected IndexationService indexationService;
+	
+	/** Maximum number of element to process for annotations */
+	public static final int MAX_NUMBER_ELEMENTS_TO_PROCESS= Integer.parseInt(MessageUtils.getMessage("obr.elements.process.max"));
 		
 	/**
 	 * Constructs a new ResourceAccessTool associated to a new Resource constructed with the given information
@@ -193,7 +197,14 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * Updates the associated Resource information fields (name, URL, description, logo URL) automatically.
 	 */
 	public abstract void updateResourceInformation();
-	
+	 
+	/**
+	 *  This method gives type of resources used for different behavior of
+	 *  resource index workflow e.g SMALL, MEDIUM , BIG
+	 *  
+	 * @return {@code ResourceType}  
+	 */
+	public abstract ResourceType getResourceType();
 	
 	/**
 	 * Enables to query a resource with a String as it is done online. 
@@ -323,5 +334,15 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public boolean updateResourceWorkflowInfo() {		 
 		return resourceUpdateService.updateResourceWorkflowInfo(this.getToolResource());
 	}
-	 
+
+	/**
+	 * This method creates temporary element table used for annotation for non annotated
+	 * element for given dictionary id.
+	 * 
+	 * @param dictionaryID 
+	 * @return Number of rows containing in temporary table
+	 */
+	public int createTemporaryElementTable(int dictionaryID) {		 
+		return annotationService.createTemporaryElementTable(dictionaryID);
+	}	 
 }

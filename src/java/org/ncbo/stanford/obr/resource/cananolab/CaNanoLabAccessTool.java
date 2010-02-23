@@ -8,6 +8,7 @@ import java.util.Set;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 import edu.wustl.utill.CaNanoLabContextDetail;
@@ -65,6 +66,11 @@ public class CaNanoLabAccessTool extends ResourceAccessTool {
         this.getToolResource().setResourceElementURL(CANANO_ELT_URL);
 
     }
+    
+    @Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
+	}
 
     @Override
     /**

@@ -5,24 +5,30 @@ package org.ncbo.stanford.obr.service.semantic;
 
 import java.util.List;
 
+import org.ncbo.stanford.obr.util.MessageUtils;
+
 /**
  * @author Kuladip Yadav
  *
  */
 public interface SemanticExpansionService {
 	
-	/**
-	 * 
+	/** For semantic expansion all level*/
+	public static final int LEVEL_ALL = -1; 
+
+	/** semantic expansion level for big resources */
+	public static final int MAX_LEVEL_FOR_BIG_RESOURCE = Integer.parseInt(MessageUtils.getMessage("obr.expanded.annotation.max.level"));
+	
+	/** 
 	 * Processes the resource direct annotations to produce expanded annotations and
 	 * populates the the corresponding _EAT.
 	 * This function implements the step 3 of the OBR workflow.
 	 * The 3 booleans corresponds to the semantic expansion component to use.
-	 *  
 	 * 
-	 * @param isaClosureExpansion  - boolean 
-	 * @param mappingExpansion     - boolean
-	 * @param distanceExpansion    - boolean  
-	 * @return                     - the number of direct annotations created. 
+	 * @param isaClosureExpansion {@code boolean} for is a closure expansion
+	 * @param mappingExpansion    {@code boolean} for mapping expansion
+	 * @param distanceExpansion   {@code boolean} for mapping expansion
+	 * @return                    the number of direct annotations created. 
 	 */
 	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
 

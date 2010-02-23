@@ -10,6 +10,7 @@ import java.util.Map;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
  
 /**
@@ -52,6 +53,11 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 		}
 		this.getToolResource().setResourceDescription(UPKB_DESCRIPTION);		
 		localOntologyIDMap = createLocalOntologyIDMap(UPKB_STRUCTURE);
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

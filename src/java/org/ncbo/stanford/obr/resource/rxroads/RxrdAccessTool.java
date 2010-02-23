@@ -17,6 +17,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.context.ContexDao;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -75,6 +76,11 @@ public class RxrdAccessTool extends ResourceAccessTool {
 			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(RXRD_DESCRIPTION);
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.MEDIUM;
 	}
 
 	@Override

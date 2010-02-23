@@ -17,6 +17,7 @@ import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
 import org.apache.axis.message.MessageElement;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
 /**
@@ -90,6 +91,11 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(GAP_DESCRIPTION);	 
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

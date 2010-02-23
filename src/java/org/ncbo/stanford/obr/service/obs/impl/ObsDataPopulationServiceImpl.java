@@ -209,25 +209,25 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		 }
 		 
 		 // remove ontology from map table
-		 mapDao.deleteEntriesFromOntology(localOntologyID);
+		 status = mapDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from mapping table.");
 		 }
 		 
 		 // remove ontology from term table
-		 termDao.deleteEntriesFromOntology(localOntologyID);
+		 status =termDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from term table.");
 		 }
 		 
 		 // remove ontology from concept table
-		 conceptDao.deleteEntriesFromOntology(localOntologyID);
+		 status = conceptDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from concept table.");
 		 }
 		 
 		 // remove ontology from ontology table
-		 ontologyDao.deleteEntriesFromOntology(localOntologyID);
+		 status = ontologyDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from ontology table.");
 		 }

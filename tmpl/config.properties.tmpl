@@ -50,6 +50,9 @@ obr.expansion.relational=@obrexpansionrelational@
 obr.expansion.mapping=@obrexpansionmapping@
 obr.expansion.distance=@obrexpansiondistance@
 
+# maximum level allows for big resource
+obr.expanded.annotation.max.level=5
+
 ####################################################
 # OBS Schema/Tables properties 
 ####################################################
@@ -84,6 +87,7 @@ obs.slave.ontology.remove=@obsslaveontologyremove@
 # Resource index table name properties
 obr.tables.prefix=obr_
 obr.element.table.suffix=_element
+obr.temp.element.table.suffix=_tmp
 obr.annotation.table.suffix=_annotation
 obr.expanded.annotation.table.suffix=_expanded_annotation
 obr.index.table.suffix=_index
@@ -92,6 +96,9 @@ obr.dictionary.table.suffix=dictionary
 obr.resource.table.suffix=resource
 obr.context.table.suffix=context
 obr.statistics.table.suffix=statistics
+
+# Maximum number of element to process
+obr.elements.process.max=15000
 
 # Configuring database 
 obr.jdbc.url=@obrjdbcurl@

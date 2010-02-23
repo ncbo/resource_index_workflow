@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 
@@ -39,6 +40,11 @@ public class TestResourceAccessTool extends ResourceAccessTool {
 			e.printStackTrace();
 		}
 		this.getToolResource().setResourceDescription(TR_DESCRIPTION);
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

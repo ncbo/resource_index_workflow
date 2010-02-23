@@ -7,6 +7,7 @@ import java.util.HashSet;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -41,6 +42,11 @@ public class PgdiAccessTool extends ResourceAccessTool {
 			logger.error(EMPTY_STRING, e);
 		}
 		this.getToolResource().setResourceDescription(PGDI_DESCRIPTION);
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

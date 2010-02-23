@@ -12,6 +12,7 @@ import obs.obr.populate.Structure;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
@@ -28,19 +29,28 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	public AnnotationServiceImpl(ResourceAccessTool resourceAccessTool) {
 		super(resourceAccessTool);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.ncbo.stanford.obr.service.annotation.AnnotationService#resourceAnnotation
-	 * (boolean, java.util.HashSet)
+	 
+	/** 
+	 * Processes the resource with Mgrep and populates the the corresponding _DAT.
+	 * The given boolean specifies if the complete dictionary must be used, or not (only the delta dictionary).
+	 * The annotation done with termName that are in the specified stopword list are removed from _DAT.
+	 * This function implements the step 2 of the OBR workflow.
+	 *  
+	 * @param withCompleteDictionary if true uses complete dictionary for annotation otherwise uses delta dictionary
+	 * @param dictionary Latest dictionary bean
+	 * @param stopwords {@code Set} of string used as stopwords
+	 * @return {@code int} the number of direct annotations created. 
 	 */
-	public int resourceAnnotation(boolean withCompleteDictionary,
+	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
 			HashSet<String> stopwords) {
 		int nbAnnotation;
-		// gets the latest dictionary from OBS_DVT
-		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
+		boolean useTemporaryElementTable;	
+		 
+		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
+			useTemporaryElementTable =false; 
+		}else{
+			useTemporaryElementTable =true; 
+		} 
 
 		// processes direct mgrep annotations
 		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
@@ -51,7 +61,16 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 
 		// updates the dictionary column in _ET
 		logger.info("Updating the dictionary field in ElementTable...");
-		elementTableDao.updateDictionary(dictionary.getDictionaryID());
+		  
+		// Update dictionary id for element table.
+		try{
+			elementTableDao.updateDictionary(dictionary.getDictionaryID(), useTemporaryElementTable);	
+		}finally{
+			if(useTemporaryElementTable){
+				elementTableDao.deleteTemporaryTable();
+			} 
+		}
+			
 		return nbAnnotation;
 	}
 
@@ -179,9 +198,17 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		File mgrepResourceFile = new File(name);
 		try {
 			mgrepResourceFile.createNewFile();
+			
+			boolean useTemporaryElementTable;			
+			if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
+				useTemporaryElementTable =false; 
+			}else{
+				useTemporaryElementTable =true; 
+			}
+			
 			elementTableDao.writeNonAnnotatedElements(mgrepResourceFile,
 					dictionaryID, resourceAccessTool.getToolResource()
-							.getResourceStructure());
+							.getResourceStructure(), useTemporaryElementTable);
 		} catch (IOException e) {
 			logger.error(
 					"** PROBLEM ** Cannot create Mgrep file for exporting resource "
@@ -227,13 +254,20 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
 		
+		boolean useTemporaryElementTable;			
+		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
+			useTemporaryElementTable =false; 
+		}else{
+			useTemporaryElementTable =true; 
+		}
+		
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
+				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, useTemporaryElementTable));				
 			}
 			
 		}
@@ -243,10 +277,31 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	/**
 	 * Method removes annotations for given ontology versions.
 	 * 
+	 * <p>For big resources, it remove local ontology id one by one
+	 * <p>For other resources remove all local ontology ids
+	 * 
 	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
 	public void removeAnnotations(List<String> localOntologyIDs) {
-		directAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs);		
+		
+		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+			 directAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	 
+		 }else{
+			 for (String localOntologyID : localOntologyIDs) {
+				 directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);	 
+			}
+			 
+		 }
 	}
 
+	/**
+	 * This method creates temporary element table used for annotation for non annotated
+	 * element for given dictionary id.
+	 * 
+	 * @param dictionaryID 
+	 * @return Number of rows containing in temporary table
+	 */ 
+	public int createTemporaryElementTable(int dictionaryID) {
+		 return elementTableDao.createTemporaryTable(dictionaryID);		
+	}
 }

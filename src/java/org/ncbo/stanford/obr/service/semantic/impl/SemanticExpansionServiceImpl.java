@@ -4,6 +4,7 @@ import java.util.List;
 
 import obs.common.utils.ExecutionTimer;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
@@ -15,12 +16,16 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		// TODO Auto-generated constructor stub
 	}	 
 
-	/**
+	/** 
 	 * Processes the resource direct annotations to produce expanded annotations and
 	 * populates the the corresponding _EAT.
 	 * This function implements the step 3 of the OBR workflow.
 	 * The 3 booleans corresponds to the semantic expansion component to use.
-	 * Returns the number of direct annotations created. 
+	 * 
+	 * @param isaClosureExpansion {@code boolean} for is a closure expansion
+	 * @param mappingExpansion    {@code boolean} for mapping expansion
+	 * @param distanceExpansion   {@code boolean} for mapping expansion
+	 * @return                    the number of direct annotations created. 
 	 */
 	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion){
 		int nbAnnotation = 0;
@@ -29,7 +34,14 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		if(isaClosureExpansion){
 			timer.start();
 			logger.info("Executing isa transitive closure expansion... ");
-			int isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
+			int isaAnnotation; 
+			// for small resources include all level	
+			if(resourceAccessTool.getResourceType()== ResourceType.SMALL || resourceAccessTool.getResourceType()== ResourceType.MEDIUM){
+				isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao, LEVEL_ALL);
+			}else{
+				isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao, MAX_LEVEL_FOR_BIG_RESOURCE);
+			}
+				
 			logger.info(isaAnnotation);
 			nbAnnotation += isaAnnotation;
 			timer.end();
@@ -57,16 +69,26 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		}
 		return nbAnnotation;
 	}
-
+	
 	/**
 	 * Method removes expanded annotations for given ontology versions.Entries are remove from 
 	 * is a parent relation and mapping relation.
 	 * 
+	 * <p>For big resources, it remove local ontology id one by one
+	 * <p>For other resources remove all local ontology ids
+	 * 
 	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
 	public void removeExpandedAnnotations(List<String> localOntologyIDs) {
-		expandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
 		
+		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+			expandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
+		 }else{
+			 for (String localOntologyID : localOntologyIDs) {
+				 expandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+			}
+			 
+		 }	
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import obs.common.files.FileParameters;
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 public class GoldminerAccessTool extends ResourceAccessTool {
@@ -54,6 +55,11 @@ public class GoldminerAccessTool extends ResourceAccessTool {
 			logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName() + " with file " + GM_FILE, e); 
 		}
 		return nbElement;
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -188,9 +189,12 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * Populates the table with isa transitive closure annotations computed 
 	 * with the annotations contained in the given table. 
 	 * Only the annotations for which isaClosureDone=false are selected in the given table.
-	 * Returns the number of isaClosure annotations created in the corresponding _EAT.
+	 *  
+	 * @param annotationDao
+	 * @param maxLevel {@code int} if greater than zero then restrict is closure expansion annotations upto this level  
+	 * @return {@code int} the number of isaClosure annotations created in the corresponding _EAT.
 	 */
-	public int isaClosureExpansion(DirectAnnotationDao table){
+	public int isaClosureExpansion(DirectAnnotationDao annotationDao, int maxLevel){
 		int nbAnnotation;		 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done)
@@ -203,14 +207,20 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false FROM ");
-		queryb.append(table.getTableSQLName());
+		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
 		queryb.append(relationDao.getTableSQLName());
-		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND is_a_closure_done = false;");
+		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND DAT.is_a_closure_done = false");
+		// Adding condition for maximum level
+		if(maxLevel !=  SemanticExpansionService.LEVEL_ALL ){
+			queryb.append(" AND ISAPT.level <= ");
+			queryb.append(maxLevel);
+		}
+		queryb.append("; ");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
-		updatingQueryb.append(table.getTableSQLName());
+		updatingQueryb.append(annotationDao.getTableSQLName());
 		updatingQueryb.append(" SET is_a_closure_done=true WHERE is_a_closure_done=false;");
 		
 		try{
@@ -228,7 +238,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * Populates the table with mapping annotations computed 
 	 * with the annotations contained in the given table. 
 	 * Only the annotations for which mappingDone=false are selected in the given table.
-	 * Returns the number of mapping annotations created in the corresponding _EAT.
+	 *  
+	 * @param DirectAnnotationDao
+	 * @return Returns the number of mapping annotations created in the corresponding _EAT.
 	 */
 	public int mappingExpansion(DirectAnnotationDao table){
 		int nbAnnotation;	 

@@ -18,6 +18,7 @@ import obs.obr.populate.Structure;
 import org.bioontology.biositemaps.api.BioSitemap;
 import org.bioontology.biositemaps.api.Resource;
 import org.bioontology.biositemaps.api.ResourceDescription;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 import edu.stanford.smi.protegex.owl.model.impl.DefaultOWLNamedClass;
@@ -94,6 +95,11 @@ public class BioSitemapsAccessTool extends ResourceAccessTool {
 		}
 		this.getToolResource().setResourceDescription(BSM_DESCRIPTION);	 
 	} 
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
+	}
 	
 	@Override
 	public void updateResourceInformation() {

@@ -17,6 +17,7 @@ import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -48,6 +49,9 @@ import com.mysql.jdbc.exceptions.MySQLSyntaxErrorException;
 public class ElementDao extends AbstractObrDao {
 
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.element.table.suffix");
+	
+	/** Suffix used for temporary table*/
+	protected static final String TEMP_TABLE_SUFFIX = MessageUtils.getMessage("obr.temp.element.table.suffix");
 	
 	private ArrayList<String> contextNames;
 	
@@ -132,6 +136,58 @@ public class ElementDao extends AbstractObrDao {
 			}
 		}
 		return queryb.toString();
+	}
+	
+	/**
+	 * This method creates temporary tables for non annotated element with MAX_NUMBER_ELEMENTS_TO_PROCESS
+	 * 
+	 * @param dictionaryID used to find non annotated element
+	 * @return number of rows inserted in temporary table.
+	 */
+	public int createTemporaryTable(int dictionaryID){
+		// Delete temporary table if exist
+		deleteTemporaryTable();
+		int noRows =0;
+		StringBuffer createQuery = new StringBuffer();
+		createQuery.append("CREATE TEMPORARY TABLE ");	 
+		createQuery.append(this.getTableSQLName());		 
+		createQuery.append(TEMP_TABLE_SUFFIX);			
+		createQuery.append(" SELECT * FROM ");
+		createQuery.append(this.getTableSQLName());			 
+		createQuery.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		createQuery.append(dictionaryID); 
+		createQuery.append(" LIMIT "); 
+		createQuery.append(ResourceAccessTool.MAX_NUMBER_ELEMENTS_TO_PROCESS); 
+		createQuery.append(";");
+		  
+		try{
+			noRows = this.executeSQLUpdate(createQuery.toString());		
+			// if zero rows updated then drop the temporary table
+			if(noRows==0){
+				deleteTemporaryTable();
+			} 
+		}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot create temp element Table " + this.getTableSQLName() + TEMP_TABLE_SUFFIX, e);
+		}
+	
+		return noRows;
+	}
+	
+	/**
+	 * This method delete temporary table. 
+	 * 
+	 */
+	public void deleteTemporaryTable(){
+		String dropQuery = "DROP TABLE IF EXISTS  " + this.getTableSQLName() + TEMP_TABLE_SUFFIX +";";
+		 
+		try{
+			this.executeSQLUpdate(dropQuery);			 
+		}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot drop tempor Table " + this.getTableSQLName() + TEMP_TABLE_SUFFIX, e);
+		}
+		 
 	}
 	
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
@@ -293,13 +349,18 @@ public class ElementDao extends AbstractObrDao {
 	
 	/**
 	 * Writes the given file with all the non annotated elements according to a given dictionaryID. 
+	 * @param useTemporaryElementTable 
 	 */
-	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure){
+	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure, boolean useTemporaryElementTable){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT * FROM ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-		queryb.append(dictionaryID);
+		if(useTemporaryElementTable){
+			queryb.append(TEMP_TABLE_SUFFIX);
+		}else{
+			queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+			queryb.append(dictionaryID);
+		} 
 		queryb.append(";");
 		
 		//loads the contextName-contextID in a temporary structure to avoid querying the DB when executing the resultset streaming
@@ -345,16 +406,26 @@ public class ElementDao extends AbstractObrDao {
 	/**
 	 * Updates the field dictionaryID of all the rows in the table where the dictionaryID is null or < to the given one. 
 	 * Returns the number of updated elements. (to be verified)
+	 * 
+	 * @param useTemporaryElementTable 
 	 */
-	public int updateDictionary(int dictionaryID){
+	public int updateDictionary(int dictionaryID, boolean useTemporaryElementTable){
 		int nbUpdated;
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
 		updatingQueryb.append(this.getTableSQLName());
 		updatingQueryb.append(" SET dictionary_id=");
 		updatingQueryb.append(dictionaryID);
-		updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-		updatingQueryb.append(dictionaryID);
+		if(useTemporaryElementTable){
+			updatingQueryb.append(" WHERE id IN (SELECT id FROM ");
+			updatingQueryb.append(this.getTableSQLName());
+			updatingQueryb.append(TEMP_TABLE_SUFFIX);
+			updatingQueryb.append(")");
+		}else{
+			updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+			updatingQueryb.append(dictionaryID);
+		}
+		
 		updatingQueryb.append(";");
 		try{
 			nbUpdated = this.executeSQLUpdate(updatingQueryb.toString());
@@ -370,8 +441,9 @@ public class ElementDao extends AbstractObrDao {
 	 * Returns the reported annotations that pre-exist in the resource, as DirectAnnotationEntry in order
 	 * to insert them in the corresponding _DAT table.
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
+	 * @param useTemporaryElementTable 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion ){		
+	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, boolean useTemporaryElementTable ){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
 		try{				
@@ -379,6 +451,9 @@ public class ElementDao extends AbstractObrDao {
 			queryb.append("SELECT local_element_id, ");
 			queryb.append(contextName+" FROM ");
 			queryb.append(this.getTableSQLName());
+			if(useTemporaryElementTable){
+				queryb.append(TEMP_TABLE_SUFFIX);
+			} 
 			queryb.append(" WHERE dictionary_id IS NULL ");
 			
 			if(isNewVirsion){

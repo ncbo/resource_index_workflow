@@ -26,6 +26,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -116,6 +117,11 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 		
 		// PUBMED supports date parameter for E-UTILS.  
 		this.supportDate = true;	
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.BIG;
 	}
 
 	@Override

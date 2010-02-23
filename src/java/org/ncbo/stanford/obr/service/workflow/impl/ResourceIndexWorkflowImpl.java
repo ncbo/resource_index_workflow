@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import obs.common.beans.DictionaryBean;
 import obs.common.beans.IsaContextBean;
 import obs.common.beans.MappingContextBean;
 import obs.common.beans.MgrepContextBean;
@@ -16,6 +17,7 @@ import obs.obr.populate.ObrWeight;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 import org.ncbo.stanford.obr.service.obs.impl.ObsDataPopulationServiceImpl;
@@ -27,7 +29,7 @@ import org.ncbo.stanford.obr.util.StringUtilities;
 
 /**
  * A service  {@code ResourceIndexWorkflowImpl} is main service for workflow execution
- * it includes methods for populating slave obs tables and processing diffrent resource tools with 
+ * it includes methods for populating slave obs tables and processing different resource tools with 
  * population of elements and indexing them using slave obs tables.
  * 
  * <p>Also, it includes functionality for removing duplicate ontologies.
@@ -67,7 +69,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	}
 
 	/**
-	 * This method includes complete resource index workflow. It process ressources and 
+	 * This method includes complete resource index workflow. It process resources and 
 	 * update elements for them and annotated them using obs tables.
 	 * 
 	 * <P>This methods process all the resources included in properties file.
@@ -141,51 +143,11 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 					+ " updated with " + nbElement + " elements.");
 		}
 
-		// Total number of entries found in element table.
-		int nbEntry = resourceAccessTool.numberOfElement();
-
-		// value for withCompleteDictionary parameter.
-		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.dictionary.complete"));
-
-		// Processing direct annotations
-		int nbDirectAnnotation = resourceAccessTool.getAnnotationService()
-				.resourceAnnotation(withCompleteDictionary,
-						Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS));
-
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbDirectAnnotation
-				+ " new direct annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".");
-
-		// Flag for mapping expansion.  
-		boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.relational"));
+		// gets the latest dictionary from OBS_DVT
+		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
 		
-		// Flag for mapping expansion.
-		boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.mapping"));
-		
-		// Flag for distance expansion.
-		boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.distance"));
-
-		// Creating semantic expansion annotation.
-		int nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
-				.semanticExpansion(isaClosureExpansion, mappingExpansion,
-						distanceExpansion);
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbExpandedAnnotation
-				+ " new expanded annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".");
-
-		// Indexation step to annotations.
-		int nbIndexedAnnotation = resourceAccessTool.getIndexationService().indexation(
-				obrWeights);
-		toolLogger.info(nbEntry + " elements indexed (with "
-				+ nbIndexedAnnotation
-				+ " new indexed annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".");
+		// Execute the workflow according to resource type. 
+		executeTypeSpecificWorkflow(resourceAccessTool, dictionary, toolLogger);
 				
 		// Update obr_statistics table.
 		resourceAccessTool.calculateObrStatistics();
@@ -198,7 +160,86 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ " processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));		
 	}
+	
+	/**
+	 * This method execute resource specific workflow dependent on resource type.
+	 * For Small resource it uses complete element table for direct annotation;
+	 * For Medium and Big resource it creates temporary element table containing 
+	 * MAX_NUMBER_ELEMENTS_TO_PROCESS elements and perform direct annotation on it.
+	 * 
+	 * <p>Temporary element table gets deleted after this step.
+	 * 
+	 * <p>After creating direct annotations perform expanded annotation on newly created direct
+	 * annotation and index it. 
+	 * 
+	 * @param resourceAccessTool {@code ResourceAccessTool}
+	 * @param dictionary {@code DictionaryBean) containing latest dictionary
+	 * @param toolLogger {@code Logger} object for given resourceAccessTool
+	 */
+	private void executeTypeSpecificWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, Logger toolLogger){
+		
+		int nbEntry ;		
+		// Total number of entries found in element table.
+		if(resourceAccessTool.getResourceType()== ResourceType.SMALL){
+			nbEntry = resourceAccessTool.numberOfElement();	
+		}else{
+			nbEntry = resourceAccessTool.createTemporaryElementTable(dictionary.getDictionaryID());	 
+		} 	 
+		
+		if(nbEntry >0 ){
+			// value for withCompleteDictionary parameter.
+			boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.dictionary.complete"));
+	
+			// Processing direct annotations
+			int nbDirectAnnotation = resourceAccessTool.getAnnotationService()
+					.resourceAnnotation(withCompleteDictionary, dictionary, 
+							Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
+			
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbDirectAnnotation
+					+ " new direct annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".");
 
+			// Flag for mapping expansion.  
+			boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.relational"));
+			
+			// Flag for mapping expansion.
+			boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.mapping"));
+			
+			// Flag for distance expansion.
+			boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.distance"));
+
+			// Creating semantic expansion annotation.
+			int nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
+					.semanticExpansion(isaClosureExpansion, mappingExpansion,
+							distanceExpansion);
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbExpandedAnnotation
+					+ " new expanded annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".");
+
+			// Indexation step to annotations.
+			int nbIndexedAnnotation = resourceAccessTool.getIndexationService().indexation(
+					obrWeights);
+			toolLogger.info(nbEntry + " elements indexed (with "
+					+ nbIndexedAnnotation
+					+ " new indexed annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".");
+			
+			// If resource type id MEDIUM OR BIG
+			if(resourceAccessTool.getResourceType()!= ResourceType.SMALL){
+				executeTypeSpecificWorkflow(resourceAccessTool, dictionary, toolLogger);
+			}  
+		} else{
+			logger.info("No elements for annotation.");
+		}
+		
+	} 
+ 
 	/**
 	 * Deletes the ontology duplicates from the OBS slave tables and all the resource index tables.
 	 * which includes ontology table, concept table, term table, relation table and mapping table

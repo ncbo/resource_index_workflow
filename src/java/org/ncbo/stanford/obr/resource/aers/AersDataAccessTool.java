@@ -22,6 +22,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.AbstractXmlResourceAccessTool;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -113,6 +114,11 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 			logger.error(EMPTY_STRING, e);			 
 		}
 		this.getToolResource().setResourceDescription(AERS_DESCRIPTION);
+	} 
+	 
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.BIG;
 	}
 
 	@Override

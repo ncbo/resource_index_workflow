@@ -19,6 +19,7 @@ import org.biopax.paxtools.io.jena.JenaIOHandler;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level2.pathway;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -94,6 +95,11 @@ public class PathwayCommonsAccessTool extends ResourceAccessTool {
 			e.printStackTrace();
 		}
 		this.getToolResource().setResourceDescription(PC_DESCRIPTION);	 
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
   	
 	@Override

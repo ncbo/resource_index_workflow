@@ -11,6 +11,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.AbstractXmlResourceAccessTool;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -52,6 +53,11 @@ public class ClinicalTrialsAccessTool extends AbstractXmlResourceAccessTool {
 		
 		this.getToolResource().setResourceDescription(CT_DESCRIPTION);
 		
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.MEDIUM;
 	}
 
 	@Override

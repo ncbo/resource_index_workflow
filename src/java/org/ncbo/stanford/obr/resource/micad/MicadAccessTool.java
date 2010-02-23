@@ -9,6 +9,7 @@ import java.util.Iterator;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -47,6 +48,11 @@ public class MicadAccessTool extends ResourceAccessTool {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.wikipathways.www.webservice.WSPathwayInfo;
 import org.wso2.www.php.WikiPathwaysPortTypeProxy;
@@ -77,6 +78,11 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 		this.getToolResource().setResourceDescription(WP_DESCRIPTION);	 
 	}
   	
+	@Override
+	public ResourceType  getResourceType() {		 
+		return ResourceType.SMALL;
+	}
+	
 	@Override
 	public void updateResourceInformation() {
 		
