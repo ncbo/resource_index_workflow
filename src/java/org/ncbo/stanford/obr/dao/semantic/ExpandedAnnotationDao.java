@@ -246,7 +246,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		int nbAnnotation;	 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done)
-		//			SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, level, false 
+		//			SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false 
 		//				FROM obr_gm_annotation AS DAT, obs_map AS MAPT 
 		//				WHERE DAT.concept_id = MAPT.concept_id
 		//					AND mapping_done = false ;		

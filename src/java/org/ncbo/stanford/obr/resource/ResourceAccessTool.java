@@ -100,6 +100,15 @@ public abstract class ResourceAccessTool implements StringHelper {
 		return resourceUpdateService;
 	}
 
+	/**
+	 * This method gives list of local ontology ids for annotation.
+	 * This set should be provided by BIG resources for annotation
+	 * 
+	 * @return {@code Set} of ontologies used for annotation
+	 */
+	public HashSet<String> getOntolgiesForAnnotation(){
+		return null;
+	}
 
 
 	/**

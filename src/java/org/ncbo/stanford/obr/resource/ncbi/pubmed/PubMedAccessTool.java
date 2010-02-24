@@ -145,6 +145,12 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	}
 
 	@Override
+	public java.util.HashSet<String> getOntolgiesForAnnotation() {
+		//TODO : Need to add list of ontology for annotation
+		return null;
+	}
+	
+	@Override
 	public void updateResourceInformation() {}
 
 	/**

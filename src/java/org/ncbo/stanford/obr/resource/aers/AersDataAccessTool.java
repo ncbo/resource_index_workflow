@@ -130,6 +130,12 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	public int updateResourceContent() {		
 		return updateAllElements();
 	}
+	
+	@Override
+	public java.util.HashSet<String> getOntolgiesForAnnotation() {
+		//TODO : Need to add list of ontology for annotation
+		return null;
+	}
 	/**
 	 * Update all the elements to database	 
 	 * @return

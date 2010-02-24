@@ -97,11 +97,18 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 			}
 			if (dictionaryFile.createNewFile()) {
 				logger.info("Re-creation of the dictionaryFile...");
+				HashSet<String> localOntologyIDs = null;
+				
+				// For big resources get list of ontologies used for annotation.
+				if(resourceAccessTool.getResourceType() == ResourceType.BIG){
+					localOntologyIDs= resourceAccessTool.getOntolgiesForAnnotation();
+				}
+				
 				if (withCompleteDictionary) {
-					dictionaryDao.writeDictionaryFile(dictionaryFile);
+					dictionaryDao.writeDictionaryFile(dictionaryFile,localOntologyIDs);
 				} else {
 					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
-							.getDictionaryID());
+							.getDictionaryID(),localOntologyIDs);
 				}
 			}
 		} catch (IOException e) {
