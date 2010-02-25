@@ -88,8 +88,8 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"INDEX X_" + this.getTableSQLName() +"parent_level (parent_level), " +
 					"INDEX X_" + this.getTableSQLName() +"mapping_type (mapping_type), " +
-					"INDEX X_" + this.getTableSQLName() +"distance (distance)," +
-					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
+					"INDEX X_" + this.getTableSQLName() +"distance (distance) " +
+					//"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
 				");";
 	}
 

@@ -26,7 +26,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	private static Logger logger = Logger.getLogger(ObsDataPopulationServiceImpl.class);
 	
 	/** The obsMasterDao used for querying OBS master database. */
-	private ObsMasterDao obsMasterDao = ObsMasterDao.getInstance();
+	private ObsMasterDao obsMasterDao;
 	 
 	/**
 	 * Populates all the OBS master tables in the right sequence in order to traverse ontologies only once and reuse
@@ -36,7 +36,11 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * 							   if false, a new dictionary row in dictionary table is created.
 	 */	
 	public void populateObsSlaveData(boolean withLatestDictionary) {
-		
+		// initialize obs master dao
+		if(obsMasterDao== null){
+			obsMasterDao = ObsMasterDao.getInstance();
+		}
+		 
 		//Initialize the Execution timer 
      	ExecutionTimer timer = new ExecutionTimer();
      	timer.start();
