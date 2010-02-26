@@ -75,8 +75,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"parent_level SMALLINT UNSIGNED, " +
 					"mapped_concept_id INT UNSIGNED, " +
 					"mapping_type VARCHAR(20), " +
-					"distant_concept_id INT UNSIGNED, " +
-					"distance SMALLINT UNSIGNED, " +
+				// TODO : Need to un-comment if distance expansion included	
+				//	"distant_concept_id INT UNSIGNED, " +
+				//	"distance SMALLINT UNSIGNED, " +
 					"indexing_done BOOL NOT NULL, " +
 					// Removed march 2009. Valid but too expensive in size. Not verified.
 					//"UNIQUE (elementID, conceptID, contextID, childConceptID, mappedConceptID, distantConceptID), " +				
@@ -85,11 +86,11 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"FOREIGN KEY (context_id) REFERENCES "         + contextTableDao.getTableSQLName()			 		+ "(contextID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (child_concept_id) REFERENCES "    + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+				//	"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"INDEX X_" + this.getTableSQLName() +"parent_level (parent_level), " +
-					"INDEX X_" + this.getTableSQLName() +"mapping_type (mapping_type), " +
-					"INDEX X_" + this.getTableSQLName() +"distance (distance) " +
-					//"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
+					"INDEX X_" + this.getTableSQLName() +"mapping_type (mapping_type) " +
+				//	"INDEX X_" + this.getTableSQLName() +"distance (distance) " +
+				//	"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
 				");";
 	}
 
