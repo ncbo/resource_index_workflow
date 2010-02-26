@@ -280,7 +280,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			INTO TABLE OBR_TR_MGREP FIELDS TERMINATED BY '	' (termID, OBR_TR_MGREP.from, OBR_TR_MGREP.to, elementID, contextID) ; */
 		// DO NOT USE a embedded SELECT IT SLOWS DOWN SIGNIFICANTLY THE QUERY
 		StringBuffer loadingQuery = new StringBuffer();
-		loadingQuery.append("LOAD DATA INFILE '");
+		loadingQuery.append("LOAD DATA LOCAL INFILE '");
 		loadingQuery.append(FileResourceParameters.mgrepOutputFolder());
 		loadingQuery.append(mgrepFile.getName());
 		loadingQuery.append("' INTO TABLE ");
