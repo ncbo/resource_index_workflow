@@ -76,8 +76,8 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"mapped_concept_id INT UNSIGNED, " +
 					"mapping_type VARCHAR(20), " +
 				// TODO : Need to un-comment if distance expansion included	
-				//	"distant_concept_id INT UNSIGNED, " +
-				//	"distance SMALLINT UNSIGNED, " +
+				 	"distant_concept_id INT UNSIGNED, " +
+				 	"distance SMALLINT UNSIGNED, " +
 					"indexing_done BOOL NOT NULL, " +
 					// Removed march 2009. Valid but too expensive in size. Not verified.
 					//"UNIQUE (elementID, conceptID, contextID, childConceptID, mappedConceptID, distantConceptID), " +				
