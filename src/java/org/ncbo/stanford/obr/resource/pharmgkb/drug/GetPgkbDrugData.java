@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import obs.common.utils.StreamGobbler;
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -16,6 +15,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.pharmgkb.disease.GetPgkbDiseaseData;
 import org.ncbo.stanford.obr.resource.pharmgkb.gene.GetPgkbGeneData;
+import org.ncbo.stanford.obr.util.ProcessExecutor;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
@@ -57,31 +57,11 @@ public class GetPgkbDrugData implements StringHelper{
 	public Element getDrugElement(String drugAccession) {
 
 		Structure elementStructure = basicStructure;
-		Element myDrug = null;
-		
-		Runtime runtime = Runtime.getRuntime();		
-		Process process = null;
-		
-		try {
-			
+		Element myDrug = null;	 
+		try {			
 			logger.info("get data for "+drugAccession+"... ");
 
-			if (drugAccession!=null){		
-				process = runtime.exec(COMMAND+" "+drugAccession);
-			}		
-
-			// error message and script output management
-	        StreamGobbler errorGobbler  = new StreamGobbler(process.getErrorStream(), "ERROR");            
-	        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");	            
-            
-	        errorGobbler.start();
-	        outputGobbler.start();
-	        
-            int exitValue = process.waitFor();
-            //logger.info("ExitValue: " + exitValue);        
-
-	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
-			
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  drugAccession);  
 			try {
 				drugData = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();				
 				Integer attributeNumber = 0;
@@ -210,49 +190,27 @@ public class GetPgkbDrugData implements StringHelper{
 	}
 	
 	public String getDrugNameByDrugLocalID(String drugLocalID) {
-		String drugName = EMPTY_STRING;
-		
-		Runtime runtime = Runtime.getRuntime();
-		Process process = null;
+		String drugName = EMPTY_STRING;	 
 		try {
-			if (drugLocalID!=null){				
-				process = runtime.exec(COMMAND+" "+drugLocalID);
-			}
-
-			// error message and script output management
-	        StreamGobbler errorGobbler  = new StreamGobbler(process.getErrorStream(), "ERROR");            
-	        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");	            
-            
-	        errorGobbler.start();
-	        outputGobbler.start();
-	        
-            int exitValue = process.waitFor();
-            //System.out.println("ExitValue: " + exitValue);        
-
-	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
-			
-			try {
-				drugName = EMPTY_STRING; 				
-				Pattern dataPattern  = Pattern.compile("^drugName: (.*)$");
-				
-				if(!lines.keySet().isEmpty()){
-					for(int i=0; i<lines.keySet().size();i++) {
-						String resultLine=lines.get(i);
-						// if resultLine is null then skip processing.
-						if(resultLine== null){
-							continue;
-						}
-						// process the line	
-						Matcher dataMatcher = dataPattern.matcher(resultLine);		
-						// line with the geneSymbol ===========================
-						if (dataMatcher.matches()){ 
-								drugName   = dataMatcher.group(1);	
-								//System.out.println(genePgkbLocalID+" => "+geneSymbol);
-						}
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  drugLocalID); 
+			 
+			Pattern dataPattern  = Pattern.compile("^drugName: (.*)$");				
+			if(!lines.keySet().isEmpty()){
+				for(int i=0; i<lines.keySet().size();i++) {
+					String resultLine=lines.get(i);
+					// if resultLine is null then skip processing.
+					if(resultLine== null){
+						continue;
+					}
+					// process the line	
+					Matcher dataMatcher = dataPattern.matcher(resultLine);		
+					// line with the geneSymbol ===========================
+					if (dataMatcher.matches()){ 
+							drugName   = dataMatcher.group(1);	
+							//System.out.println(genePgkbLocalID+" => "+geneSymbol);
 					}
 				}
-			}finally{
-			}
+			}			 
         }catch(Throwable t){
         	logger.error("Problem in getting drug name for drugLocalID : " + drugLocalID, t);            
         }

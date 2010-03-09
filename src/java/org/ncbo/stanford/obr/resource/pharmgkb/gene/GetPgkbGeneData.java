@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import obs.common.utils.StreamGobbler;
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -15,6 +14,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.resource.pharmgkb.disease.GetPgkbDiseaseData;
 import org.ncbo.stanford.obr.resource.pharmgkb.drug.GetPgkbDrugData;
+import org.ncbo.stanford.obr.util.ProcessExecutor;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 public class GetPgkbGeneData implements StringHelper{
@@ -45,29 +45,10 @@ public class GetPgkbGeneData implements StringHelper{
 
 		Structure elementStructure = basicStructure;
 		Element myGene = null;
-		
-		Runtime runtime = Runtime.getRuntime();
-		Process process = null;
-		try {
-			
+		try {			
 			logger.info("get the data for "+geneAccession+"... ");
 			
-			if (geneAccession!=null){				
-				process = runtime.exec(COMMAND+" "+geneAccession);
-			}
-			
-			// error message and script output management
-	        StreamGobbler errorGobbler  = new StreamGobbler(process.getErrorStream(), "ERROR");            
-	        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");	            
-            
-	        errorGobbler.start();
-	        outputGobbler.start();
-	        
-            int exitValue = process.waitFor();
-            //logger.info("ExitValue: " + exitValue);        
-
-	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
-
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  geneAccession); 
 			try {
 				geneData = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();				
 				Integer attributeNumber = 0;
@@ -184,34 +165,13 @@ public class GetPgkbGeneData implements StringHelper{
 	}
 	public String getGeneSymbolByGenePgkbLocalID(String genePgkbLocalID) {
 		String geneSymbol = EMPTY_STRING;
-		
-		Runtime runtime = Runtime.getRuntime();
-		Process process = null;
+
 		try {
 			//geneAccession="PA447230";
-			if (genePgkbLocalID!=null){				
-				process = runtime.exec(COMMAND+" "+genePgkbLocalID);
-				//InputStream results = process.getInputStream();
-			}
-
-
-			// error message and script output management
-	        StreamGobbler errorGobbler  = new StreamGobbler(process.getErrorStream(), "ERROR");            
-	        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");	            
-            
-	        errorGobbler.start();
-	        outputGobbler.start();
-	        
-            int exitValue = process.waitFor();
-            //System.out.println("ExitValue: " + exitValue);        
-
-	        HashMap<Integer, String> lines = StreamGobbler.lines;         	        
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  genePgkbLocalID);         	        
 
 			try {
-				geneSymbol = EMPTY_STRING; 				
 				Pattern dataPattern  = Pattern.compile("^geneSymbol: (.*)$");
-				//String attributeName = null;
-				
 				if(!lines.keySet().isEmpty()){
 					for(int i=0; i<lines.keySet().size();i++) {
 						String resultLine=lines.get(i);
