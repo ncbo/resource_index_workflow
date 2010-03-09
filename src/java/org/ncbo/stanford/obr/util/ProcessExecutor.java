@@ -1,11 +1,11 @@
 package org.ncbo.stanford.obr.util;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
-
-import obs.common.utils.StreamGobbler;
 
 /**
  * This is utility class for executing process in java
@@ -13,24 +13,16 @@ import obs.common.utils.StreamGobbler;
  * @author Kuladip Yadav
  *
  */
-public class ProcessExecutor implements StringHelper {
-	
-	/** logger for this class*/
-	private static Logger logger = Logger.getLogger(ProcessExecutor.class);
-	/** Maximum number of attempt allowed. */	
-	private static final int MAX_ATTEMPT_ALLOWED = 5;
-	
+public class ProcessExecutor implements StringHelper {	  
 	/**
-	 * This method execute base command with given paramater.If the process gives error then try to re-execute recursively 
-	 * upto {@code MAX_ATTEMPT_ALLOWED} time.
+	 * This method execute base command with given parameter. 
 	 * 
 	 * @param baseCommand
-	 * @param attemptNumber
 	 * @param parameters
 	 * @return
 	 * @throws Exception
 	 */
-	public static HashMap<Integer, String> executeCommand(String baseCommand, int attemptNumber, String... parameters) throws Exception{
+	public static HashMap<Integer, String> executeCommand(String baseCommand, String... parameters) throws Exception{
 		Runtime runtime = Runtime.getRuntime();
 		Process process = null;
 		
@@ -43,22 +35,20 @@ public class ProcessExecutor implements StringHelper {
 		} 
 		 
 		process = runtime.exec(command.toString()); 
-		// error message and script output management
-        StreamGobbler errorGobbler  = new StreamGobbler(process.getErrorStream(), "ERROR");            
-        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");	            
-        
-        errorGobbler.start();
-        outputGobbler.start();
-        
-        process.waitFor();      
+		
+		BufferedReader resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		
+		String resultLine = EMPTY_STRING;
+		HashMap<Integer, String> lines = new HashMap<Integer, String>();
+		int line_nb = 0;
+		// Tab separated string containing id and name of organism.
+		while((resultLine = resultReader.readLine()) != null) {
+			lines.put(line_nb, resultLine) ;
+			line_nb++;
+		}
+		resultReader.close(); 
          
-        if(StreamGobbler.lines.size() == 0 && attemptNumber<MAX_ATTEMPT_ALLOWED){  
-        	  logger.info("Trying to execute again after" +(attemptNumber +1)+ "s...");
-        	  Thread.sleep((attemptNumber +1)*1000);
-        	  return executeCommand(baseCommand, ++attemptNumber, parameters);        	
-        }         
-        
-        return StreamGobbler.lines;
+        return lines;
        
 	}
 

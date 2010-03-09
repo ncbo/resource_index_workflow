@@ -61,9 +61,9 @@ public class GetPgkbDiseaseData implements StringHelper{
 		Element myDisease = null;
 		  
 		try {			
-			logger.info("get data for "+diseaseAccession+"... ");	
+			//logger.info("get data for "+diseaseAccession+"... ");	
 			
-			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  diseaseAccession);  
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, diseaseAccession);  
 			try {
 				diseaseData = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();				
 				Integer attributeNumber = 0;
@@ -117,7 +117,7 @@ public class GetPgkbDiseaseData implements StringHelper{
 					//update the diseaseData
 					diseaseData.put(diseaseAccession, diseaseAttribute);//update of diseaseData content
 				}else{
-					logger.info("PROBLEM when getting data with the web service");
+					logger.info("PROBLEM when getting data with the web service for "+ diseaseAccession);
 				}
 				// PUT DATA INTO AN ELEMENT++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 				// for each attribute
@@ -181,7 +181,7 @@ public class GetPgkbDiseaseData implements StringHelper{
 	public String getDiseaseNameByDiseaseLocalID(String diseaseLocalID) {
 		String diseaseName = EMPTY_STRING;		  
 		try {     	        
-	        HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  diseaseLocalID); 	        
+	        HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, diseaseLocalID); 	        
 			 			 		
 			Pattern dataPattern  = Pattern.compile("^diseaseName: (.*)$");
 			

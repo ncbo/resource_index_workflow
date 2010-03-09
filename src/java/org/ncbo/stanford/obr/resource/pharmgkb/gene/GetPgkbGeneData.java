@@ -46,9 +46,9 @@ public class GetPgkbGeneData implements StringHelper{
 		Structure elementStructure = basicStructure;
 		Element myGene = null;
 		try {			
-			logger.info("get the data for "+geneAccession+"... ");
+			//logger.info("get the data for "+geneAccession+"... ");
 			
-			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  geneAccession); 
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, geneAccession); 
 			try {
 				geneData = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();				
 				Integer attributeNumber = 0;
@@ -102,7 +102,7 @@ public class GetPgkbGeneData implements StringHelper{
 					//update the geneData
 					geneData.put(geneAccession, geneAttribute);//update of geneData content
 				}else{
-					logger.info("PROBLEM when getting data with the web service");
+					logger.info("PROBLEM when getting data with the web service for " + geneAccession);
 				}
 				
 				// PUT DATA INTO AN ELEMENT++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -168,7 +168,7 @@ public class GetPgkbGeneData implements StringHelper{
 
 		try {
 			//geneAccession="PA447230";
-			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  genePgkbLocalID);         	        
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, genePgkbLocalID);         	        
 
 			try {
 				Pattern dataPattern  = Pattern.compile("^geneSymbol: (.*)$");

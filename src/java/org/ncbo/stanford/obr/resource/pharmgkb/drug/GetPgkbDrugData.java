@@ -59,9 +59,9 @@ public class GetPgkbDrugData implements StringHelper{
 		Structure elementStructure = basicStructure;
 		Element myDrug = null;	 
 		try {			
-			logger.info("get data for "+drugAccession+"... ");
+			//logger.info("get data for "+drugAccession+"... ");
 
-			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  drugAccession);  
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, drugAccession);  
 			try {
 				drugData = new Hashtable<String, Hashtable<String, Hashtable<Integer, String>>>();				
 				Integer attributeNumber = 0;
@@ -114,7 +114,7 @@ public class GetPgkbDrugData implements StringHelper{
 					//update the drugData
 					drugData.put(drugAccession, drugAttribute);//update of drugData content
 				}else{
-					logger.info("PROBLEM when getting data with the web service");
+					logger.info("PROBLEM when getting data with the web service for " + drugAccession);
 				}
 				// PUT DATA INTO AN ELEMENT++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 				//System.out.println(drugData.get(drugAccession).toString());		
@@ -192,7 +192,7 @@ public class GetPgkbDrugData implements StringHelper{
 	public String getDrugNameByDrugLocalID(String drugLocalID) {
 		String drugName = EMPTY_STRING;	 
 		try {
-			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, 0,  drugLocalID); 
+			HashMap<Integer, String> lines = ProcessExecutor.executeCommand(COMMAND, drugLocalID); 
 			 
 			Pattern dataPattern  = Pattern.compile("^drugName: (.*)$");				
 			if(!lines.keySet().isEmpty()){
