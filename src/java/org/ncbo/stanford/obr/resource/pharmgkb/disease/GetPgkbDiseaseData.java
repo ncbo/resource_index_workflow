@@ -92,6 +92,10 @@ public class GetPgkbDiseaseData implements StringHelper{
 				if(!lines.keySet().isEmpty()){
 					for(int i=0; i<lines.keySet().size();i++) {
 						String resultLine=lines.get(i);
+						// if resultLine is null then skip processing.
+						if(resultLine== null){
+							continue;
+						}
 						// process the line	
 						Matcher setMatcher = setPattern.matcher(resultLine);		
 						// line with an attribute name =====================
@@ -221,6 +225,10 @@ public class GetPgkbDiseaseData implements StringHelper{
 				if(!lines.keySet().isEmpty()){
 					for(int i=0; i<lines.keySet().size();i++) {
 						String resultLine=lines.get(i);
+						// if resultLine is null then skip processing.
+						if(resultLine== null){
+							continue;
+						}
 						// process the line	
 						Matcher dataMatcher = dataPattern.matcher(resultLine);		
 						// line with the geneSymbol ===========================

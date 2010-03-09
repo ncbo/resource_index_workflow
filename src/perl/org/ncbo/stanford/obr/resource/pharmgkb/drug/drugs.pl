@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use SOAP::Lite +trace;
+use SOAP::Lite;
 use English;
 use Carp;
 import SOAP::Data 'type';
