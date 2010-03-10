@@ -17,7 +17,6 @@ import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
-import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -142,9 +141,10 @@ public class ElementDao extends AbstractObrDao {
 	 * This method creates temporary tables for non annotated element with MAX_NUMBER_ELEMENTS_TO_PROCESS
 	 * 
 	 * @param dictionaryID used to find non annotated element
+	 * @param maxNumberOfElementsToProcess 
 	 * @return number of rows inserted in temporary table.
 	 */
-	public int createTemporaryTable(int dictionaryID){
+	public int createTemporaryTable(int dictionaryID, int maxNumberOfElementsToProcess){
 		// Delete temporary table if exist
 		deleteTemporaryTable();
 		int noRows =0;
@@ -157,7 +157,7 @@ public class ElementDao extends AbstractObrDao {
 		createQuery.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
 		createQuery.append(dictionaryID); 
 		createQuery.append(" LIMIT "); 
-		createQuery.append(ResourceAccessTool.MAX_NUMBER_ELEMENTS_TO_PROCESS); 
+		createQuery.append(maxNumberOfElementsToProcess); 
 		createQuery.append(";");
 		  
 		try{

@@ -50,11 +50,8 @@ public abstract class ResourceAccessTool implements StringHelper {
 	protected ResourceUpdateService resourceUpdateService;
 	protected AnnotationService annotationService;
 	protected SemanticExpansionService semanticExpansionService;
-	protected IndexationService indexationService;
-	
-	/** Maximum number of element to process for annotations */
-	public static final int MAX_NUMBER_ELEMENTS_TO_PROCESS= Integer.parseInt(MessageUtils.getMessage("obr.elements.process.max"));
-		
+	protected IndexationService indexationService;	  
+	  	
 	/**
 	 * Constructs a new ResourceAccessTool associated to a new Resource constructed with the given information
 	 * Gets access also the associated tables in the DB (and eventually created them). 
@@ -200,7 +197,15 @@ public abstract class ResourceAccessTool implements StringHelper {
 		return toolName;
 	}
 	
-	 
+	/**
+	 * Default maximum number of element to process
+	 * Need to override for MEDIUM and BIG resources
+	 * 
+	 * @return int  Number fo element 
+	 */
+	public int getMaxNumberOfElementsToProcess(){
+		return Integer.parseInt(MessageUtils.getMessage("obr.elements.process.max"));
+	}
 
 	/**
 	 * Updates the associated Resource information fields (name, URL, description, logo URL) automatically.

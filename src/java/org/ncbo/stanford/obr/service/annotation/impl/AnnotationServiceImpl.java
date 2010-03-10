@@ -309,6 +309,6 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @return Number of rows containing in temporary table
 	 */ 
 	public int createTemporaryElementTable(int dictionaryID) {
-		 return elementTableDao.createTemporaryTable(dictionaryID);		
+		 return elementTableDao.createTemporaryTable(dictionaryID, resourceAccessTool.getMaxNumberOfElementsToProcess());		
 	}
 }

@@ -76,10 +76,13 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * 
 	 */
 	public void startResourceIndexWorkflow() { 
+		ExecutionTimer workflowTimer = new ExecutionTimer();
+		workflowTimer.start();
 		// gets all resource ids for processing, 
 		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
-				.getMessage("obr.resource.ids"), ",");
-		//Initialize the Execution timer 
+				.getMessage("obr.resource.ids"), ",");		
+		
+		//Initialize the Execution timer 		
 		ExecutionTimer timer = new ExecutionTimer();		
 		logger.info("The Resources index Workflow Started.");	
 		for (String resourceID : resourceIDs) {
@@ -104,7 +107,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			}
 
 		}
-		logger.info("Resources index Workflow completed.");	
+		workflowTimer.end();
+		logger.info("Resources index Workflow completed in : " + timer.millisecondsToTimeString(timer.duration()));	
 	}
 
 	/**

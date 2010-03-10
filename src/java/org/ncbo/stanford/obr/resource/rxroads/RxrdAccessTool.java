@@ -56,6 +56,8 @@ public class RxrdAccessTool extends ResourceAccessTool {
 	private static final String RXRD_USER = MessageUtils.getMessage("obr.rxrd.jdbc.username");
 	private static final String RXRD_PASSWORD = MessageUtils.getMessage("obr.rxrd.jdbc.password");
 	
+	private static final int RXRD_MAX_NUMBER_ELEMENT_TO_PROCESS = 50000;
+	
 	//specific parameters
 	private static Connection        tableConnection;
 	private static PreparedStatement getElementDataStatement;
@@ -82,6 +84,11 @@ public class RxrdAccessTool extends ResourceAccessTool {
 	public ResourceType  getResourceType() {		 
 		return ResourceType.MEDIUM;
 	}
+	
+	@Override
+	public int getMaxNumberOfElementsToProcess(){
+		return RXRD_MAX_NUMBER_ELEMENT_TO_PROCESS;
+	}
 
 	@Override
 	public void updateResourceInformation() {
@@ -106,6 +113,8 @@ public class RxrdAccessTool extends ResourceAccessTool {
 			nbElement = this.updates();		
 		} catch (Exception e) {
 			logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName() + " with the db rx_roads", e); 
+		}finally{
+			this.closeConnection();
 		}
 		return nbElement;
 	}
@@ -417,6 +426,23 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		}
 	}
 	
+	private void closeConnection(){
+		if(tableConnection != null){
+			try{
+				closePreparedStatements();				
+			}
+			catch(Exception e){
+				logger.error("** PROBLEM ** Cannot create connection to database " + RXRD_CONNECTION_STRING, e);
+			}finally{
+				 try{
+					 tableConnection.close();
+				 }catch (Exception e) {
+					logger.error("Problem in closing connection.") ;
+				}
+			}
+		}
+	} 
+	
 	/**
 	 * Returns true if the table already exists in the DB. 
 	 */
@@ -483,7 +509,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		return tableSQLName;
 	}
 	
-	protected void openPreparedStatements() {		
+	private void openPreparedStatements() {		
 		this.openGetElementDataStatement();
 		this.openGetElementListStatement();
 		this.openGetGrantIdsByFiscalYearStatement();
@@ -491,7 +517,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		this.openGetObrLocalElementIdStatement();
 	}
 	
-	protected void closePreparedStatements() throws SQLException {		
+	private void closePreparedStatements() throws SQLException {		
 		getElementDataStatement.close();
 		getElementListStatement.close();
 		getGrantIdsByFiscalYearStatement.close();
