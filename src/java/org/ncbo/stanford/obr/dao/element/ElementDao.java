@@ -412,16 +412,22 @@ public class ElementDao extends AbstractObrDao {
 	public int updateDictionary(int dictionaryID, boolean useTemporaryElementTable){
 		int nbUpdated;
 		StringBuffer updatingQueryb = new StringBuffer();
-		updatingQueryb.append("UPDATE ");
-		updatingQueryb.append(this.getTableSQLName());
-		updatingQueryb.append(" SET dictionary_id=");
-		updatingQueryb.append(dictionaryID);
+		
 		if(useTemporaryElementTable){
-			updatingQueryb.append(" WHERE id IN (SELECT id FROM ");
+			updatingQueryb.append("UPDATE ");
+			updatingQueryb.append(this.getTableSQLName());
+			updatingQueryb.append(" ET, ");
 			updatingQueryb.append(this.getTableSQLName());
 			updatingQueryb.append(TEMP_TABLE_SUFFIX);
-			updatingQueryb.append(")");
+			updatingQueryb.append(" TEMP SET ET.dictionary_id=");
+			updatingQueryb.append(dictionaryID);
+			updatingQueryb.append(" WHERE ET.id = TEMP.id");
+			
 		}else{
+			updatingQueryb.append("UPDATE ");
+			updatingQueryb.append(this.getTableSQLName());
+			updatingQueryb.append(" SET dictionary_id=");
+			updatingQueryb.append(dictionaryID);
 			updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
 			updatingQueryb.append(dictionaryID);
 		}
