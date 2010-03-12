@@ -140,8 +140,18 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		Element myGrant;
 		
 		// get the list of element in the database (ie. list of grants in rxroads db)
-		HashSet<Integer> localElementIDList       = this.getElementList();
-		logger.info(localElementIDList.size()+" distinct grants ...");
+		HashSet<Integer> localElementIDList       = this.getElementList();		
+		HashSet<String> allElementLocalIDs = resourceUpdateService.getAllLocalElementIDs();
+		
+		// Removed already existed element.
+		HashSet<Integer> allElemenIDs = new HashSet<Integer>();		
+		for (String localElementID : allElementLocalIDs) { 
+			allElemenIDs.add(Integer.valueOf(localElementID)); 
+		}
+		
+		localElementIDList.removeAll(allElemenIDs);
+		
+		logger.info(localElementIDList.size()+" new distinct grants found...");
 		Iterator<Integer> i      = localElementIDList.iterator();		
 		Integer localElementID   = 0;
 		Structure basicStructure = RXRD_STRUCTURE;
@@ -157,8 +167,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 					if(resourceUpdateService.addElement(myGrant)){
 						nbAdded++;				
 					}
-				}
-				
+				}				
 				// populates the OBR_RXRD_CTX table				
 				try{
 					// for the first grant we also use the structure data to populate the OBR_RXRD_CXT Table.

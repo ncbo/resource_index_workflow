@@ -40,6 +40,7 @@ public class ClinicalTrialsAccessTool extends AbstractXmlResourceAccessTool {
 	private static final int ELT_PER_PAGE = 1000;
 	private int totalNumberElement;
 	
+	private static final int CT_MAX_NUMBER_ELEMENT_TO_PROCESS = 10000;
 
 	public ClinicalTrialsAccessTool(){
 		super(CT_NAME, CT_RESOURCEID, CT_STRUCTURE );
@@ -58,6 +59,11 @@ public class ClinicalTrialsAccessTool extends AbstractXmlResourceAccessTool {
 	@Override
 	public ResourceType  getResourceType() {		 
 		return ResourceType.MEDIUM;
+	}
+	
+	@Override
+	public int getMaxNumberOfElementsToProcess(){
+		return CT_MAX_NUMBER_ELEMENT_TO_PROCESS;
 	}
 
 	@Override
