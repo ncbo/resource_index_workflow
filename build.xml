@@ -175,7 +175,11 @@
 			<jar destfile="${dist.dir}/${app.name}.jar" >
 				<fileset dir="${build.dir}/classes">
 					<include name="**/*.*"/>
-				</fileset>			
+				</fileset>		
+				<!-- Copy all properties from src dierctories. -->
+				<fileset dir="${src.dir}">
+					<include name="**/*.properties"/>
+				</fileset>	
 			</jar>		
 			<!-- Copy shell scripts and bash script to dist directory -->
 		 

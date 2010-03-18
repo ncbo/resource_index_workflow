@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import obs.common.utils.UnzipUtils;
+import obs.common.utils.Utilities;
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
@@ -78,24 +79,25 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	private static final String AERS_DRUG_INDI_			= "drugindication";
 	
 	//All Zip Files name
-	private static final String[] arraersZip  = new String[]{"ucm084155.zip", "ucm083998.zip", "ucm083854.zip", "ucm085815.zip",
+	private static final String[] aersZip  = new String[]{"ucm084155.zip", "ucm083998.zip", "ucm083854.zip", "ucm085815.zip",
 															"ucm085799.zip", "ucm085789.zip", "ucm085782.zip", "UCM150386.zip",
 															"UCM173889.zip","UCM186489.zip","UCM197919.zip"};
-	//execute workflow for AERS RAT by passing 'arraersZip' array index one by one
-	private static final String[] aersZip	  =	new String[]{arraersZip[3]};// value for this variable varies by execution 
-	
 	//All extracts Data Files name
-	private static final String[] arraersExtract =	new String[]{"aers_sgml_2007q1","aers_sgml_2007q2","aers_sgml_2007q3","aers_sgml_2007q4",
+	private static final String[] aersExtract =	new String[]{"aers_sgml_2007q1","aers_sgml_2007q2","aers_sgml_2007q3","aers_sgml_2007q4",
 		 														"aers_sgml_2008q1","aers_sgml_2008q2","aers_sgml_2008q3","aers_sgml_2008q4",
 		 														"aers_sgml_2009_q1","aers_sgml_2009_q2","aers_sgml_2009_q3"};
-	//execute workflow for AERS RAT by passing 'arraersExtract' array index one by one
-	private static final String[] aersExtract =	new String[]{arraersExtract[3]};// value for this variable varies by execution
 	
 	//drugcharacterization key values appends with this string in safety reports specification properties 
 	private static final String SPEC_CHAR_="DRUG_CHAR_";
 	
 	//drugadministrationroute key values appends with this string in safety reports specification properties
 	private static final String SPEC_ADMIN_="DRUG_ADMIN_";
+	
+	/** Ontologies used for annotations.*/
+	private final String[] ontologiesForAnnotations = new String[]{"1032", "1342", "1353", "1427", "1351", "1422", "1352", "1055", "1057", "1007", "1350", "1022", "1341", "1423", "1429", "1401", "1354","1348", "1349", "1172"};
+	
+	/** Maximum number of element allow to process. */
+	private static final int AERS_MAX_NUMBER_ELEMENT_TO_PROCESS = 50000;
 	
 	/**
 	 * Constructor for AersDataAccessTool
@@ -122,6 +124,11 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	}
 
 	@Override
+	public int getMaxNumberOfElementsToProcess() {
+		return AERS_MAX_NUMBER_ELEMENT_TO_PROCESS;
+	}
+	
+	@Override
 	public void updateResourceInformation() {
 		// TODO See if it can be implemented for this resource.
 	}
@@ -132,9 +139,9 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	}
 	
 	@Override
-	public java.util.HashSet<String> getOntolgiesForAnnotation() {
+	public HashSet<String> getOntolgiesForAnnotation() {
 		//TODO : Need to add list of ontology for annotation
-		return null;
+		return Utilities.arrayToHashSet(ontologiesForAnnotations);
 	}
 	/**
 	 * Update all the elements to database	 
@@ -146,7 +153,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		try {			
 			//Extracts all data Files
 			for(int i=0;i<aersZip.length;i++){				
-				nbElement += extractZipFile( AERS_URL_ZIP + aersZip[i], aersExtract[i]);
+				nbElement += processZipFile( AERS_URL_ZIP + aersZip[i], aersExtract[i]);
 			}
 		} catch (FileNotFoundException e) {
 			logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e); 
@@ -155,6 +162,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		}
 		return nbElement;
 	}
+	
 	/**
 	 * Extracting zip files to local path using UnzipUtils.java class.	  
 	 * Removing file from local path after finish the data parsing.
@@ -163,9 +171,8 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
 	 * @throws FileNotFoundException 
-	 */
-	
-	private int extractZipFile(String fileName, String outFileName) throws FileNotFoundException,BadElementStructureException{
+	 */	
+	private int processZipFile(String fileName, String outFileName) throws FileNotFoundException,BadElementStructureException{
 		// Download and extracts zip file
 		int nbElement = 0;		
 		try {
@@ -180,7 +187,8 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		} catch(BadElementStructureException ex1){
 			throw ex1;
 		} finally{
-//			UnzipUtils.deleteDir(UnzipUtils.getDataFile());			
+			logger.info("Delete File");
+			UnzipUtils.deleteDir(UnzipUtils.getDataFile());			
 		}
 		return nbElement;
 	}
@@ -215,7 +223,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 				
 				//Replacing file content which contains '&' instead of '&amp;' 
 				logger.info("Replacing the '&' instead of '&amp;' from "+filePath +" file...");
-				replaceAmp(file.getName()+SLASH_STRING+subDir+SLASH_STRING,fileName);
+				cleanXml(file.getName()+SLASH_STRING+subDir+SLASH_STRING,fileName);
 				
 				//Parsing the file
 				logger.info("Parsing "+filePath +" file...");
@@ -225,6 +233,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 				org.w3c.dom.Element domRoot = dom.getDocumentElement();
 				//get the node list of 'safetyreport' XML elements
 				NodeList experimentList = domRoot.getElementsByTagName(AERS_SAFETYREPORT);
+				 
 				if(experimentList != null && experimentList.getLength() > 0) {
 					int listSize = experimentList.getLength();
 					logger.info("Total number of elements on " + this.getToolResource().getResourceName() + ": " + listSize);
@@ -242,13 +251,14 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		return nbElement;
 	}	
 	/**
-	 * Replacing file content which contains '&' instead of '&amp;' 
+	 * Replacing file content which contains '&' instead of '&amp;' also removes invalid xml character.
+	 * 
 	 * @param filePath
 	 * @param fileName
 	 * @throws FileNotFoundException
 	 * @throws BadElementStructureException
 	 */
-	private void replaceAmp(String filePath, String fileName)throws	FileNotFoundException, BadElementStructureException{
+	private void cleanXml(String filePath, String fileName)throws	FileNotFoundException, BadElementStructureException{
 		
 		try{
 		    // Open the file that is the first 
@@ -263,12 +273,14 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		    String strLine;		    
 		    //Read File Line By Line
 		    while ((strLine = br.readLine()) != null)   {
-		      // Print the content on the console
+		      // Print the content onm the console
 		    	if(strLine.contains("&")){
 			    	strLine=strLine.replace("&", "&amp;");
 		    	}
+		    	strLine = cleanTextForValidXmlCharacters(strLine);
+		    	
 		    	bWriter.append(strLine);
-		    	bWriter.append("\n");
+		    	bWriter.append(NEW_LINE_REGEX);
 		    }
 		    
 		    //Close the input stream
@@ -446,13 +458,43 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	public static void loadSafetyReportsSpecificatonProperities(){
 		try{			
 			safetyReportsSpecification=new Properties();
-			//Initialize the InputStream
-			//InputStream inputStream = ClassLoader.getSystemResourceAsStream("org/ncbo/stanford/obr/resource/aers/SafetyReportsSpecification.properties");
-			InputStream inputStream = AersDataAccessTool.class.getResourceAsStream("/org/ncbo/stanford/obr/resource/aers/SafetyReportsSpecification.properties");
-			//InputStream inputStream = AersDataAccessTool.class.getResourceAsStream("/SafetyReportsSpecification.properties");
+			//Initialize the InputStream			 
+			InputStream inputStream = AersDataAccessTool.class.getResourceAsStream("SafetyReportsSpecification.properties");
 			safetyReportsSpecification.load(inputStream);
 		}catch(Exception ex){	
 			logger.error("Problem in loading safety reports specification properties", ex);
 		}
+	} 
+	 
+	/**
+	 * This method remove invalid xml character as specified here :
+	 * http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
+	 * 
+	 * @param dirtyText
+	 * @return String with clean text.
+	 */
+	public String cleanTextForValidXmlCharacters(String dirtyText) {
+		StringBuffer cleanText = new StringBuffer();
+		char character;
+
+		if (dirtyText == null || dirtyText.trim().length() == 0) {
+			return Utilities.EMPTY_STRING;
+		}
+
+		for (int i = 0; i < dirtyText.length(); i++) {
+			character = dirtyText.charAt(i);
+			// Append only valid xml character.
+			if ((character == 0x9)
+					|| (character == 0xA)
+					|| (character == 0xD)
+					|| ((character >= 0x20) && (character <= 0xD7FF))
+					|| ((character >= 0xE000) && (character <= 0xFFFD))
+					|| ((character >= 0x10000) && (character <= 0x10FFFF))) {
+				cleanText.append(character);
+			} else { // replace non valid xml character with space
+				cleanText.append(BLANK_SPACE);
+			}
+		}
+		return cleanText.toString();
 	}
 }

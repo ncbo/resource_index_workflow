@@ -11,4 +11,5 @@ done
  
 echo "${CLASSPATH}"
 
+# For executing AERS RAT required 2048M max memory other wise keep it 1024M 
 java -Xms512M -Xmx1024M -cp "script:conf:${CLASSPATH}:resource_index_workflow.jar" org.ncbo.stanford.obr.populate.main.PopulateResourceIndex
