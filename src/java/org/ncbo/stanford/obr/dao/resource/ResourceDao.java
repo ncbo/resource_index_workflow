@@ -163,15 +163,25 @@ public class ResourceDao extends AbstractObrDao {
 	 */
 	public boolean addEntry(Resource resource){
 		boolean inserted = false;
-		try {
+		try {			
 			addEntryStatement.setString(1, resource.getResourceName());
 			addEntryStatement.setString(2, resource.getResourceID());
 			addEntryStatement.setString(3, resource.getResourceStructure().toXMLString());
 			addEntryStatement.setString(4, resource.getMainContext());
-			addEntryStatement.setString(5, resource.getResourceURL().toString());
+			
+			String resourceURL= null;
+			if(resource.getResourceURL()!= null){
+				resourceURL=  resource.getResourceURL().toString();
+			}
+			addEntryStatement.setString(5, resourceURL);
 			addEntryStatement.setString(6, resource.getResourceElementURL());
 			addEntryStatement.setString(7, resource.getResourceDescription());
-			addEntryStatement.setString(8, resource.getResourceLogo().toString());		
+			
+			String logoURL= null;
+			if(resource.getResourceLogo()!= null){
+				logoURL =  resource.getResourceLogo().toString();
+			}
+			addEntryStatement.setString(8, logoURL);		
  
 			this.executeSQLUpdate(addEntryStatement);
 			inserted = true;
@@ -244,10 +254,18 @@ public class ResourceDao extends AbstractObrDao {
 			updateEntryStatement.setString(1, resource.getResourceName());			
 			updateEntryStatement.setString(2, resource.getResourceStructure().toXMLString());
 			updateEntryStatement.setString(3, resource.getMainContext());
-			updateEntryStatement.setString(4, resource.getResourceURL().toString());
+			String resourceURL= null;
+			if(resource.getResourceURL()!= null){
+				resourceURL=  resource.getResourceURL().toString();
+			}
+			updateEntryStatement.setString(4, resourceURL);
 			updateEntryStatement.setString(5, resource.getResourceElementURL());
 			updateEntryStatement.setString(6, resource.getResourceDescription());
-			updateEntryStatement.setString(7, resource.getResourceLogo().toString());
+			String logoURL= null;
+			if(resource.getResourceLogo()!= null){
+				logoURL =  resource.getResourceLogo().toString();
+			}
+			updateEntryStatement.setString(7, logoURL);
 			updateEntryStatement.setString(8, resource.getResourceID());
  
 			this.executeSQLUpdate(updateEntryStatement);

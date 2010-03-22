@@ -43,8 +43,9 @@ import com.aliasi.util.Files;
 
 /**
  * PubMedAccessTool is responsible for getting data elements for 
- * Pub Med.  
- * 
+ * Pub Med. The latest files available for the particular year 
+ * http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
+ *  
  * This tool fetch data using xml files and E-Utilities.
  * <p>
  * To fetch data using E-utilities  use method <code>updateResourceContent</code>  

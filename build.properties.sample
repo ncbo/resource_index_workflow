@@ -37,6 +37,11 @@ obr.rxrd.jdbc.url=jdbc:mysql://localhost:3306/rxrd
 obr.rxrd.jdbc.username=yourusername
 obr.rxrd.jdbc.password=yourpassword
 
+# Configuring rxrd database 
+obr.grants.jdbc.url=jdbc:mysql://localhost:3306/rxrd
+obr.grants.jdbc.username=yourusername
+obr.grants.jdbc.password=yourpassword
+
 # Configuring master OBS database 
 obs.master.schema.name=obsschemaname
 obs.master.schema.host.name=obsschemahost
@@ -74,5 +79,5 @@ obr.expansion.mapping=true
 obr.expansion.distance=true
 
 # Resources to be included in workflow i.e resource ids separated by comma.
-#obr.resource.ids=GEO,AE,CT,GM,OMIM,CDD,PGDI,PGDR,PGGE,REAC,RXRD,UPKB,WP,BSM,DBK,SMD,CANANO,PC,PCM,UPKB,PM,AERS
+#obr.resource.ids=GEO,AE,CT,GM,OMIM,CDD,PGDI,PGDR,PGGE,REAC,RXRD,UPKB,WP,BSM,DBK,SMD,CANANO,PC,PCM,UPKB,PM,AERS,GRANTS
 obr.resource.ids=WP,GEO

@@ -112,7 +112,12 @@
 				<filter token="obrrxrdjdbcusername" value="${obr.rxrd.jdbc.username}" />
 				<filter token="obrrxrdjdbcpassword" value="${obr.rxrd.jdbc.password}" />
 				
-				<!-- For rxrd resource access tool database 						-->
+				<!-- For grants resource access tool database 						-->
+				<filter token="obrgrantsjdbcurl" value="${obr.grants.jdbc.url}" />
+				<filter token="obrgrantsjdbcusername" value="${obr.grants.jdbc.username}" />
+				<filter token="obrgrantsjdbcpassword" value="${obr.grants.jdbc.password}" />
+				
+				<!-- For obs master database						-->
 				<filter token="obsmasterschemaname" value="${obs.master.schema.name}" />
 				<filter token="obsmasterschemahost" value="${obs.master.schema.host.name}" />
 				<filter token="obsmasterjdbcusername" value="${obs.master.jdbc.username}" />

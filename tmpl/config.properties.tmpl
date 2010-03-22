@@ -25,6 +25,7 @@ resource.rxrd=org.ncbo.stanford.obr.resource.rxroads.RxrdAccessTool
 resource.upkb=org.ncbo.stanford.obr.resource.uniprotkb.UpkbAnnotAccessTool
 resource.aers=org.ncbo.stanford.obr.resource.aers.AersDataAccessTool
 resource.pm=org.ncbo.stanford.obr.resource.ncbi.pubmed.PubMedAccessTool
+resource.grants=org.ncbo.stanford.obr.resource.grants.GrantsAccessTool
 
 # Resources to be included in workflow i.e resource ids separated by comma.
 obr.resource.ids=@obrresourceids@
@@ -110,6 +111,11 @@ obr.jdbc.password=@obrjdbcpassword@
 obr.rxrd.jdbc.url=@obrrxrdjdbcurl@
 obr.rxrd.jdbc.username=@obrrxrdjdbcusername@
 obr.rxrd.jdbc.password=@obrrxrdjdbcpassword@
+
+# Configuring GRANTS database 
+obr.grants.jdbc.url=@obrgrantsjdbcurl@
+obr.grants.jdbc.username=@obrgrantsjdbcusername@
+obr.grants.jdbc.password=@obrgrantsjdbcpassword@
 
 # File parameters 
 obr.remote.host=ncbolabs-dev2
