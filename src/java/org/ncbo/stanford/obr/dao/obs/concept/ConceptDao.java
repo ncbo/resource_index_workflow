@@ -120,7 +120,7 @@ public class ConceptDao extends AbstractObsDao {
 		int nbInserted =0 ;
 		
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("LOAD DATA INFILE '");
+		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(conceptEntryFile.getAbsolutePath());
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());

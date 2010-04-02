@@ -182,7 +182,7 @@ public class TermDao extends AbstractObsDao{
 	 */
 	public int populateSlaveTermTableFromFile(File termEntryFile) {
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("LOAD DATA INFILE '");
+		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(termEntryFile.getAbsolutePath());
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());

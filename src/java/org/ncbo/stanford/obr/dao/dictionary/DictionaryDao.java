@@ -281,15 +281,15 @@ public class DictionaryDao extends AbstractObrDao {
 		if(ontologies== null ||ontologies.size()== 0){
 			queryb.append("SELECT id, name FROM ");
 			queryb.append(TermDao.name());
-			queryb.append("TT WHERE TT.");
+			queryb.append(" TT WHERE TT.");
 		}else{
 			queryb.append("SELECT TT.id, TT.name FROM ");
 			queryb.append(TermDao.name());
-			queryb.append("TT, ");
+			queryb.append(" TT, ");
 			queryb.append(ConceptDao.name());
-			queryb.append("CT, ");
+			queryb.append(" CT, ");
 			queryb.append(OntologyDao.name());
-			queryb.append("OT WHERE TT.concept_id = CT.id AND CT.ontology_id = OT.id AND ");
+			queryb.append(" OT WHERE TT.concept_id = CT.id AND CT.ontology_id = OT.id AND ");
 			queryb.append(localOntologyIDFilter(ontologies));
 			queryb.append(" AND ");
 		}		

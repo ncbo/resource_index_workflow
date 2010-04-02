@@ -119,7 +119,7 @@ public class MapDao extends AbstractObsDao{
 	 */
 	public int populateSlaveMappingTableFromFile(File mappingEntryFile) {
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("LOAD DATA INFILE '");
+		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(mappingEntryFile.getAbsolutePath());
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());
