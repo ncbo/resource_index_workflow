@@ -70,7 +70,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT  , " +
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"context_id SMALLINT UNSIGNED NOT NULL, " +
@@ -82,17 +82,24 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"mapping_done BOOL NOT NULL, " +
 					"distance_done BOOL NOT NULL, " +
 					"indexing_done BOOL NOT NULL, " +
-					"FOREIGN KEY (element_id) REFERENCES "    + ElementDao.name(this.resourceID)        + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES "    + conceptDao.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
-					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE "+
+//					"FOREIGN KEY (element_id) REFERENCES "    + ElementDao.name(this.resourceID)        + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (concept_id) REFERENCES "    + conceptDao.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
+//					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
+					"PRIMARY KEY (id, concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
+					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +
+					"INDEX X_" + this.getTableSQLName() +"term_id (term_id), " +
+					"INDEX X_" + this.getTableSQLName() +"dictionary_id (dictionary_id), " +
+					
 				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
-//					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
-//					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
-//					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
-//					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
-				");";
+					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
+					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
+					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
+					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
+				")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25;";
 	}
 
 	@Override

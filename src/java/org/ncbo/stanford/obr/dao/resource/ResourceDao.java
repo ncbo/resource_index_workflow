@@ -88,8 +88,9 @@ public class ResourceDao extends AbstractObrDao {
 					"total_element BIGINT, " +
 					"last_update_date DATETIME, " +
 					"workflow_completed_date DATETIME, " +
-					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
-				    ");";
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +
+				//	"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()+ "(id) ON DELETE CASCADE ON UPDATE CASCADE " +
+				    ")ENGINE=InnoDB ;";
 	}
 
 	@Override

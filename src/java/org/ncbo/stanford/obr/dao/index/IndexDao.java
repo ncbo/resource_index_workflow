@@ -66,9 +66,11 @@ public class IndexDao extends AbstractObrDao {
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
 					"UNIQUE (element_id, concept_id), " +
-					"FOREIGN KEY (element_id) REFERENCES " + ElementDao.name(this.resourceID)  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() 		+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +												
-				");";
+					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id) " +
+					//"FOREIGN KEY (element_id) REFERENCES " + ElementDao.name(this.resourceID)  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() 		+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +												
+				")ENGINE=InnoDB ;";
 	}
 	
 	@Override

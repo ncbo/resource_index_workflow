@@ -65,9 +65,12 @@ public class StatisticsDao extends AbstractObrDao {
 					"isa_annotations INT UNSIGNED," +
 					"mapping_annotations INT UNSIGNED," +
 					"UNIQUE (resource_id, ontology_id), " +
-					"FOREIGN KEY (resource_id) REFERENCES " + ResourceDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (ontology_id) REFERENCES " + OntologyDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE" +		
-				");";
+					
+					//"FOREIGN KEY (resource_id) REFERENCES " + ResourceDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					//"FOREIGN KEY (ontology_id) REFERENCES " + OntologyDao.name() + "(id) ON DELETE CASCADE ON UPDATE CASCADE" +
+					"INDEX X_" + this.getTableSQLName() +"_resource_id (resource_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_ontology_id (ontology_id)" +
+				")ENGINE=InnoDB ;";
 	}
 
 	@Override

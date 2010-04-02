@@ -74,15 +74,18 @@ public class RelationDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-		"id INT(11) NOT NULL PRIMARY KEY, " +
+		"id INT(11) NOT NULL AUTO_INCREMENT, " +
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
 		"level INT(11) NOT NULL, " +
+		"PRIMARY KEY (id, concept_id), " +
 		//"UNIQUE (localConceptID, parentLocalConceptID), " +
-		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
+		//"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
+		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
+		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
 		"INDEX X_" + getTableSQLName() +"_level (level)" +
-		");";
+		")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25;";
 	}
 	
 	/**

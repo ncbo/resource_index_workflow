@@ -72,15 +72,18 @@ public class MapDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-		"id INT(11) NOT NULL PRIMARY KEY, " +
+		"id INT(11) NOT NULL AUTO_INCREMENT, " +
 		"concept_id INT(11) NOT NULL, " +
 		"mapped_concept_id INT(11) NOT NULL, " +
 		"mapping_type VARCHAR(246) NOT NULL, " +
-		"UNIQUE (concept_id, mapped_concept_id ), " +
-		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		//"UNIQUE (concept_id, mapped_concept_id ), " +
+		"PRIMARY KEY (id, concept_id), " +
+		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
+		//"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
+		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
+		"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
 		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +
-		");";
+		")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
 	}
 
 	/**

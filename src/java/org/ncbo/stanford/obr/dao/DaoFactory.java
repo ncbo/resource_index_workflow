@@ -21,19 +21,10 @@ import org.ncbo.stanford.obr.dao.statistics.StatisticsDao;
  * @author Kuladip Yadav
  */
 public interface DaoFactory {
-	 
-	/** Singleton data access object for context table. */
-	public static final ContexDao contextTableDao = ContexDao.getInstance();
-	
-	/** Singleton data access object for resource table. */
-	public static final ResourceDao resourceTableDao = ResourceDao.getInstance();	
-	
-	/** Singleton data access object for statistics table. */
-	public static final StatisticsDao statisticsDao = StatisticsDao.getInstance();
 	
 	/** Singleton data access object for dictionary table. */
 	public static final DictionaryDao dictionaryDao = DictionaryDao.getInstance();
-	 
+	
 	/** Singleton data access object for ontology table. */
 	public static final OntologyDao ontologyDao = OntologyDao.getInstance();
 	
@@ -48,5 +39,15 @@ public interface DaoFactory {
 	
 	/** Singleton data access object for relation table. */
 	public static final RelationDao relationDao = RelationDao.getInstance();
+	 
+	/** Singleton data access object for context table. */
+	public static final ContexDao contextTableDao = ContexDao.getInstance();
+	
+	/** Singleton data access object for resource table. */
+	public static final ResourceDao resourceTableDao = ResourceDao.getInstance();	
+	
+	/** Singleton data access object for statistics table. */
+	public static final StatisticsDao statisticsDao = StatisticsDao.getInstance();
+	 
 
 }

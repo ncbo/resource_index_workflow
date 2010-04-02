@@ -54,9 +54,10 @@ public class ConceptDao extends AbstractObsDao {
 		"local_concept_id VARCHAR(246) NOT NULL UNIQUE, " +
 		"ontology_id INT(11) NOT NULL, " +
 		"is_toplevel BOOL NOT NULL, " +
-		"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+	//	"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		"INDEX X_" + this.getTableSQLName() +"_ontology_id (ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() +"_isTopLevel (is_toplevel)" +
-	");";
+	")ENGINE=InnoDB ;";
 }
 	@Override
 	protected void openPreparedStatements() {

@@ -76,10 +76,11 @@ public class OntologyDao extends AbstractObsDao{
 		"status INT(11) NOT NULL, " +
 		"virtual_ontology_id VARCHAR(246) NOT NULL, " +
 		"format VARCHAR(32) DEFAULT NULL, "+
-		"dictionary_id SMALLINT NOT NULL, " +
+		"dictionary_id SMALLINT UNSIGNED NOT NULL, " +
 		"INDEX X_" + this.getTableSQLName() + "_virtualOntologyID (virtual_ontology_id), " +
-		"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName() + "(id)" +
-		");";
+		"INDEX X_" + this.getTableSQLName() + "_dictionary_id (dictionary_id)" +
+		//"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName() + "(id)" +
+		")ENGINE=InnoDB ;";
 	}
 	
 	@Override

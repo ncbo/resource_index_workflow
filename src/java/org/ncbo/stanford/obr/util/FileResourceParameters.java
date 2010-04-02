@@ -15,7 +15,7 @@ public class FileResourceParameters {
 	
 	// Local & remote paths
 	public static final String LOCAL_FOLDER 		= MessageUtils.getMessage("obr.local.path");
-	private static final String NCBODATA_FOLDER 	= MessageUtils.getMessage("obt.remote.path");
+	private static final String NCBODATA_FOLDER 	= MessageUtils.getMessage("obr.remote.path");
 	
 	// Folder names
 	public static final String RESULT_FOLDER     	= MessageUtils.getMessage("obr.result.dir");

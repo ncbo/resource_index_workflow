@@ -82,8 +82,9 @@ public class ElementDao extends AbstractObrDao {
 					"id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"local_element_id VARCHAR(255) NOT NULL UNIQUE, " +
 					"dictionary_id SMALLINT UNSIGNED, " +
-					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
-				");";
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +
+					//"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
+				")ENGINE=InnoDB ;";
 	}
 	
 	@Override

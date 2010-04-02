@@ -61,7 +61,7 @@ public class ObsMasterDao implements DaoFactory{
 	 * Making as private for using singleton pattern. 
 	 */
 	private ObsMasterDao() {
-		this.createConnection();
+		//this.createConnection();
 	}
 
 	/** Instance holder for ObsMasterDao. */ 

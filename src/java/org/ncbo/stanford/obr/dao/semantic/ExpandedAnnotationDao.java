@@ -67,7 +67,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, " +
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +			
 					"context_id SMALLINT UNSIGNED NOT NULL, " +			
@@ -81,17 +81,26 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"indexing_done BOOL NOT NULL, " +
 					// Removed march 2009. Valid but too expensive in size. Not verified.
 					//"UNIQUE (elementID, conceptID, contextID, childConceptID, mappedConceptID, distantConceptID), " +				
-					"FOREIGN KEY (element_id) REFERENCES "         + ElementDao.name(this.resourceID)  + "(elementID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (concept_id) REFERENCES "         + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (context_id) REFERENCES "         + contextTableDao.getTableSQLName()			 		+ "(contextID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (child_concept_id) REFERENCES "    + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-				//	"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					"INDEX X_" + this.getTableSQLName() +"parent_level (parent_level), " +
-					"INDEX X_" + this.getTableSQLName() +"mapping_type (mapping_type) " +
-				//	"INDEX X_" + this.getTableSQLName() +"distance (distance) " +
-				//	"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
-				");";
+//					"FOREIGN KEY (element_id) REFERENCES "         + ElementDao.name(this.resourceID)  + "(elementID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (concept_id) REFERENCES "         + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (context_id) REFERENCES "         + contextTableDao.getTableSQLName()			 		+ "(contextID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (child_concept_id) REFERENCES "    + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+//					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
+					
+					"PRIMARY KEY (id, concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_child_concept_id (child_concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
+					"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
+					
+					"INDEX X_" + this.getTableSQLName() +"_parent_level (parent_level), " +
+					"INDEX X_" + this.getTableSQLName() +"_mapping_type (mapping_type), " +
+				 	"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
+				 	"INDEX X_" + this.getTableSQLName() +"_indexing_done (indexing_done)" +
+				")ENGINE=InnoDB PARTITION BY HASH( concept_id) PARTITIONS 25;";
 	}
 
 	@Override

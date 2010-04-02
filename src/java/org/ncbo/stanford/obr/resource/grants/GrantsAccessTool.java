@@ -71,7 +71,7 @@ public class GrantsAccessTool extends ResourceAccessTool {
 	
 	@Override
 	public ResourceType  getResourceType() {		 
-		return ResourceType.MEDIUM;
+		return ResourceType.SMALL;
 	}
 	
 	@Override
