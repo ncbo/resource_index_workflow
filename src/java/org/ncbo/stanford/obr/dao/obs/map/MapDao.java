@@ -76,7 +76,8 @@ public class MapDao extends AbstractObsDao{
 		"concept_id INT(11) NOT NULL, " +
 		"mapped_concept_id INT(11) NOT NULL, " +
 		"mapping_type VARCHAR(246) NOT NULL, " +
-		"UNIQUE (concept_id, mapped_concept_id ), " +
+		//TODO : Need to verify
+	//	"UNIQUE (concept_id, mapped_concept_id ), " +
 		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +
@@ -116,7 +117,7 @@ public class MapDao extends AbstractObsDao{
 	 */
 	public int populateSlaveMappingTableFromFile(File mappingEntryFile) {
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("LOAD DATA INFILE '");
+		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(mappingEntryFile.getAbsolutePath());
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());

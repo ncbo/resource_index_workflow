@@ -86,12 +86,12 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"FOREIGN KEY (concept_id) REFERENCES "    + conceptDao.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
-					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE "+
+					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
 				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
-//					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
-//					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
-//					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
-//					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
+					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
+					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
+					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
+					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
 				");";
 	}
 
