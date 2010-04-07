@@ -80,7 +80,7 @@ public class MapDao extends AbstractObsDao{
 	//	"UNIQUE (concept_id, mapped_concept_id ), " +
 		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type)" +
+		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type(10))" +
 		");";
 	}
 
