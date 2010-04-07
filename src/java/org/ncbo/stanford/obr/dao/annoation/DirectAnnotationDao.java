@@ -87,7 +87,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 //					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 //					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
 //					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
-					"PRIMARY KEY (id, concept_id), " +
+					"PRIMARY KEY (concept_id, id), " +
 					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
 					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +
@@ -97,7 +97,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
 					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
 					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
-					"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
+					//"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
 					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
 				")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25;";
 	}

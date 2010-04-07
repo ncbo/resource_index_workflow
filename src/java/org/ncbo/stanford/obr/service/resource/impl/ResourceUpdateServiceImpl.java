@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import obs.common.beans.DictionaryBean;
+import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -253,6 +254,8 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public void calculateObrStatistics() {
 		
 		logger.info("Processing of statistics started...");
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
 		
 		// Getting Indexed annotations
 		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics();
@@ -333,6 +336,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		logger.info("Number of entries added/updated in statistics table are :" + noOfEntiesUpdated);
+		timer.end();
+		logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName()
+				+ " statistics processed in: "
+				+ timer.millisecondsToTimeString(timer.duration()));
 		logger.info("Processing of statistics completed.");
 		
 	} 
