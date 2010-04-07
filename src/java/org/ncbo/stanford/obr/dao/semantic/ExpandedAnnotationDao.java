@@ -94,11 +94,11 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_child_concept_id (child_concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
+					//"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
 					
 					"INDEX X_" + this.getTableSQLName() +"_parent_level (parent_level), " +
 					"INDEX X_" + this.getTableSQLName() +"_mapping_type (mapping_type), " +
-				 	"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
+				 	//"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
 				 	"INDEX X_" + this.getTableSQLName() +"_indexing_done (indexing_done)" +
 				")ENGINE=InnoDB PARTITION BY HASH( concept_id) PARTITIONS 25;";
 	}
