@@ -87,7 +87,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 //					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 //					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
 //					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
-					"PRIMARY KEY (concept_id, id), " +
+					"PRIMARY KEY (id, concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
 					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +

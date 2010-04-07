@@ -78,7 +78,7 @@ public class RelationDao extends AbstractObsDao{
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
 		"level INT(11) NOT NULL, " +
-		"PRIMARY KEY (concept_id, id), " +
+		"PRIMARY KEY (id, concept_id), " +
 		//"UNIQUE (localConceptID, parentLocalConceptID), " +
 		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
 		//"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +

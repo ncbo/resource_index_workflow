@@ -88,7 +88,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 //					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 //					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					
-					"PRIMARY KEY (concept_id, id), " +
+					"PRIMARY KEY (id, concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +

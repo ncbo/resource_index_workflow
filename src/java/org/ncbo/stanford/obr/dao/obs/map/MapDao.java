@@ -77,7 +77,7 @@ public class MapDao extends AbstractObsDao{
 		"mapped_concept_id INT(11) NOT NULL, " +
 		"mapping_type VARCHAR(246) NOT NULL, " +
 		//"UNIQUE (concept_id, mapped_concept_id ), " +
-		"PRIMARY KEY (concept_id, id,), " +
+		"PRIMARY KEY (id, concept_id), " +
 		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
 		//"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
 		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
