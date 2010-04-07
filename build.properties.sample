@@ -32,12 +32,12 @@ obr.jdbc.driver=com.mysql.jdbc.Driver
 obr.jdbc.username=yourusername
 obr.jdbc.password=yourpassword
 
-# Configuring rxrd database 
+# Configuring RXRD database 
 obr.rxrd.jdbc.url=jdbc:mysql://localhost:3306/rxrd
 obr.rxrd.jdbc.username=yourusername
 obr.rxrd.jdbc.password=yourpassword
 
-# Configuring rxrd database 
+# Configuring GRANTS database 
 obr.grants.jdbc.url=jdbc:mysql://localhost:3306/rxrd
 obr.grants.jdbc.username=yourusername
 obr.grants.jdbc.password=yourpassword
