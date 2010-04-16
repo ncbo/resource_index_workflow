@@ -67,7 +67,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, " +
+					"id BIGINT UNSIGNED NOT NULL, " +
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +			
 					"context_id SMALLINT UNSIGNED NOT NULL, " +			
@@ -88,19 +88,19 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 //					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 //					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
 					
-					"PRIMARY KEY (id, concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_child_concept_id (child_concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
-					//"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
-					
-					"INDEX X_" + this.getTableSQLName() +"_parent_level (parent_level), " +
-					"INDEX X_" + this.getTableSQLName() +"_mapping_type (mapping_type), " +
-				 	//"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
-				 	"INDEX X_" + this.getTableSQLName() +"_indexing_done (indexing_done)" +
-				")ENGINE=InnoDB PARTITION BY HASH( concept_id) PARTITIONS 25;";
+					"PRIMARY KEY (concept_id, id)" +
+//					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"_child_concept_id (child_concept_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
+//					//"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
+//					
+//					"INDEX X_" + this.getTableSQLName() +"_parent_level (parent_level), " +
+//					"INDEX X_" + this.getTableSQLName() +"_mapping_type (mapping_type), " +
+//				 	//"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
+//				 	"INDEX X_" + this.getTableSQLName() +"_indexing_done (indexing_done)" +
+				")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
 	}
 
 	@Override
@@ -216,7 +216,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false FROM ");
+		queryb.append(" (id, element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT @counter:=@counter+1, element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false FROM ");
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
 		queryb.append(relationDao.getTableSQLName());
@@ -234,7 +234,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		updatingQueryb.append(" SET is_a_closure_done=true WHERE is_a_closure_done=false;");
 		
 		try{
-			nbAnnotation = this.executeSQLUpdate(queryb.toString());
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
@@ -264,7 +264,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false FROM ");
+		queryb.append(" (id, element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT @counter:=@counter+1, element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false FROM ");
 		queryb.append(table.getTableSQLName());
 		queryb.append(" AS DAT, ");		
 		queryb.append(mapDao.getTableSQLName());

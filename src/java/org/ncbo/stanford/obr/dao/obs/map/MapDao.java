@@ -72,18 +72,18 @@ public class MapDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-		"id INT(11) NOT NULL AUTO_INCREMENT, " +
+		"id INT(11) NOT NULL , " +
 		"concept_id INT(11) NOT NULL, " +
 		"mapped_concept_id INT(11) NOT NULL, " +
 		"mapping_type VARCHAR(246) NOT NULL, " +
 		//"UNIQUE (concept_id, mapped_concept_id ), " +
-		"PRIMARY KEY (id, concept_id), " +
+		"PRIMARY KEY (concept_id, id) " +
 		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
 		//"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
-		"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
-		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type(10))" +
-		")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
+//		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
+//		"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
+//		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type(10))" +
+		")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
 	}
 
 	/**

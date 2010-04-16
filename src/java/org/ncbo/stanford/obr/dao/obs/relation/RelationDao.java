@@ -78,14 +78,14 @@ public class RelationDao extends AbstractObsDao{
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
 		"level INT(11) NOT NULL, " +
-		"PRIMARY KEY (id, concept_id), " +
+		"PRIMARY KEY (concept_id, id) " +
 		//"UNIQUE (localConceptID, parentLocalConceptID), " +
 		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
 		//"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
-		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
-		"INDEX X_" + getTableSQLName() +"_level (level)" +
-		")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25;";
+//		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
+//		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
+//		"INDEX X_" + getTableSQLName() +"_level (level)" +
+		")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -16,7 +17,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
-
+ 
 import com.mysql.jdbc.CommunicationsException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 
@@ -205,6 +206,43 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		tableStatement.close();
 		return nbRow;
 	}
+	
+	/**
+	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
+	 */
+	protected int executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
+		int nbRow=0;
+		try{
+			 CallableStatement callableStatement = tableConnection.prepareCall("call CommonBatchInsertProcedure(?,?)");
+			 callableStatement.setString(1, tableName);
+			 callableStatement.setString(2, query);
+			 callableStatement.setBoolean(3, disableKeys);
+			 
+			 ResultSet rs3 = callableStatement.executeQuery();
+			 if(rs3.next()){
+				 nbRow=rs3.getInt(0);
+			 }
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(query);
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (CommunicationsException e) {
+			reOpenConnectionIfClosed();
+			tableStatement = tableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			nbRow = tableStatement.executeUpdate(query);
+		}
+		tableStatement.close();
+		return nbRow;
+	}
+	
 	
 	/**
 	 * Executes the SQL query on the given prepared statement and returns the number of row in the table. 

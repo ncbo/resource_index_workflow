@@ -70,7 +70,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT  , " +
+					"id BIGINT UNSIGNED NOT NULL, " +
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"context_id SMALLINT UNSIGNED NOT NULL, " +
@@ -87,19 +87,19 @@ public class DirectAnnotationDao extends AbstractObrDao {
 //					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 //					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
 //					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
-					"PRIMARY KEY (id, concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
-					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +
-					"INDEX X_" + this.getTableSQLName() +"term_id (term_id), " +
-					"INDEX X_" + this.getTableSQLName() +"dictionary_id (dictionary_id), " +
-					
-				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
-					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
-					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
-					//"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
-					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
-				")ENGINE=InnoDB PARTITION BY HASH(concept_id) PARTITIONS 25;";
+					"PRIMARY KEY (concept_id, id)" +
+//					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"term_id (term_id), " +
+//					"INDEX X_" + this.getTableSQLName() +"dictionary_id (dictionary_id), " +
+//					
+//				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
+//					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
+//					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
+//					//"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
+//					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
+				")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25;";
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(" (element_id, concept_id, context_id, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) "); 
-		queryb.append("VALUES (");
+		queryb.append("VALUES ( ");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
 			queryb.append(ElementDao.name(this.resourceID));
@@ -312,11 +312,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer joinQuery = new StringBuffer();
 		joinQuery.append("INSERT INTO ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(" (element_id, concept_id, context_id, term_id, ");
+		joinQuery.append(" (id, element_id, concept_id, context_id, term_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append(".position_from, ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(".position_to, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) SELECT element_id, concept_id, context_id, ");
+		joinQuery.append(".position_to, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) SELECT @counter:=@counter+1, element_id, concept_id, context_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.term_id, ");
 		joinQuery.append(this.getTableSQLName());
@@ -334,7 +334,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		joinQuery.append(termDao.getTableSQLName());
 		joinQuery.append(".id;");
 		try{
-			nbAnnotation = this.executeSQLUpdate(joinQuery.toString());
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot join the temporary table and OBS_TT to load the file " + mgrepFile.getName()+". 0 returned", e);
