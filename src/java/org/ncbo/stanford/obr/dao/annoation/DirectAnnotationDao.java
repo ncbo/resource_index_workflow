@@ -267,7 +267,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
     	(termID INT UNSIGNED, OBR_TR_MGREP.from INT UNSIGNED, OBR_TR_MGREP.to INT UNSIGNED, elementID INT UNSIGNED, contextID INT UNSIGNED,); */
 		
 		StringBuffer createQuery = new StringBuffer();
-		createQuery.append("CREATE TEMPORARY TABLE ");
+		createQuery.append("CREATE TABLE ");
 		createQuery.append(this.getTableSQLName());
 		createQuery.append("_MGREP (term_id INT UNSIGNED, ");
 		createQuery.append(this.getTableSQLName());

@@ -213,15 +213,14 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected int executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
 		int nbRow=0;
 		try{
-			 CallableStatement callableStatement = tableConnection.prepareCall("call CommonBatchInsertProcedure(?,?)");
+			 CallableStatement callableStatement = tableConnection.prepareCall("call CommonBatchInsertProcedure(?,?, ?, ?)");
 			 callableStatement.setString(1, tableName);
 			 callableStatement.setString(2, query);
 			 callableStatement.setBoolean(3, disableKeys);
-			 
-			 ResultSet rs3 = callableStatement.executeQuery();
-			 if(rs3.next()){
-				 nbRow=rs3.getInt(0);
-			 }
+			 callableStatement.registerOutParameter(4, java.sql.Types.INTEGER);
+			 callableStatement.execute();
+			 nbRow = callableStatement.getInt(4);
+			  
 			 
 			try{
 				if(AbstractObrDao.sqlLogFile != null){

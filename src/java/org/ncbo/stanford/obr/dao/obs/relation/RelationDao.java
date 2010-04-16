@@ -74,7 +74,7 @@ public class RelationDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-		"id INT(11) NOT NULL AUTO_INCREMENT, " +
+		"id INT(11) NOT NULL , " +
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
 		"level INT(11) NOT NULL, " +
