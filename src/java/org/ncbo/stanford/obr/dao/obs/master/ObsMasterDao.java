@@ -422,7 +422,9 @@ public class ObsMasterDao implements DaoFactory{
 		deleteDataQuery.append(tableName);
 		
 		try {
-			executeSQLQuery(deleteDataQuery.toString());
+			logger.info("Removing all entries from table "+  tableName);
+			executeSQLUpdate(deleteDataQuery.toString());			
+			
 		} catch (SQLException e) {
 			 logger.error("Problem in removing data from table " +tableName, e);
 		}
