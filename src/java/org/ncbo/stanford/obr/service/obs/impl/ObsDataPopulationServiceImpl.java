@@ -152,6 +152,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		int numberOfRelationsAdded= 0;
 		File relationEntryFile = null;		
 		try{
+			// Remove all data from relation table.
+			obsMasterDao.removeAllDataFromTable(relationDao.getTableSQLName());
 			// Writes 'is a parent' relation entries to file from master relation table.
 			relationEntryFile = obsMasterDao.writeMasterRelationEntries(localOntologyIDs);
 			// Load file entries into slave term table. 
@@ -176,6 +178,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		int numberOfMappingsAdded = 0 ;
 		File mappingEntryFile = null;
 		try{
+			// Remove all data from mapping table.
+			obsMasterDao.removeAllDataFromTable(mapDao.getTableSQLName());
 			// Writes mapping entries to file from master map table.
 			mappingEntryFile = obsMasterDao.writeMasterMappingEntries(localOntologyIDs);
 			// Load file entries into slave mapping table. 

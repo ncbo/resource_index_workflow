@@ -2,6 +2,7 @@ package org.ncbo.stanford.obr.dao.obs.master;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao.OntologyEntry;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
@@ -155,6 +157,25 @@ public class ObsMasterDao implements DaoFactory{
 		}			 
 		return rSet;
 	}	
+	
+	/**
+	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
+	 */
+	protected int executeSQLUpdate(String query) throws SQLException {
+		int nbRow;
+		try{
+			tableStatement = masterTableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			nbRow = tableStatement.executeUpdate(query);
+			 
+		}
+		catch (CommunicationsException e) {
+			reOpenConnectionIfClosed();
+			tableStatement = masterTableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			nbRow = tableStatement.executeUpdate(query);
+		}
+		tableStatement.close();
+		return nbRow;
+	}
 
 	/**
 	 * Method get new versions of ontologies from obs master table which are not present 
@@ -274,18 +295,7 @@ public class ObsMasterDao implements DaoFactory{
 		StringBuffer selectQuery = new StringBuffer();
 		selectQuery.append("SELECT ISAPT.id, ISAPT.concept_id, ISAPT.parent_concept_id, ISAPT.level FROM ");
 		selectQuery.append(relationDao.getTableSQLName());
-		selectQuery.append(" ISAPT, ");
-		selectQuery.append(conceptDao.getTableSQLName());
-		selectQuery.append(" CT, ");
-		selectQuery.append(ontologyDao.getTableSQLName());
-		selectQuery.append(" OT WHERE ISAPT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");		
-		for (String localOntologyID : localOntologyIDs) {
-			selectQuery.append(localOntologyID);
-			selectQuery.append(", ");
-		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
-		selectQuery.append("); ");	
-		
+		selectQuery.append(" ISAPT; ");		 
 		try {		
 			return writeQueryResultFile(selectQuery.toString(), RELATION_ENTRIES_FILENAME);			
 		}  
@@ -310,15 +320,7 @@ public class ObsMasterDao implements DaoFactory{
 		selectQuery.append(conceptDao.getTableSQLName());
 		selectQuery.append(" CT, ");
 		selectQuery.append(conceptDao.getTableSQLName());
-		selectQuery.append(" CT1, ");
-		selectQuery.append(ontologyDao.getTableSQLName());
-		selectQuery.append(" OT WHERE MAPT.local_concept_id = CT.local_concept_id AND MAPT.mapped_local_concept_id = CT1.local_concept_id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");		
-		for (String localOntologyID : localOntologyIDs) {
-			selectQuery.append(localOntologyID);
-			selectQuery.append(", ");
-		}		
-		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
-		selectQuery.append("); ");		
+		selectQuery.append(" CT1 WHERE MAPT.local_concept_id = CT.local_concept_id AND MAPT.mapped_local_concept_id = CT1.local_concept_id ; ");		
 		
 		try {	
 			return writeQueryResultFile(selectQuery.toString(), MAPPING_ENTRIES_FILENAME);
@@ -412,6 +414,19 @@ public class ObsMasterDao implements DaoFactory{
 		}
 		
 		return ontologyIDs;
+	}
+	
+	public void removeAllDataFromTable(String tableName){
+		StringBuffer deleteDataQuery = new StringBuffer();
+		deleteDataQuery.append("DELETE FROM ");
+		deleteDataQuery.append(tableName);
+		
+		try {
+			executeSQLQuery(deleteDataQuery.toString());
+		} catch (SQLException e) {
+			 logger.error("Problem in removing data from table " +tableName, e);
+		}
+		 
 	}
 	
 }
