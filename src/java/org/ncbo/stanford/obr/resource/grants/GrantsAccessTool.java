@@ -165,7 +165,7 @@ public class GrantsAccessTool extends ResourceAccessTool {
 	
 	protected void openGetElementListStatement(){
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("SELECT id FROM "+this.getTableSQLName()+" WHERE fiscal_year>=1995 LIMIT 10000;");		
+		queryb.append("SELECT id FROM "+this.getTableSQLName()+" WHERE fiscal_year>=1995;");		
 		//THING TO REMOVE sub grants from the all set like :: ends with S something eg S01
 		getElementListStatement = this.prepareSQLStatement(queryb.toString());
 	}
