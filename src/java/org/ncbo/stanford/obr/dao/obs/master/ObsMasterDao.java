@@ -306,13 +306,9 @@ public class ObsMasterDao implements DaoFactory{
 	 */
 	public File writeMasterMappingEntries(List<String> localOntologyIDs){		 
 		StringBuffer selectQuery = new StringBuffer();
-		selectQuery.append("SELECT MAPT.id, CT.id AS concept_id, CT1.id AS mapped_concept_id, MAPT.mapping_type FROM ");
+		selectQuery.append("SELECT MAPT.id,  MAPT.concept_id,  MAPT.mapped_concept_id, MAPT.mapping_type FROM ");
 		selectQuery.append(mapDao.getTableSQLName());
-		selectQuery.append(" MAPT, ");
-		selectQuery.append(conceptDao.getTableSQLName());
-		selectQuery.append(" CT, ");
-		selectQuery.append(conceptDao.getTableSQLName());
-		selectQuery.append(" CT1 WHERE MAPT.local_concept_id = CT.local_concept_id AND MAPT.mapped_local_concept_id = CT1.local_concept_id ; ");		
+		selectQuery.append(" MAPT; ");
 		
 		try {	
 			return writeQueryResultFile(selectQuery.toString(), MAPPING_ENTRIES_FILENAME);
