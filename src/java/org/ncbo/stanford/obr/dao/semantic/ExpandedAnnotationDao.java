@@ -11,6 +11,7 @@ import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.enumeration.ExpansionTypeEnum;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -191,7 +192,11 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, workflow_status) SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false, 0 FROM ");
+		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, ISAPT.parent_concept_id, context_id,");
+		queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
+		queryb.append(", DAT.concept_id, level, ");
+		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE);
+		queryb.append(" FROM ");
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
 		queryb.append(relationDao.getMemoryTableSQLName()); // JOin with memory table.
@@ -237,7 +242,11 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT @counter:=@counter+1, element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false, 0 FROM ");
+		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, MAPT.mapped_concept_id, context_id, ");
+		queryb.append(ExpansionTypeEnum.MAPPING.getType());
+		queryb.append(", DAT.concept_id, mapping_type, ");
+		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE);	
+		queryb.append(" FROM ");	   
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");		
 		queryb.append(mapDao.getMemoryTableSQLName()); // JOin with memory map table
