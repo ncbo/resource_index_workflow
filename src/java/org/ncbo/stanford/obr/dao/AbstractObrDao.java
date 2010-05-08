@@ -17,7 +17,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
- 
+
 import com.mysql.jdbc.CommunicationsException;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 
@@ -44,6 +44,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected static Logger logger = Logger.getLogger(AbstractObrDao.class);
 	
 	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
+	protected static final String OBS_MEMORY_SUFFIX = "_mem";
 		
 	// Database connection properties.
 	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
@@ -157,6 +158,10 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		return this.tableSQLName;
 	}
 	
+	public String getMemoryTableSQLName() {
+		return this.tableSQLName + OBS_MEMORY_SUFFIX;
+	}
+	
 	public static Connection getTableConnection() {
 		return tableConnection;
 	}
@@ -213,14 +218,13 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected int executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
 		int nbRow=0;
 		try{
-			 CallableStatement callableStatement = tableConnection.prepareCall("call CommonBatchInsertProcedure(?,?, ?, ?)");
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL CommonBatchInsertProcedure(?,?, ?, ?)");
 			 callableStatement.setString(1, tableName);
 			 callableStatement.setString(2, query);
 			 callableStatement.setBoolean(3, disableKeys);
 			 callableStatement.registerOutParameter(4, java.sql.Types.INTEGER);
 			 callableStatement.execute();
-			 nbRow = callableStatement.getInt(4);
-			  
+			 nbRow = callableStatement.getInt(4);			  
 			 
 			try{
 				if(AbstractObrDao.sqlLogFile != null){
@@ -234,12 +238,65 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 			}
 		}
 		catch (CommunicationsException e) {
-			reOpenConnectionIfClosed();
-			tableStatement = tableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			nbRow = tableStatement.executeUpdate(query);
-		}
-		tableStatement.close();
+			reOpenConnectionIfClosed();			 
+		}		 
 		return nbRow;
+	}
+	
+	/**
+	 * 
+	 * Call the store procedure LoadObsSlaveTablesIntoMemeory
+	 * 
+	 */
+	public void callLoadObsSlaveTablesIntoMemeoryProcedure(){	 
+		try{
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL LoadObsSlaveTablesIntoMemeory();");
+			 callableStatement.execute();  
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write("call LoadObsSlaveTablesIntoMemeory();");
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (SQLException e) {
+			 logger.error("Problem in calling LoadObsSlaveTablesIntoMemeoryProcedure", e);		 
+		}
+		 
+		 
+	}
+	
+	public void callStoredProcedure(String storedProcedureName){	 
+		try{
+			StringBuffer callSPQuery = new StringBuffer();
+			callSPQuery.append("CALL ");
+			callSPQuery.append(storedProcedureName);
+			callSPQuery.append("(); ");
+			  
+			CallableStatement callableStatement = tableConnection.prepareCall(callSPQuery.toString());
+			callableStatement.execute();  
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(callSPQuery.toString());
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (SQLException e) {
+			 logger.error("Problem in calling stored procedure " + storedProcedureName, e);		 
+		}
+		 
+		 
 	}
 	
 	

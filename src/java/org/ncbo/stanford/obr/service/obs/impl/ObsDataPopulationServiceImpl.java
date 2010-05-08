@@ -239,4 +239,12 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from ontology table.");
 		 }
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.obs.ObsDataPopulationService#loadObsSlaveTablesIntoMemeory()
+	 */
+	public void loadObsSlaveTablesIntoMemeory() {
+		ontologyDao.callLoadObsSlaveTablesIntoMemeoryProcedure();
+	}
 }

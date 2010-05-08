@@ -17,6 +17,7 @@ import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -352,16 +353,12 @@ public class ElementDao extends AbstractObrDao {
 	 * Writes the given file with all the non annotated elements according to a given dictionaryID. 
 	 * @param useTemporaryElementTable 
 	 */
-	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure, boolean useTemporaryElementTable){
+	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT * FROM ");
-		queryb.append(this.getTableSQLName());
-		if(useTemporaryElementTable){
-			queryb.append(TEMP_TABLE_SUFFIX);
-		}else{
-			queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-			queryb.append(dictionaryID);
-		} 
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		queryb.append(dictionaryID);		 
 		queryb.append(";");
 		
 		//loads the contextName-contextID in a temporary structure to avoid querying the DB when executing the resultset streaming
@@ -410,29 +407,15 @@ public class ElementDao extends AbstractObrDao {
 	 * 
 	 * @param useTemporaryElementTable 
 	 */
-	public int updateDictionary(int dictionaryID, boolean useTemporaryElementTable){
+	public int updateDictionary(int dictionaryID){
 		int nbUpdated;
-		StringBuffer updatingQueryb = new StringBuffer();
-		
-		if(useTemporaryElementTable){
-			updatingQueryb.append("UPDATE ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(" ET, ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(TEMP_TABLE_SUFFIX);
-			updatingQueryb.append(" TEMP SET ET.dictionary_id=");
-			updatingQueryb.append(dictionaryID);
-			updatingQueryb.append(" WHERE ET.id = TEMP.id");
-			
-		}else{
-			updatingQueryb.append("UPDATE ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(" SET dictionary_id=");
-			updatingQueryb.append(dictionaryID);
-			updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-			updatingQueryb.append(dictionaryID);
-		}
-		
+		StringBuffer updatingQueryb = new StringBuffer();		 
+		updatingQueryb.append("UPDATE ");
+		updatingQueryb.append(this.getTableSQLName());
+		updatingQueryb.append(" SET dictionary_id=");
+		updatingQueryb.append(dictionaryID);
+		updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		updatingQueryb.append(dictionaryID);		
 		updatingQueryb.append(";");
 		try{
 			nbUpdated = this.executeSQLUpdate(updatingQueryb.toString());
@@ -450,17 +433,14 @@ public class ElementDao extends AbstractObrDao {
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
 	 * @param useTemporaryElementTable 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, boolean useTemporaryElementTable ){		
+	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
 		try{				
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("SELECT local_element_id, ");
 			queryb.append(contextName+" FROM ");
-			queryb.append(this.getTableSQLName());
-			if(useTemporaryElementTable){
-				queryb.append(TEMP_TABLE_SUFFIX);
-			} 
+			queryb.append(this.getTableSQLName());			 
 			queryb.append(" WHERE dictionary_id IS NULL ");
 			
 			if(isNewVirsion){
@@ -482,8 +462,8 @@ public class ElementDao extends AbstractObrDao {
 								new DirectAnnotationEntry(localElementID, 
 										splittedLocalConceptIDs[i].replace(structure.getOntoID(contextName), localOntologyID),
 										contextName, 
-										dictionaryID, // dictionaryID for existing annotations
-										false, false, false, false));// for now the semantic distance expansion is not done
+										dictionaryID,  // dictionaryID for existing annotations
+										WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus()));// for now the semantic distance expansion is not done
 						}
 					}
 					catch (Exception e) {

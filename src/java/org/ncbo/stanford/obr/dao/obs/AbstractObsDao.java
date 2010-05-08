@@ -9,6 +9,7 @@ public abstract class AbstractObsDao extends AbstractObrDao {
 	  	
 	public AbstractObsDao(String suffix) {
 		 super(OBS_PREFIX + suffix);
-	} 
+	}  
+	
 	 	
 }

@@ -13,6 +13,7 @@ import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -70,36 +71,16 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL, " +
-					"element_id INT UNSIGNED NOT NULL, " +
-					"concept_id INT UNSIGNED NOT NULL, " +
-					"context_id SMALLINT UNSIGNED NOT NULL, " +
-					"term_id INT UNSIGNED, " +				
-					this.getTableSQLName()+".position_from INTEGER, " +
-					this.getTableSQLName()+".position_to INTEGER, " +
-					"dictionary_id SMALLINT UNSIGNED NOT NULL, " +
-					"is_a_closure_done BOOL NOT NULL, " +
-					"mapping_done BOOL NOT NULL, " +
-					"distance_done BOOL NOT NULL, " +
-					"indexing_done BOOL NOT NULL, " +
-//					"FOREIGN KEY (element_id) REFERENCES "    + ElementDao.name(this.resourceID)        + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (concept_id) REFERENCES "    + conceptDao.getTableSQLName()        	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (context_id) REFERENCES "    + contextTableDao.getTableSQLName()            + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (term_id) REFERENCES "       + termDao.getTableSQLName()           	 + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "    +					
-//					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, "+
-					"PRIMARY KEY (concept_id, id)" +
-//					"INDEX X_" + this.getTableSQLName() +"element_id (element_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"concept_id (concept_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"context_id (context_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"term_id (term_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"dictionary_id (dictionary_id), " +
-//					
-//				// TODO: Need to verify by more testing. Does not useful for workflow queries performance and not used in api queries 	
-//					"INDEX X_" + this.getTableSQLName() +"is_a_closure_done (is_a_closure_done), " +
-//					"INDEX X_" + this.getTableSQLName() +"mapping_done (mapping_done), " +
-//					//"INDEX X_" + this.getTableSQLName() +"distance_done (distance_done)," +
-//					"INDEX X_" + this.getTableSQLName() +"indexing_done (indexing_done)" +
-				")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25;";
+					"id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"element_id INT(11) UNSIGNED NOT NULL, " +
+					"concept_id INT(11) UNSIGNED NOT NULL, " +
+					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +
+					"term_id INT(11) UNSIGNED, " +				
+					"position_from INT(11), " +
+					"position_to INT(11), " +
+					"dictionary_id SMALLINT(5) UNSIGNED NOT NULL, " +
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +					
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 
 	@Override
@@ -125,7 +106,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) "); 
+		queryb.append(" (element_id, concept_id, context_id, dictionary_id, workflow_staus) "); 
 		queryb.append("VALUES ( ");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
@@ -141,7 +122,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append("(SELECT id FROM ");
 			queryb.append(contextTableDao.getTableSQLName());
 			queryb.append(" WHERE name=?)");
-		queryb.append(",?,?,?,?,?)");	
+		queryb.append(",?,?)");	
 		this.addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 
@@ -156,10 +137,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addEntryStatement.setString (2, entry.getLocalConceptID());
 			this.addEntryStatement.setString (3, entry.getContextName());
 			this.addEntryStatement.setInt    (4, entry.getDictionaryID());
-			this.addEntryStatement.setBoolean(5, entry.getIsaClosureDone());
-			this.addEntryStatement.setBoolean(6, entry.getMappingDone());
-			this.addEntryStatement.setBoolean(7, entry.getDistanceDone());
-			this.addEntryStatement.setBoolean(8, entry.getIndexingDone());
+			this.addEntryStatement.setInt(5, entry.getWorkflowStatus());		 
 			this.executeSQLUpdate(this.addEntryStatement);
 			inserted = true;
 		}
@@ -181,7 +159,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, term_id, "+this.getTableSQLName()+".position_from, "+this.getTableSQLName()+".position_to, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) "); 
+		queryb.append(" (element_id, concept_id, context_id, term_id, "+this.getTableSQLName()+".position_from, "+this.getTableSQLName()+".position_to, dictionary_id, workflow_status) "); 
 		queryb.append("VALUES (");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
@@ -197,7 +175,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append("(SELECT id FROM ");
 			queryb.append(contextTableDao.getTableSQLName());
 			queryb.append(" WHERE name=?)");
-		queryb.append(",?,?,?,?,?,?,?,?)");	
+		queryb.append(",?,?,?,?,?)");	
 		this.addMgrepEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 
@@ -216,10 +194,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addMgrepEntryStatement.setInt    (5, entry.getFrom());
 			this.addMgrepEntryStatement.setInt    (6, entry.getTo());
 			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryID());
-			this.addMgrepEntryStatement.setBoolean(8, entry.getIsaClosureDone());
-			this.addMgrepEntryStatement.setBoolean(9, entry.getMappingDone());
-			this.addMgrepEntryStatement.setBoolean(10,entry.getDistanceDone());
-			this.addMgrepEntryStatement.setBoolean(11,entry.getIndexingDone());
+			this.addMgrepEntryStatement.setInt(8, entry.getWorkflowStatus());
+		 
 			this.executeSQLUpdate(this.addMgrepEntryStatement);
 			inserted = true;
 		}
@@ -312,11 +288,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer joinQuery = new StringBuffer();
 		joinQuery.append("INSERT INTO ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(" (id, element_id, concept_id, context_id, term_id, ");
+		joinQuery.append(" (element_id, concept_id, context_id, term_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append(".position_from, ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(".position_to, dictionary_id, is_a_closure_done, mapping_done, distance_done, indexing_done) SELECT @counter:=@counter+1, element_id, concept_id, context_id, ");
+		joinQuery.append(".position_to, dictionary_id, workflow_status) SELECT element_id, concept_id, context_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.term_id, ");
 		joinQuery.append(this.getTableSQLName());
@@ -324,15 +300,15 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.position_to, ");
 		joinQuery.append(dictionaryID);
-		joinQuery.append(", false, false, false, false FROM ");
+		joinQuery.append(", ");
+		joinQuery.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
+		joinQuery.append(" FROM ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP, ");
-		joinQuery.append(termDao.getTableSQLName());
-		joinQuery.append(" WHERE ");
+		joinQuery.append(termDao.getMemoryTableSQLName());
+		joinQuery.append(" TT WHERE ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append("_MGREP.term_id=");
-		joinQuery.append(termDao.getTableSQLName());
-		joinQuery.append(".id;");
+		joinQuery.append("_MGREP.term_id= TT.id ;");		 
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
 			}
@@ -568,22 +544,17 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		private String localConceptID;
 		private String contextName;
 		private Integer dictionaryID;
-		private Boolean isaClosureDone;
-		private Boolean mappingDone;
-		private Boolean distanceDone;
-		private Boolean indexingDone;
+		private Integer workflowStatus;
+		 
 		
 		public DirectAnnotationEntry(String localElementID, String localConceptID, String contextName, Integer dictionaryID,
-				Boolean isaClosureDone, Boolean mappingDone, Boolean distanceDone, Boolean indexingDone) {
+				 Integer workflowStatus) {
 			super();
 			this.localElementID = localElementID;
 			this.localConceptID = localConceptID;
 			this.contextName = contextName;
 			this.dictionaryID = dictionaryID;
-			this.isaClosureDone = isaClosureDone;
-			this.mappingDone = mappingDone;
-			this.distanceDone = distanceDone;
-			this.indexingDone = indexingDone;
+			this.workflowStatus =workflowStatus;
 		}
 
 		public String getLocalElementID() {
@@ -599,22 +570,10 @@ public class DirectAnnotationDao extends AbstractObrDao {
 
 		public Integer getDictionaryID() {
 			return dictionaryID;
-		}
+		}	 
 
-		public Boolean getIsaClosureDone() {
-			return isaClosureDone;
-		}
-
-		public Boolean getMappingDone() {
-			return mappingDone;
-		}
-
-		public Boolean getDistanceDone() {
-			return distanceDone;
-		}
-
-		public Boolean getIndexingDone() {
-			return indexingDone;
+		public Integer getWorkflowStatus() {
+			return workflowStatus;
 		}
 
 		public String toString(){
@@ -628,13 +587,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			sb.append(", ");
 			sb.append(this.dictionaryID);
 			sb.append(", ");			
-			sb.append(this.isaClosureDone);
-			sb.append(", ");			
-			sb.append(this.mappingDone);
-			sb.append(", ");			
-			sb.append(this.distanceDone);
-			sb.append(", ");			
-			sb.append(this.indexingDone);
+			sb.append(this.workflowStatus);		 
 			sb.append("]");
 			return sb.toString();
 		}
@@ -658,10 +611,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		public DirectMgrepAnnotationEntry(String localElementID,
 				String localConceptID, String contextName, Integer termID,
 				Integer from, Integer to, Integer dictionaryID,
-				Boolean isaClosureDone, Boolean mappingDone,
-				Boolean distanceDone, Boolean indexingDone) {
-			super(localElementID, localConceptID, contextName, dictionaryID,
-					isaClosureDone, mappingDone, distanceDone, indexingDone);
+				Integer workflowStaus) {
+			super(localElementID, localConceptID, contextName, dictionaryID, workflowStaus);
 			this.termID = termID;
 			this.from = from;
 			this.to = to;
@@ -696,15 +647,18 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			sb.append(", ");			
 			sb.append(this.getDictionaryID());
 			sb.append(", ");			
-			sb.append(this.getIsaClosureDone());
-			sb.append(", ");			
-			sb.append(this.getMappingDone());
-			sb.append(", ");			
-			sb.append(this.getDistanceDone());
-			sb.append(", ");			
-			sb.append(this.getIndexingDone());
+			sb.append(this.getWorkflowStatus());		 
 			sb.append("]");
 			return sb.toString();
 		}
+	}
+	
+	public void createIndex() {
+		try {
+			callStoredProcedure("CreateIndexForAnnotationTable");	
+		} catch (Exception e) {
+			logger.error("Problem in creating index on annotation tables", e);
+		}
+			 
 	}
 }

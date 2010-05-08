@@ -42,4 +42,9 @@ public interface AnnotationService {
 	 * @return Number of rows containing in temporary table
 	 */
 	public int createTemporaryElementTable(int dictionaryID);
+	
+	/**
+	 * 
+	 */
+	public void createIndexForAnnotationTable();
 }

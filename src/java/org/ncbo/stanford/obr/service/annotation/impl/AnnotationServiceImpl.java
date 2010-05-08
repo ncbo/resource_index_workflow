@@ -43,14 +43,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */
 	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
 			HashSet<String> stopwords) {
-		int nbAnnotation;
-		boolean useTemporaryElementTable;	
-		 
-		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-			useTemporaryElementTable =false; 
-		}else{
-			useTemporaryElementTable =true; 
-		} 
+		int nbAnnotation;		 
 
 		// processes direct mgrep annotations
 		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
@@ -60,16 +53,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		nbAnnotation += this.reportExistingAnnotations(dictionary);
 
 		// updates the dictionary column in _ET
-		logger.info("Updating the dictionary field in ElementTable...");
-		  
-		// Update dictionary id for element table.
-		try{
-			elementTableDao.updateDictionary(dictionary.getDictionaryID(), useTemporaryElementTable);	
-		}finally{
-			if(useTemporaryElementTable){
-				elementTableDao.deleteTemporaryTable();
-			} 
-		}
+		logger.info("Updating the dictionary field in ElementTable...");		  
+		// Update dictionary id for element table.		 
+		elementTableDao.updateDictionary(dictionary.getDictionaryID());		 
 			
 		return nbAnnotation;
 	}
@@ -96,19 +82,13 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 						.dictionaryFileName(dictionary));
 			}
 			if (dictionaryFile.createNewFile()) {
-				logger.info("Re-creation of the dictionaryFile...");
-				HashSet<String> localOntologyIDs = null;
-				
-				// For big resources get list of ontologies used for annotation.
-				if(resourceAccessTool.getResourceType() == ResourceType.BIG){
-					localOntologyIDs= resourceAccessTool.getOntolgiesForAnnotation();
-				}
+				logger.info("Re-creation of the dictionaryFile...");			 
 				
 				if (withCompleteDictionary) {
-					dictionaryDao.writeDictionaryFile(dictionaryFile,localOntologyIDs);
+					dictionaryDao.writeDictionaryFile(dictionaryFile);
 				} else {
 					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
-							.getDictionaryID(),localOntologyIDs);
+							.getDictionaryID());
 				}
 			}
 		} catch (IOException e) {
@@ -205,18 +185,11 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 				+ dictionaryID + "_MGREP.txt";
 		File mgrepResourceFile = new File(name);
 		try {
-			mgrepResourceFile.createNewFile();
-			
-			boolean useTemporaryElementTable;			
-			if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-				useTemporaryElementTable =false; 
-			}else{
-				useTemporaryElementTable =true; 
-			}
+			mgrepResourceFile.createNewFile();	 
 			
 			elementTableDao.writeNonAnnotatedElements(mgrepResourceFile,
 					dictionaryID, resourceAccessTool.getToolResource()
-							.getResourceStructure(), useTemporaryElementTable);
+							.getResourceStructure());
 		} catch (IOException e) {
 			logger.error(
 					"** PROBLEM ** Cannot create Mgrep file for exporting resource "
@@ -261,21 +234,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
 		
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		
-		boolean useTemporaryElementTable;			
-		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-			useTemporaryElementTable =false; 
-		}else{
-			useTemporaryElementTable =true; 
-		}
-		
+		 
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, useTemporaryElementTable));				
+				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
 			}
 			
 		}
@@ -311,5 +277,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */ 
 	public int createTemporaryElementTable(int dictionaryID) {
 		 return elementTableDao.createTemporaryTable(dictionaryID, resourceAccessTool.getMaxNumberOfElementsToProcess());		
+	}
+	
+	public void createIndexForAnnotationTable() {
+		 directAnnotationTableDao.createIndex();
 	}
 }

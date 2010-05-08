@@ -35,12 +35,8 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 			timer.start();
 			logger.info("Executing isa transitive closure expansion... ");
 			int isaAnnotation; 
-			// for small resources include all level	
-			if(resourceAccessTool.getResourceType()== ResourceType.SMALL || resourceAccessTool.getResourceType()== ResourceType.MEDIUM){
-				isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao, LEVEL_ALL);
-			}else{
-				isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao, MAX_LEVEL_FOR_BIG_RESOURCE);
-			}
+			
+			isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
 				
 			logger.info(isaAnnotation);
 			nbAnnotation += isaAnnotation;

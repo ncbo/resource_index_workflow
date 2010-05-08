@@ -10,14 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import obs.common.beans.DictionaryBean;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.dao.obs.term.TermDao;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
@@ -235,23 +231,11 @@ public class DictionaryDao extends AbstractObrDao {
 	 * for a given dictionaryID. Used to generate a dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
-	public int writeDictionaryFile(File file, int dictionaryID, HashSet<String> localOntologyIDs){
-		StringBuffer queryb = new StringBuffer();
-		if(localOntologyIDs== null ||localOntologyIDs.size()== 0){
-			queryb.append("SELECT id, name FROM ");
-			queryb.append(TermDao.name());
-			queryb.append("TT WHERE TT.");
-		}else{
-			queryb.append("SELECT TT.id, TT.name FROM ");
-			queryb.append(TermDao.name());
-			queryb.append("TT, ");
-			queryb.append(ConceptDao.name());
-			queryb.append("CT, ");
-			queryb.append(OntologyDao.name());
-			queryb.append("OT WHERE TT.concept_id = CT.id AND CT.ontology_id = OT.id AND ");
-			queryb.append(localOntologyIDFilter(localOntologyIDs));
-			queryb.append(" AND TT.");
-		}		
+	public int writeDictionaryFile(File file, int dictionaryID){
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT id, name FROM ");
+		queryb.append(TermDao.name());
+		queryb.append("TT WHERE TT.");		 
 		queryb.append(this.blackListFilter());
 		queryb.append(" AND OT.dictionary_id = ");
 		queryb.append(dictionaryID);
@@ -275,24 +259,12 @@ public class DictionaryDao extends AbstractObrDao {
 	 * Used to generate a complete dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
-	public int writeDictionaryFile(File file, HashSet<String> ontologies){
+	public int writeDictionaryFile(File file){
 		
-		StringBuffer queryb = new StringBuffer();
-		if(ontologies== null ||ontologies.size()== 0){
-			queryb.append("SELECT id, name FROM ");
-			queryb.append(TermDao.name());
-			queryb.append(" TT WHERE TT.");
-		}else{
-			queryb.append("SELECT TT.id, TT.name FROM ");
-			queryb.append(TermDao.name());
-			queryb.append(" TT, ");
-			queryb.append(ConceptDao.name());
-			queryb.append(" CT, ");
-			queryb.append(OntologyDao.name());
-			queryb.append(" OT WHERE TT.concept_id = CT.id AND CT.ontology_id = OT.id AND ");
-			queryb.append(localOntologyIDFilter(ontologies));
-			queryb.append(" AND ");
-		}		
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT id, name FROM ");
+		queryb.append(TermDao.name());
+		queryb.append(" TT WHERE TT.");		 
 		queryb.append(this.blackListFilter());
 		queryb.append("; "); 
 		
@@ -307,24 +279,7 @@ public class DictionaryDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot write complete dictionary file " + file.getName(), e);
 		}
 		return nbLines;
-	}
-	
-	private String localOntologyIDFilter(HashSet<String> localOntologyIDs){
-		
-		StringBuffer queryb = new StringBuffer();
-		queryb.append(" local_ontology_id IN(");
-		for(Iterator<String> it = localOntologyIDs.iterator(); it.hasNext();){
-			queryb.append("'");
-			queryb.append(it.next());
-			queryb.append("'");
-			if(it.hasNext()){
-				queryb.append(", ");
-			}
-		}
-		queryb.append(") ");
-		
-		return queryb.toString();
-	}
+	} 
 	
 	private int writeFile(File file, ResultSet couplesSet) throws IOException, SQLException {
 		int nbLines = 0;

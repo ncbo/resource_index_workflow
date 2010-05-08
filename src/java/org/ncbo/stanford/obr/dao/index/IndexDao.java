@@ -14,6 +14,8 @@ import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
+import org.ncbo.stanford.obr.enumeration.ExpansionTypeEnum;
+import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -146,7 +148,7 @@ public class IndexDao extends AbstractObrDao {
 	public int indexation(ObrWeight weights){
 		int nbAnnotation = 0;
 		// Adds to _IT the direct annotations done with a term that is a preferredName.
-		String query1 = indexationQueryForMgrepAnnotations(true, weights);
+		String query1 = indexationQueryForMgrepAnnotations(weights);
 		try{
 			nbAnnotation = this.executeSQLUpdate(query1);
 			}
@@ -155,16 +157,17 @@ public class IndexDao extends AbstractObrDao {
 		}
 		logger.info(nbAnnotation + " annotations indexed with direct annotations (isPreferred=true).");
 		
-		// Adds to _IT the direct annotations done with a term that is NOT preferredName.
-		String query2 = indexationQueryForMgrepAnnotations(false, weights);
-		try{
-			nbAnnotation = this.executeSQLUpdate(query2);
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index annotations from _DAT (isPreferred=false)", e);
-		}
-		logger.info(nbAnnotation + " annotations indexed with direct annotations (isPreferred=false).");
+//		// Adds to _IT the direct annotations done with a term that is NOT preferredName.
+//		String query2 = indexationQueryForMgrepAnnotations(false, weights);
+//		try{
+//			nbAnnotation = this.executeSQLUpdate(query2);
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot index annotations from _DAT (isPreferred=false)", e);
+//		}
+//		logger.info(nbAnnotation + " annotations indexed with direct annotations (isPreferred=false).");
 
+		// TODO : Need to modify
 		// Adds to _IT the direct reported annotations.
 		String query3 = indexationQueryForReportedAnnotations(weights);
 		try{
@@ -179,9 +182,12 @@ public class IndexDao extends AbstractObrDao {
 		StringBuffer updatingQueryb1 = new StringBuffer();
 		updatingQueryb1.append("UPDATE ");
 		updatingQueryb1.append(DirectAnnotationDao.name(this.resourceID));
-		updatingQueryb1.append(" SET indexing_done=true WHERE indexing_done=false;");
+		updatingQueryb1.append(" SET workflow_status = ");
+		updatingQueryb1.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
+		updatingQueryb1.append(" WHERE workflow_status = ");
+		updatingQueryb1.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeSQLUpdate(updatingQueryb1.toString());
+			nbAnnotation = this.executeWithStoreProcedure(DirectAnnotationDao.name(this.resourceID), updatingQueryb1.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _DAT.", e);
@@ -211,9 +217,12 @@ public class IndexDao extends AbstractObrDao {
 		StringBuffer updatingQueryb2 = new StringBuffer();
 		updatingQueryb2.append("UPDATE ");
 		updatingQueryb2.append(ExpandedAnnotationDao.name(this.resourceID));
-		updatingQueryb2.append(" SET indexing_done=true WHERE indexing_done=false;");
+		updatingQueryb2.append(" SET workflow_status = ");
+		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
+		updatingQueryb2.append(" WHERE workflow_status = ");
+		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeSQLUpdate(updatingQueryb2.toString());
+			nbAnnotation = this.executeWithStoreProcedure(ExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
@@ -222,7 +231,7 @@ public class IndexDao extends AbstractObrDao {
 		return this.numberOfEntry();
 	}
 	
-	private String indexationQueryForMgrepAnnotations(boolean doneWithPreferredName, ObrWeight weights){
+	private String indexationQueryForMgrepAnnotations( ObrWeight weights){
 		/* INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
 		SELECT elementID, OBR_TR_DAT.conceptID, @s:=SUM(10*contextWeight)
 			FROM OBR_TR_DAT, OBR_CXT, OBS_TT
@@ -233,40 +242,21 @@ public class IndexDao extends AbstractObrDao {
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
 		query.append(this.getTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id, ");
+		query.append(" (element_id, concept_id, score) SELECT element_id, DAT.concept_id, ");
+		query.append("IF(TT.is_preferred, @s:=SUM(");
+		query.append(weights.getPreferredNameDA());	
+		query.append("*weight), @s:=SUM(");
+		query.append(weights.getSynonymDA());	
+		query.append("*weight)) ");			 
+		query.append(" score FROM ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".concept_id, @s:=SUM(");
-		if (doneWithPreferredName){
-			query.append(weights.getPreferredNameDA());	
-		}
-		else{
-			query.append(weights.getSynonymDA());
-		}
-		query.append("*weight) FROM ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(", ");
+		query.append(" DAT, ");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(", ");
-		query.append(termDao.getTableSQLName());
-		query.append(" WHERE ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".context_id=");
-		query.append(contextTableDao.getTableSQLName());
-		query.append(".id AND ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".term_id=");
-		query.append(termDao.getTableSQLName());
-		query.append(".id AND is_preferred=");
-		if (doneWithPreferredName){
-			query.append("true");	
-		}
-		else{
-			query.append("false");
-		}
-		query.append(" AND ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".term_id IS NOT NULL");
-		query.append(" AND indexing_done=false GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
+		query.append(" CXT, ");
+		query.append(termDao.getMemoryTableSQLName());
+		query.append(" TT WHERE DAT.context_id = CXT.id AND DAT.term_id= TT.id AND workflow_status= ");
+		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
+		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
 	}
 	
@@ -307,35 +297,32 @@ public class IndexDao extends AbstractObrDao {
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
 		query.append(this.getTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id, ");
-		query.append(ExpandedAnnotationDao.name(this.resourceID));
-		query.append(".concept_id, @s:=SUM(");
+		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=SUM(");
 		switch (component) {
 		// case 1 is equivalent to function 3 in ObrWeights
 		case 1: query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
-				query.append("*");
-				query.append(ExpandedAnnotationDao.name(this.resourceID));
-				query.append(".parent_level)+1)");
+				query.append("* EAT.parent_level)+1)");
 			break;
 		case 2: query.append(weights.getMappingEA());
 			break;
 		}
 		query.append("*weight) FROM ");
 		query.append(ExpandedAnnotationDao.name(this.resourceID));
-		query.append(", ");
+		query.append(" EAT, ");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(" WHERE ");
-		query.append(ExpandedAnnotationDao.name(this.resourceID));
-		query.append(".context_id=");
-		query.append(contextTableDao.getTableSQLName());
-		query.append(".id AND");
+		query.append(" CXT WHERE EAT.context_id= CXT.id AND");
 		switch (component) {
-		case 1: query.append(" child_concept_id IS NOT NULL");
+		case 1: 
+			query.append(" expansion_type= "); // IS a closure expansion
+			query.append(ExpansionTypeEnum.IS_A_CLOSURE.getType()); 
 			break;
-		case 2: query.append(" mapped_concept_id IS NOT NULL");
+		case 2: query.append(" expansion_type= ");  // Maping Expansion
+		         query.append(ExpansionTypeEnum.MAPPING.getType()); 
 			break;
 		}
-		query.append(" AND indexing_done=false GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
+		query.append(" AND workflow_status=");
+		query.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
+		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
 	}
 		

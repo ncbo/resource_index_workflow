@@ -20,6 +20,12 @@ public interface ResourceIndexWorkflow {
 	public void populateObsSlaveTables();
 	
 	/**
+	 * This method load obs table and stuff into memory.  
+	 * It creates obs tables with MEMORY storage engin.
+	 */
+	public void loadObsSlaveTablesIntoMemeory();
+	
+	/**
 	 * This method includes complete resource index workflow. It process ressources and 
 	 * update elements for them and annotated them using obs tables.
 	 * 
@@ -43,5 +49,6 @@ public interface ResourceIndexWorkflow {
 	 * 
 	 * <p>This method ensures to keep only the latest version of ontologies.	  
 	 */
-	public void removeOntologyDuplicates();
+	public void removeOntologyDuplicates();	
+	
 }

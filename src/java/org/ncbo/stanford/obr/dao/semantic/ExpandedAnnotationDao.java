@@ -11,7 +11,7 @@ import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
-import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
+import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -67,40 +67,15 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL, " +
-					"element_id INT UNSIGNED NOT NULL, " +
-					"concept_id INT UNSIGNED NOT NULL, " +			
-					"context_id SMALLINT UNSIGNED NOT NULL, " +			
-					"child_concept_id INT UNSIGNED, " +
-					"parent_level SMALLINT UNSIGNED, " +
-					"mapped_concept_id INT UNSIGNED, " +
-					"mapping_type VARCHAR(20), " +
-				// TODO : Need to un-comment if distance expansion included	
-				 	"distant_concept_id INT UNSIGNED, " +
-				 	"distance SMALLINT UNSIGNED, " +
-					"indexing_done BOOL NOT NULL, " +
-					// Removed march 2009. Valid but too expensive in size. Not verified.
-					//"UNIQUE (elementID, conceptID, contextID, childConceptID, mappedConceptID, distantConceptID), " +				
-//					"FOREIGN KEY (element_id) REFERENCES "         + ElementDao.name(this.resourceID)  + "(elementID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (concept_id) REFERENCES "         + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (context_id) REFERENCES "         + contextTableDao.getTableSQLName()			 		+ "(contextID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (child_concept_id) REFERENCES "    + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (mapped_concept_id) REFERENCES "   + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-//					"FOREIGN KEY (distant_concept_id) REFERENCES "  + conceptDao.getTableSQLName() 		+ "(conceptID) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					
-					"PRIMARY KEY (concept_id, id)" +
-//					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"_context_id (context_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"_child_concept_id (child_concept_id), " +
-//					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
-//					//"INDEX X_" + this.getTableSQLName() +"_distant_concept_id (distant_concept_id), " +					
-//					
-//					"INDEX X_" + this.getTableSQLName() +"_parent_level (parent_level), " +
-//					"INDEX X_" + this.getTableSQLName() +"_mapping_type (mapping_type), " +
-//				 	//"INDEX X_" + this.getTableSQLName() +"_distance (distance), " +
-//				 	"INDEX X_" + this.getTableSQLName() +"_indexing_done (indexing_done)" +
-				")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
+					"id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"element_id INT(11) UNSIGNED NOT NULL, " +
+					"concept_id INT(11) UNSIGNED NOT NULL, " +			
+					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +	
+					"expansion_type TINYINT(1) UNSIGNED NOT NULL, " +
+					"expansion_concept_id INT(11) UNSIGNED, " +
+					"expansion_value SMALLINT(5) UNSIGNED NOT NULL, " +	
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
+					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 
 	@Override
@@ -204,7 +179,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * @param maxLevel {@code int} if greater than zero then restrict is closure expansion annotations upto this level  
 	 * @return {@code int} the number of isaClosure annotations created in the corresponding _EAT.
 	 */
-	public int isaClosureExpansion(DirectAnnotationDao annotationDao, int maxLevel){
+	public int isaClosureExpansion(DirectAnnotationDao annotationDao){
 		int nbAnnotation;		 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done)
@@ -216,26 +191,24 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done) SELECT @counter:=@counter+1, element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false FROM ");
+		queryb.append(" (id, element_id, concept_id, context_id, child_concept_id, parent_level, workflow_status) SELECT @counter:=@counter+1, element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false, 0 FROM ");
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
-		queryb.append(relationDao.getTableSQLName());
-		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND DAT.is_a_closure_done = false");
-		// Adding condition for maximum level
-		if(maxLevel !=  SemanticExpansionService.LEVEL_ALL ){
-			queryb.append(" AND ISAPT.level <= ");
-			queryb.append(maxLevel);
-		}
+		queryb.append(relationDao.getMemoryTableSQLName()); // JOin with memory table.
+		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND DAT.workflow_status = ");
+		queryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());		 
 		queryb.append("; ");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
 		updatingQueryb.append(annotationDao.getTableSQLName());
-		updatingQueryb.append(" SET is_a_closure_done=true WHERE is_a_closure_done=false;");
-		
+		updatingQueryb.append(" SET workflow_status = ");
+		updatingQueryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());
+		updatingQueryb.append(" WHERE workflow_status = ");
+		updatingQueryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
-			this.executeSQLUpdate(updatingQueryb.toString());
+			this.executeWithStoreProcedure(annotationDao.getTableSQLName(), updatingQueryb.toString(), true);
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot execute the isa transitive closure on table " + this.getTableSQLName() +". 0 returned", e);
@@ -252,7 +225,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	 * @param DirectAnnotationDao
 	 * @return Returns the number of mapping annotations created in the corresponding _EAT.
 	 */
-	public int mappingExpansion(DirectAnnotationDao table){
+	public int mappingExpansion(DirectAnnotationDao annotationDao){
 		int nbAnnotation;	 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done)
@@ -264,20 +237,23 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT @counter:=@counter+1, element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false FROM ");
-		queryb.append(table.getTableSQLName());
+		queryb.append(" (id, element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done) SELECT @counter:=@counter+1, element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false, 0 FROM ");
+		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");		
-		queryb.append(mapDao.getTableSQLName());
+		queryb.append(mapDao.getMemoryTableSQLName()); // JOin with memory map table
 		queryb.append(" AS MAPT WHERE DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
-		updatingQueryb.append(table.getTableSQLName());
-		updatingQueryb.append(" SET mapping_done=true WHERE mapping_done=false;");
+		updatingQueryb.append(annotationDao.getTableSQLName());
+		updatingQueryb.append(" SET workflow_status = ");
+		updatingQueryb.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
+		updatingQueryb.append(" WHERE workflow_status = ");
+		updatingQueryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());
 		
 		try{
 			nbAnnotation = this.executeSQLUpdate(queryb.toString());
-			this.executeSQLUpdate(updatingQueryb.toString());
+			this.executeWithStoreProcedure(annotationDao.getTableSQLName(), updatingQueryb.toString(), true);
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot execute the mapping expansion query on table " + this.getTableSQLName() +". 0 returned", e);

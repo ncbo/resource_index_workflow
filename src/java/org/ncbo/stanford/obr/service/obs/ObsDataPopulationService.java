@@ -21,6 +21,12 @@ public interface ObsDataPopulationService {
 	public void populateObsSlaveData(boolean withLatestDictionary);
 	
 	/**
+	 * This method load obs table and stuff into memory.  
+	 * It creates obs tables with MEMORY storage engin.
+	 */
+	public void loadObsSlaveTablesIntoMemeory();	
+	
+	/**
 	 * Populates new ontology versions present in OBS master database which are not present in 
 	 * slave ontology table with particular dictionary. 
 	 *  
