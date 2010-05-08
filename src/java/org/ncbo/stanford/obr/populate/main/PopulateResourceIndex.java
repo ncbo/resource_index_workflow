@@ -28,8 +28,9 @@ public class PopulateResourceIndex {
 		// Populate obs tables from master database 
 		if(poluateSlaveTables){	
 			resourceIndexWorkflow.populateObsSlaveTables();
-			resourceIndexWorkflow.loadObsSlaveTablesIntoMemeory();
+			resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
 		}	
+		
 		
 		// Populate resource index data
 		if(processResources){

@@ -191,7 +191,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, child_concept_id, parent_level, workflow_status) SELECT @counter:=@counter+1, element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false, 0 FROM ");
+		queryb.append(" (element_id, concept_id, context_id, child_concept_id, parent_level, workflow_status) SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false, 0 FROM ");
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
 		queryb.append(relationDao.getMemoryTableSQLName()); // JOin with memory table.

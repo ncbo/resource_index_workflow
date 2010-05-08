@@ -24,7 +24,7 @@ public interface ObsDataPopulationService {
 	 * This method load obs table and stuff into memory.  
 	 * It creates obs tables with MEMORY storage engin.
 	 */
-	public void loadObsSlaveTablesIntoMemeory();	
+	public void loadObsSlaveTablesIntoMemory();	
 	
 	/**
 	 * Populates new ontology versions present in OBS master database which are not present in 

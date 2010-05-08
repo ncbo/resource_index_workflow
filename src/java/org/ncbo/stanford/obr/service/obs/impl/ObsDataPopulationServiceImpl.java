@@ -244,7 +244,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * (non-Javadoc)
 	 * @see org.ncbo.stanford.obr.service.obs.ObsDataPopulationService#loadObsSlaveTablesIntoMemeory()
 	 */
-	public void loadObsSlaveTablesIntoMemeory() {
-		ontologyDao.callLoadObsSlaveTablesIntoMemeoryProcedure();
+	public void loadObsSlaveTablesIntoMemory() {
+		ontologyDao.callLoadObsSlaveTablesIntoMemoryProcedure();
 	}
 }

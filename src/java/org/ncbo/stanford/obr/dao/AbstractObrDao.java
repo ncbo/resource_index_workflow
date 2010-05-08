@@ -248,14 +248,14 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	 * Call the store procedure LoadObsSlaveTablesIntoMemeory
 	 * 
 	 */
-	public void callLoadObsSlaveTablesIntoMemeoryProcedure(){	 
+	public void callLoadObsSlaveTablesIntoMemoryProcedure(){	 
 		try{
-			 CallableStatement callableStatement = tableConnection.prepareCall("CALL LoadObsSlaveTablesIntoMemeory();");
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL LoadObsTablesIntoMemory();");
 			 callableStatement.execute();  
 			 
 			try{
 				if(AbstractObrDao.sqlLogFile != null){
-					AbstractObrDao.sqlLogBuffer.write("call LoadObsSlaveTablesIntoMemeory();");
+					AbstractObrDao.sqlLogBuffer.write("call LoadObsTablesIntoMemory();");
 					AbstractObrDao.sqlLogBuffer.newLine();
 					AbstractObrDao.sqlLogBuffer.flush();
 				}

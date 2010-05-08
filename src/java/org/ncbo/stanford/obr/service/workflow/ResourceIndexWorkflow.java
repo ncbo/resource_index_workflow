@@ -23,7 +23,7 @@ public interface ResourceIndexWorkflow {
 	 * This method load obs table and stuff into memory.  
 	 * It creates obs tables with MEMORY storage engin.
 	 */
-	public void loadObsSlaveTablesIntoMemeory();
+	public void loadObsSlaveTablesIntoMemory();
 	
 	/**
 	 * This method includes complete resource index workflow. It process ressources and 
