@@ -263,7 +263,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		updatingQueryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());
 		
 		try{
-			nbAnnotation = this.executeSQLUpdate(queryb.toString());
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
 			this.executeWithStoreProcedure(annotationDao.getTableSQLName(), updatingQueryb.toString(), true);
 		}
 		catch(SQLException e){

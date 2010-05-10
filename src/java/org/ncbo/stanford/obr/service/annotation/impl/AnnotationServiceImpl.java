@@ -279,7 +279,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		 return elementTableDao.createTemporaryTable(dictionaryID, resourceAccessTool.getMaxNumberOfElementsToProcess());		
 	}
 	
-	public void createIndexForAnnotationTable() {
+	public void createIndexForAnnotationTables() {
 		 directAnnotationTableDao.createIndex(directAnnotationTableDao.getTableSQLName(), expandedAnnotationTableDao.getTableSQLName());
 		 
 	}
