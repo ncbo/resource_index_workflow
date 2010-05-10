@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import obs.common.utils.ExecutionTimer;
+
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
@@ -71,7 +73,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-					"id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"id BIGINT(20) UNSIGNED NOT NULL, " +
 					"element_id INT(11) UNSIGNED NOT NULL, " +
 					"concept_id INT(11) UNSIGNED NOT NULL, " +
 					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +
@@ -237,6 +239,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 */
 	public int loadMgrepFile(File mgrepFile, int dictionaryID){
 		int nbAnnotation;
+		ExecutionTimer timer = new ExecutionTimer();
 
 		// Creates a temporary table with the same columns than the Mgrep result file
 		/* CREATE TEMPORARY TABLE OBR_TR_MGREP
@@ -273,12 +276,17 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		loadingQuery.append("_MGREP.position_from, ");
 		loadingQuery.append(this.getTableSQLName());
 		loadingQuery.append("_MGREP.position_to, element_id, context_id);");
+		timer.start();
 		try{
 			this.executeSQLUpdate(loadingQuery.toString());
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot load the file " + mgrepFile.getName(), e);
 		}
+		
+		timer.end();
+		logger.info("MGREP Table craeted in:"
+				+ timer.millisecondsToTimeString(timer.duration()) + "\n");
 		
 		// Joins the temporary table and OBS_TT to populate the table
 		/* INSERT INTO OBR_TR_DAT (elementID, conceptID, contextID, termID, OBR_TR_DAT.from, OBR_TR_DAT.to, dictionaryID, isaClosureDone, mappingDone, distanceDone, indexingDone)
@@ -288,11 +296,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer joinQuery = new StringBuffer();
 		joinQuery.append("INSERT INTO ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(" (element_id, concept_id, context_id, term_id, ");
+		joinQuery.append(" (id, element_id, concept_id, context_id, term_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append(".position_from, ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(".position_to, dictionary_id, workflow_status) SELECT element_id, concept_id, context_id, ");
+		joinQuery.append(".position_to, dictionary_id, workflow_status) SELECT @counter:=@counter+1, element_id, concept_id, context_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.term_id, ");
 		joinQuery.append(this.getTableSQLName());
@@ -308,7 +316,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		joinQuery.append(termDao.getMemoryTableSQLName());
 		joinQuery.append(" TT WHERE ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append("_MGREP.term_id= TT.id ;");		 
+		joinQuery.append("_MGREP.term_id= TT.id ;");	
+		timer.reset();
+		timer.start();
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
 			}
@@ -316,6 +326,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot join the temporary table and OBS_TT to load the file " + mgrepFile.getName()+". 0 returned", e);
 			nbAnnotation = 0;
 		}
+		timer.end();
+		logger.info("Processing MGREP to DAT Table in:"
+				+ timer.millisecondsToTimeString(timer.duration()) + "\n");
 		
 		// Deletes the temporary table
 		StringBuffer deleteQuery = new StringBuffer();

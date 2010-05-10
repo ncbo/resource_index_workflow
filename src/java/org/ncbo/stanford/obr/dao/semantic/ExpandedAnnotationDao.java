@@ -68,7 +68,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"id BIGINT(20) UNSIGNED NOT NULL, " +
 					"element_id INT(11) UNSIGNED NOT NULL, " +
 					"concept_id INT(11) UNSIGNED NOT NULL, " +			
 					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +	
@@ -192,7 +192,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, ISAPT.parent_concept_id, context_id,");
+		queryb.append(" (id, element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT @counter:=@counter+1, element_id, ISAPT.parent_concept_id, context_id,");
 		queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
 		queryb.append(", DAT.concept_id, level, ");
 		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
@@ -242,7 +242,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, MAPT.mapped_concept_id, context_id, ");
+		queryb.append(" (id, element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT @counter:=@counter+1, element_id, MAPT.mapped_concept_id, context_id, ");
 		queryb.append(ExpansionTypeEnum.MAPPING.getType());
 		queryb.append(", DAT.concept_id, mapping_type, ");
 		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());	
