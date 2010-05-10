@@ -46,5 +46,5 @@ public interface AnnotationService {
 	/**
 	 * 
 	 */
-	public void createIndexForAnnotationTables();
+	public void createIndexForAnnotationTable();
 }

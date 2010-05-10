@@ -39,4 +39,6 @@ public interface SemanticExpansionService {
 	 * @param {@code List} of localOntologyIDs String containing ontology versions.
 	 */
 	public void removeExpandedAnnotations(List<String> localOntologyIDs);
+ 
+	public void createIndexForExpandedAnnotationTable();
 }

@@ -78,6 +78,15 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
+	
+	protected String getIndexCreationQuery(){
+		  return "ALTER TABLE " + this.getTableSQLName() +
+	  			" ADD PRIMARY KEY(id), " +
+	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_element_id(element_id), " +
+	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_concept_id(concept_id), " +
+	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_expansion_type(expansion_type), " +
+	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_workflow_status(_workflow_status) "; 
+	}
 
 	@Override
 	protected void openPreparedStatements() {
@@ -433,6 +442,35 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		}
 		return annotationStats;
 		 
+	}
+	
+	public boolean isIndexExist(){
+		boolean isIndexExist= false;
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery("SHOW INDEX FROM "+ this.getTableSQLName());
+			if(rSet.first()){
+				isIndexExist= true;
+			} 
+			
+			rSet.close();
+		} 
+		catch (SQLException e) {
+			logger.error("** PROBLEM **  Problem in getting index from " + this.getTableSQLName()+ " .", e);
+		}
+		
+		return isIndexExist;
+	}
+	
+	public boolean createIndex() {
+		boolean result = false;
+		try{
+			this.executeSQLUpdate(getIndexCreationQuery());
+			result = true;
+			}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot delete the temporary table.", e);
+		}
+		 return result; 
 	}
 	
 	/********************************* ENTRY CLASS *****************************************************/

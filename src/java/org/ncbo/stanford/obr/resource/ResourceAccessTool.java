@@ -358,5 +358,10 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 */
 	public int createTemporaryElementTable(int dictionaryID) {		 
 		return annotationService.createTemporaryElementTable(dictionaryID);
+	}
+
+	public void createIndexForAnnotationTables() {
+		annotationService.createIndexForAnnotationTable();
+		semanticExpansionService.createIndexForExpandedAnnotationTable(); 
 	}	 
 }

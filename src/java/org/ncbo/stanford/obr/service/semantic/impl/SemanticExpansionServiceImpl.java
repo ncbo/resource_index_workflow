@@ -87,4 +87,10 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		 }	
 	}
 
+	public void createIndexForExpandedAnnotationTable() {
+		if(!expandedAnnotationTableDao.isIndexExist()){
+			expandedAnnotationTableDao.createIndex();	 
+		} 
+	}
+
 }

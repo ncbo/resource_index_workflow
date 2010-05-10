@@ -230,7 +230,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		toolLogger.info("Creating indexes on Annotation and expanded annotation table starts ..");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
-		resourceAccessTool.getAnnotationService().createIndexForAnnotationTables();
+		resourceAccessTool.createIndexForAnnotationTables();
 		timer.end();
 		toolLogger.info("Creating indexes on Annotation and expanded annotation table completed in "
 				+ timer.millisecondsToTimeString(timer.duration()));			
