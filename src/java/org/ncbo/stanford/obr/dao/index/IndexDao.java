@@ -169,14 +169,14 @@ public class IndexDao extends AbstractObrDao {
 
 		// TODO : Need to modify
 		// Adds to _IT the direct reported annotations.
-		String query3 = indexationQueryForReportedAnnotations(weights);
-		try{
-			nbAnnotation = this.executeSQLUpdate(query3);
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
-		}
-		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
+//		String query3 = indexationQueryForReportedAnnotations(weights);
+//		try{
+//			nbAnnotation = this.executeSQLUpdate(query3);
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
+//		}
+//		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
 
 		// Switches the indexingDone flags on DAT
 		StringBuffer updatingQueryb1 = new StringBuffer();
@@ -301,7 +301,7 @@ public class IndexDao extends AbstractObrDao {
 		switch (component) {
 		// case 1 is equivalent to function 3 in ObrWeights
 		case 1: query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
-				query.append("* EAT.parent_level)+1)");
+				query.append("* EAT.expansion_value)+1)");
 			break;
 		case 2: query.append(weights.getMappingEA());
 			break;

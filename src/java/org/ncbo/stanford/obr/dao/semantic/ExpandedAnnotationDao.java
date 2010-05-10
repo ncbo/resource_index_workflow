@@ -195,7 +195,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, ISAPT.parent_concept_id, context_id,");
 		queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
 		queryb.append(", DAT.concept_id, level, ");
-		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE);
+		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		queryb.append(" FROM ");
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");			 
@@ -245,12 +245,14 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(" (element_id, concept_id, context_id, expansion_type, expansion_concept_id, expansion_value, workflow_status) SELECT element_id, MAPT.mapped_concept_id, context_id, ");
 		queryb.append(ExpansionTypeEnum.MAPPING.getType());
 		queryb.append(", DAT.concept_id, mapping_type, ");
-		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE);	
+		queryb.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());	
 		queryb.append(" FROM ");	   
 		queryb.append(annotationDao.getTableSQLName());
 		queryb.append(" AS DAT, ");		
 		queryb.append(mapDao.getMemoryTableSQLName()); // JOin with memory map table
-		queryb.append(" AS MAPT WHERE DAT.concept_id = MAPT.concept_id AND mapping_done = false;");
+		queryb.append(" AS MAPT WHERE DAT.concept_id = MAPT.concept_id AND DAT.workflow_status = ");
+		queryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());		 
+		queryb.append("; ");
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
@@ -374,7 +376,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
 		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.child_concept_id IS NOT NULL GROUP BY OT.id; ");
+		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type = ");
+		queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
+		queryb.append(" GROUP BY OT.id; ");
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
@@ -410,7 +414,9 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		queryb.append(conceptDao.getTableSQLName());
 		queryb.append(" AS CT, ");
 		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.mapped_concept_id IS NOT NULL GROUP BY OT.id; ");
+		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type =");
+		queryb.append(ExpansionTypeEnum.MAPPING.getType());
+		queryb.append(" GROUP BY OT.id; ");		
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());

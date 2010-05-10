@@ -653,9 +653,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		}
 	}
 	
-	public void createIndex() {
+	public void createIndex(String annotationTable, String expnadedAnnotationTable) {
 		try {
-			callStoredProcedure("CreateIndexForAnnotationTable");	
+			callStoredProcedure("CreateIndexForAnnotationTable", annotationTable, expnadedAnnotationTable);	
 		} catch (Exception e) {
 			logger.error("Problem in creating index on annotation tables", e);
 		}

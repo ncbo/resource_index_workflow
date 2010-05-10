@@ -271,12 +271,19 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		 
 	}
 	
-	public void callStoredProcedure(String storedProcedureName){	 
+	public void callStoredProcedure(String storedProcedureName, String... paramaters){	 
 		try{
 			StringBuffer callSPQuery = new StringBuffer();
 			callSPQuery.append("CALL ");
 			callSPQuery.append(storedProcedureName);
-			callSPQuery.append("(); ");
+			callSPQuery.append("(");
+			for (String parameter : paramaters) {
+				callSPQuery.append("'");
+				callSPQuery.append(parameter);
+				callSPQuery.append("', ");
+			}
+			callSPQuery.delete(callSPQuery.length()-2, callSPQuery.length());
+			callSPQuery.append(" );");
 			  
 			CallableStatement callableStatement = tableConnection.prepareCall(callSPQuery.toString());
 			callableStatement.execute();  

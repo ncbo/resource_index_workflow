@@ -280,6 +280,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	}
 	
 	public void createIndexForAnnotationTable() {
-		 directAnnotationTableDao.createIndex();
+		 directAnnotationTableDao.createIndex(directAnnotationTableDao.getTableSQLName(), expandedAnnotationTableDao.getTableSQLName());
+		 
 	}
 }
