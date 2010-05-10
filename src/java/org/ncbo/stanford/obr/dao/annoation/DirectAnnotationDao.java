@@ -117,8 +117,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (element_id, concept_id, context_id, dictionary_id, workflow_staus) "); 
-		queryb.append("VALUES ( ");
+		queryb.append(" (id, element_id, concept_id, context_id, dictionary_id, workflow_staus) "); 
+		queryb.append("VALUES ( ?, ");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
 			queryb.append(ElementDao.name(this.resourceID));
@@ -141,20 +141,21 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Add an new entry in corresponding SQL table.
 	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
 	 */
-	public boolean addEntry(DirectAnnotationEntry entry){
+	private boolean addEntry(DirectAnnotationEntry entry, long id){
 		boolean inserted = false;
 		try {
-			this.addEntryStatement.setString (1, entry.getLocalElementID());
-			this.addEntryStatement.setString (2, entry.getLocalConceptID());
-			this.addEntryStatement.setString (3, entry.getContextName());
-			this.addEntryStatement.setInt    (4, entry.getDictionaryID());
-			this.addEntryStatement.setInt(5, entry.getWorkflowStatus());		 
+			this.addEntryStatement.setLong(1, id);
+			this.addEntryStatement.setString (2, entry.getLocalElementID());
+			this.addEntryStatement.setString (3, entry.getLocalConceptID());
+			this.addEntryStatement.setString (4, entry.getContextName());
+			this.addEntryStatement.setInt    (5, entry.getDictionaryID());
+			this.addEntryStatement.setInt(6, entry.getWorkflowStatus());		 
 			this.executeSQLUpdate(this.addEntryStatement);
 			inserted = true;
 		}
 		catch (MySQLNonTransientConnectionException e) {
 			this.openAddEntryStatement();
-			return this.addEntry(entry);
+			return this.addEntry(entry, id);
 		}
 		catch (MySQLIntegrityConstraintViolationException e){
 			//logger.error("Table " + this.getTableSQLName() + " already contains an entry for the concept: " + entry.getLocalConceptID() +".");
@@ -231,13 +232,33 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
 		int nbInserted = 0;
+		long maxID =this.getMaximumID() + 1;
 		for(DirectAnnotationEntry entry: entries){
-			if (this.addEntry(entry)){
+			if (this.addEntry(entry, maxID)){
 				nbInserted++;
+				maxID=maxID+1;
 			}
 		}
 		return nbInserted;
 	} 
+	
+	private long getMaximumID(){ 
+		long maxID =0;
+		try {			 			
+			ResultSet rSet = this.executeSQLQuery("SELECT MAX(id) FROM " + this.getTableSQLName());
+			if(rSet.first()){
+				maxID = rSet.getLong(1);
+			} 
+			 		
+			rSet.close();
+		} 
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get maximum id  from "+this.getTableSQLName()+" .", e);
+		}
+		
+		return maxID;
+		
+	}
 	 
 	//********************************* MGREP FUNCTIONS *****************************************************
 

@@ -169,14 +169,14 @@ public class IndexDao extends AbstractObrDao {
 
 		// TODO : Need to modify
 		// Adds to _IT the direct reported annotations.
-//		String query3 = indexationQueryForReportedAnnotations(weights);
-//		try{
-//			nbAnnotation = this.executeSQLUpdate(query3);
-//			}
-//		catch(SQLException e){
-//			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
-//		}
-//		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
+		String query3 = indexationQueryForReportedAnnotations(weights);
+		try{
+			nbAnnotation = this.executeSQLUpdate(query3);
+			}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
+		}
+		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
 
 		// Switches the indexingDone flags on DAT
 		StringBuffer updatingQueryb1 = new StringBuffer();
@@ -270,19 +270,19 @@ public class IndexDao extends AbstractObrDao {
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
 		query.append(this.getTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id, ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".concept_id, @s:=SUM(");
+		query.append(" (element_id, concept_id, score) SELECT element_id, DAT.concept_id, @s:=SUM(");
 		query.append(weights.getReportedDA());
 		query.append("*weight) FROM ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(", ");
+		query.append(" DAT, ");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(" WHERE ");
+		query.append(" CXT WHERE ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(".context_id=");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(".id AND term_id IS NULL AND indexing_done=false GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
+		query.append(".id AND term_id IS NULL AND AND workflow_status= ");
+		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
+		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
 	}
 	
