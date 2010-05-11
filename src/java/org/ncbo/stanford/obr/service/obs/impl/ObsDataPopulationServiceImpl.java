@@ -1,6 +1,7 @@
 package org.ncbo.stanford.obr.service.obs.impl;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,7 +248,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * (non-Javadoc)
 	 * @see org.ncbo.stanford.obr.service.obs.ObsDataPopulationService#loadObsSlaveTablesIntoMemeory()
 	 */
-	public void loadObsSlaveTablesIntoMemory() {
+	public void loadObsSlaveTablesIntoMemory() throws SQLException {
 		ontologyDao.callLoadObsSlaveTablesIntoMemoryProcedure();
 	}
 }

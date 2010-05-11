@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.service.obs;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public interface ObsDataPopulationService {
 	 * This method load obs table and stuff into memory.  
 	 * It creates obs tables with MEMORY storage engin.
 	 */
-	public void loadObsSlaveTablesIntoMemory();	
+	public void loadObsSlaveTablesIntoMemory() throws SQLException;	
 	
 	/**
 	 * Populates new ontology versions present in OBS master database which are not present in 

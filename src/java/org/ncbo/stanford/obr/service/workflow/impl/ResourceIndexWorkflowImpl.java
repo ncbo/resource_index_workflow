@@ -80,7 +80,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * (non-Javadoc)
 	 * @see org.ncbo.stanford.obr.service.workflow.ResourceIndexWorkflow#loadObsSlaveTablesIntoMemeory()
 	 */
-	public void loadObsSlaveTablesIntoMemory() {
+	public void loadObsSlaveTablesIntoMemory() throws Exception{
 		 logger.info("Populating obs slave memory  tables starts");		  
 		 this.obsDataPopulationService.loadObsSlaveTablesIntoMemory();			 
 		 System.gc();
