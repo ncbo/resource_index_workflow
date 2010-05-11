@@ -91,7 +91,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_element_id(element_id), " +
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_concept_id(concept_id), " +
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_dictionary_id(dictionary_id), " +
-	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_workflow_status(_workflow_status) "; 
+	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_workflow_status(workflow_status) "; 
 	}
 
 	@Override
