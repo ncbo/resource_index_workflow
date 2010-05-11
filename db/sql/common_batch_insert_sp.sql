@@ -1,15 +1,15 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `resource_index_test`.`CommonBatchInsertProcedure`$$
+DROP PROCEDURE IF EXISTS `resource_index`.`CommonBatchInsertProcedure`$$
 
 CREATE DEFINER=`optra`@`%` PROCEDURE `CommonBatchInsertProcedure`(IN TableToPopulate VARCHAR(100),IN InsertQueryString text, IN DisableKeys BOOL, OUT RowsAffected BIGINT)
 BEGIN
-        # Define counter 
-        DECLARE counter BIGINT(20) unsigned DEFAULT 0;       
+    # Define counter 
+    DECLARE counter BIGINT(20) unsigned DEFAULT 0; 
 	
 	#Creating SQL queries 
 	SET @BulkInsertQuery = InsertQueryString;
-	SET @SetCounterQuery = Concat( 'SELECT if (MAX(id) iS NULL, 0, MAX(id)) INTO @counter FROM ',TableToPopulate,'; ');
+	SET @SetCounterQuery = Concat( 'SELECT IF (MAX(id) IS NULL, 0, MAX(id)) INTO @counter FROM ',TableToPopulate,'; ');
 	SET @DisableKeysQuery = Concat( 'ALTER TABLE ',TableToPopulate, ' DISABLE KEYS;');
 	SET @EnableKeysQuery =  Concat( 'ALTER TABLE ',TableToPopulate, ' ENABLE KEYS;');
 	 

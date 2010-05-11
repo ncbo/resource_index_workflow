@@ -41,7 +41,7 @@ BEGIN
 	 `mapping_type` varchar(30) NOT NULL,
 	 PRIMARY KEY (id)
 	) ENGINE=MEMORY DEFAULT CHARSET=latin1
-	SELECT DISTINCT mapping_type FROM obs_map_mem;
+	SELECT id, mapping_type FROM obs_mapping_type;
         
         -- Prepare the new integer field.
 	ALTER TABLE `obs_map_mem` ADD mapping_type_id int(11);

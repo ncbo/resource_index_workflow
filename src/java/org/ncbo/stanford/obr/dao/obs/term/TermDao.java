@@ -85,11 +85,10 @@ public class TermDao extends AbstractObsDao{
 		"name TEXT NOT NULL, " +
 		"concept_id INT(11) NOT NULL, " +
 		"is_preferred TINYINT(1) NOT NULL, " +		 
-	//	"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"INDEX X_" + getTableSQLName() +"_termName (name(255)), " +
 		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
 		"INDEX X_" + getTableSQLName() +"_isPreferred (is_preferred)" +
-		")ENGINE=InnoDB ;";
+		") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	/**

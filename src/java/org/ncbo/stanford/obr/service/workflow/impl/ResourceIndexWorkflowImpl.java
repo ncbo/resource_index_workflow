@@ -1,5 +1,7 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +18,7 @@ import obs.common.utils.Utilities;
 import obs.obr.populate.ObrWeight;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
@@ -49,6 +52,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	  
 	public ResourceIndexWorkflowImpl() {
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
+		
+		try {
+			AbstractObrDao.setSqlLogFile(new File("resource_index_workflow.sql"));
+		} catch (IOException e) {
+			logger.error("Problem in creating SQL log file.", e);
+		}
 	}
 	
 	/**

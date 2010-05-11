@@ -27,7 +27,8 @@ public class MapDao extends AbstractObsDao{
  
 	private PreparedStatement addEntryStatement;
 	private static PreparedStatement deleteEntriesFromOntologyStatement;
-
+    private MapppingTypeDao mapppingTypeDao= MapppingTypeDao.getInstance();
+	
 	private MapDao() {
 		super(TABLE_SUFFIX);
 
@@ -72,18 +73,15 @@ public class MapDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-		"id INT(11) NOT NULL , " +
+		"id INT(11) NOT NULL PRIMARY KEY, " +
 		"concept_id INT(11) NOT NULL, " +
 		"mapped_concept_id INT(11) NOT NULL, " +
-		"mapping_type VARCHAR(246) NOT NULL, " +
-		//"UNIQUE (concept_id, mapped_concept_id ), " +
-		"PRIMARY KEY (concept_id, id) " +
-		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-		//"FOREIGN KEY (mapped_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-//		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
-//		"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
-//		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type(10))" +
-		")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
+		"mapping_type VARCHAR(30) NOT NULL, " +
+		//"UNIQUE (concept_id, mapped_concept_id ), " +	 
+		"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id), " +
+		"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id (mapped_concept_id), " +
+		"INDEX X_" + this.getTableSQLName() +"_mappingType (mapping_type(10))" +
+		") ENGINE=MyISAM DEFAULT CHARSET=latin1; ";
 	}
 
 	/**
@@ -109,6 +107,23 @@ public class MapDao extends AbstractObsDao{
 			logger.error(entry.toString());
 		}
 		return inserted;	
+	} 
+	
+	public int populateMappingTypeTable() {
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("INSERT IGNORE INTO ");
+		queryb.append(mapppingTypeDao.getTableSQLName());
+		queryb.append(" (mapping_type) SELECT DISTINCT mapping_type FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append("; ");		
+		int nbInserted =0 ;		
+		try{
+			 nbInserted = this.executeSQLUpdate(queryb.toString());
+			
+		} catch (SQLException e) {			 
+			logger.error("Problem in populating mapping type table" , e);
+		}	
+		return nbInserted;
 	} 
 	
 	/**
@@ -174,11 +189,11 @@ public class MapDao extends AbstractObsDao{
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
 		}
 		return deleted;
-	}
+	} 
 	
 	/**
 	 * This class is representation for obs_map table entry.
-	 * @author k.palanisamy
+	 * @author 
 	 *
 	 */
 	public static class MapEntry{
@@ -236,4 +251,5 @@ public class MapDao extends AbstractObsDao{
 			return sb.toString();
 		}
 	} 
+	
 }

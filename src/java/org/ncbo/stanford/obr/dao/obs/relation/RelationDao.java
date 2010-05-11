@@ -74,18 +74,15 @@ public class RelationDao extends AbstractObsDao{
 	@Override
 	protected String creationQuery() {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-		"id INT(11) NOT NULL , " +
+		"id INT(11) NOT NULL PRIMARY KEY, " +
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
-		"level INT(11) NOT NULL, " +
-		"PRIMARY KEY (concept_id, id) " +
-		//"UNIQUE (localConceptID, parentLocalConceptID), " +
-		//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-		//"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id)  , " +
-//		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
-//		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
-//		"INDEX X_" + getTableSQLName() +"_level (level)" +
-		")ENGINE=InnoDB DEFAULT CHARSET=latin1 PARTITION BY HASH(concept_id) PARTITIONS 25 ;";
+		"level INT(11) NOT NULL, " +	 
+		//"UNIQUE (localConceptID, parentLocalConceptID), " +	 
+		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
+		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
+		"INDEX X_" + getTableSQLName() +"_level (level)" +
+		") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	/**

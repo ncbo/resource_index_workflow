@@ -6,6 +6,6 @@
 ant clean all
 cd dist
 chmod 777 run.sh
-./run.sh >resource_grant_workflow_10k.log &
-tail -f resource_grant_workflow_10k.log
+./run.sh >resource_index_workflow.log &
+tail -f resource_index_workflow.log
  

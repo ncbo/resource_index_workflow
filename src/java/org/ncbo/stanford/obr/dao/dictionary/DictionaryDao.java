@@ -53,7 +53,7 @@ public class DictionaryDao extends AbstractObrDao {
 					"id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"name CHAR(13) NOT NULL UNIQUE, " +
 					"date_created DATETIME" +
-				")ENGINE=InnoDB ;";
+				") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	@Override

@@ -177,13 +177,16 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		File mappingEntryFile = null;
 		try{
 			logger.info("Re-initialize slave Mapping table.");
-			// Remove all data from mapping table.
+			// Remove all data from mapping table.			
 			mapDao.reInitializeSQLTable();
 			// Writes mapping entries to file from master map table.
 			mappingEntryFile = obsMasterDao.writeMasterMappingEntries(localOntologyIDs);
 			// Load file entries into slave mapping table. 
-			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);
+			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);			
 			logger.info("Total Number of mapping entries added in slave map table : " + numberOfMappingsAdded);
+		    
+			int mappingTypeEntries= mapDao.populateMappingTypeTable();
+			logger.info("Total Number of mapping type entries added in slave mapping_type table : " + mappingTypeEntries);
 		}finally {
 			 if(mappingEntryFile!= null && mappingEntryFile.exists()){
 				 mappingEntryFile.delete();
