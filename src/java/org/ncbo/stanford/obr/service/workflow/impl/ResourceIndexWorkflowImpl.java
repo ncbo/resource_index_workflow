@@ -160,12 +160,17 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// gets the latest dictionary from OBS_DVT
 		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
 		
+		// value for withCompleteDictionary parameter.
+		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
+				.getMessage("obr.dictionary.complete"));
+		
 		// Execute the workflow according to resource type. 
-		executeWorkflow(resourceAccessTool, dictionary, toolLogger);
+		int nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
 				
 		// Update obr_statistics table.
-		resourceAccessTool.calculateObrStatistics();
-		
+		if(nbIndexedAnnotation > 0) {
+			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
+		} 
 		// Update resource table entry for latest DictionaryID and 
 		resourceAccessTool.updateResourceWorkflowInfo();
 		
@@ -185,16 +190,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * @param dictionary {@code DictionaryBean) containing latest dictionary
 	 * @param toolLogger {@code Logger} object for given resourceAccessTool
 	 */
-	private void executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, Logger toolLogger){
+	private int executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
 		
 		int nbEntry ;		
 		// Total number of entries found in element table.		 
-		nbEntry = resourceAccessTool.numberOfElement();		
-		 
-		// value for withCompleteDictionary parameter.
-		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.dictionary.complete"));
-
+		nbEntry = resourceAccessTool.numberOfElement();	 
+		
 		// Processing direct annotations
 		int nbDirectAnnotation = resourceAccessTool.getAnnotationService()
 				.resourceAnnotation(withCompleteDictionary, dictionary, 
@@ -244,7 +245,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ " new indexed annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".");			
 			 
-		 
+		return nbIndexedAnnotation;  
 		
 	} 
  

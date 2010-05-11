@@ -251,26 +251,26 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * for current resource.
 	 * 
 	 */
-	public void calculateObrStatistics() {
+	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
 		logger.info("Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
 		// Getting Indexed annotations
-		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics();
+		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
-		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics();
+		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting REPORTED annotations
-		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics();
+		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting ISA annotations
-		HashMap<Integer, Integer> isaAnnotations= expandedAnnotationTableDao.getISAAnnotationStatistics();
+		HashMap<Integer, Integer> isaAnnotations= expandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting Mapping annotations
-		HashMap<Integer, Integer> mappingAnnotations= expandedAnnotationTableDao.getMappingAnnotationStatistics();
+		HashMap<Integer, Integer> mappingAnnotations= expandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		

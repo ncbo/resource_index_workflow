@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import obs.common.beans.DictionaryBean;
+
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
@@ -372,22 +374,36 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	/**
 	 * 
 	 *  Get number of IS A Annotations for each ontlogyID
+	 * @param dictionary 
+	 * @param withCompleteDictionary 
 	 *  
 	 *  @return HashMap<Integer, Integer>
 	 */
-	public HashMap<Integer, Integer> getISAAnnotationStatistics(){
+	public HashMap<Integer, Integer> getISAAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
 		
-		StringBuffer queryb = new StringBuffer();		 
-		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
-		queryb.append(this.getTableSQLName());		 	 
-		queryb.append(" AS EAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type = ");
-		queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
-		queryb.append(" GROUP BY OT.id; ");
+		StringBuffer queryb = new StringBuffer(); 
+		if(withCompleteDictionary){
+			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS EAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT WHERE EAT.concept_id=CT.id AND EAT.expansion_type =");
+			queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
+			queryb.append(" GROUP BY CT.ontology_id; ");		 
+		}else{
+			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS EAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT, ");
+			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type =");
+			queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
+			queryb.append(" OT.dictionary_id = ");
+			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append( " GROUP BY OT.id; ");
+		}
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
@@ -397,7 +413,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {			 
-			return this.getISAAnnotationStatistics();
+			return this.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot get IS A annotations statistics from "+this.getTableSQLName()+" .", e);
@@ -410,22 +426,36 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 	/**
 	 * 
 	 *  Get number of Mapping Annotations for each ontlogyID
+	 * @param dictionary 
+	 * @param withCompleteDictionary 
 	 *  
 	 *  @return HashMap<Integer, Integer>
 	 */
-	public HashMap<Integer, Integer> getMappingAnnotationStatistics(){
+	public HashMap<Integer, Integer> getMappingAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
 		
-		StringBuffer queryb = new StringBuffer();		 
-		queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
-		queryb.append(this.getTableSQLName());		 	 
-		queryb.append(" AS EAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE EAT.concept_id = CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type =");
-		queryb.append(ExpansionTypeEnum.MAPPING.getType());
-		queryb.append(" GROUP BY OT.id; ");		
+		StringBuffer queryb = new StringBuffer(); 
+		if(withCompleteDictionary){
+			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS EAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT WHERE EAT.concept_id=CT.id AND EAT.expansion_type =");
+			queryb.append(ExpansionTypeEnum.MAPPING.getType());
+			queryb.append(" GROUP BY CT.ontology_id; ");		 
+		}else{
+			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS EAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT, ");
+			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND EAT.expansion_type =");
+			queryb.append(ExpansionTypeEnum.MAPPING.getType());
+			queryb.append(" OT.dictionary_id = ");
+			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append( " GROUP BY OT.id; ");
+		}
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
@@ -435,7 +465,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {			 
-			return this.getMappingAnnotationStatistics();
+			return this.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot get mapping annotations statistics from " + this.getTableSQLName()+ " .", e);

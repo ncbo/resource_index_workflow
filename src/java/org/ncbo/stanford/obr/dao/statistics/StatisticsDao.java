@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
-import org.ncbo.stanford.obr.dao.resource.ResourceDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;

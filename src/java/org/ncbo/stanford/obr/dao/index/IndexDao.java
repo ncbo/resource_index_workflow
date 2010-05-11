@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import obs.common.beans.DictionaryBean;
 import obs.obr.populate.ObrWeight;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
@@ -43,8 +44,7 @@ public class IndexDao extends AbstractObrDao {
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
-	private PreparedStatement getIndexedAnnotationStatsStatement;
-	
+	 
 	/**
 	 * Creates a new IndexDao with a given resourceID.
 	 * The suffix that will be added for AnnotationTable is "_index".
@@ -79,16 +79,14 @@ public class IndexDao extends AbstractObrDao {
 	protected void openPreparedStatements() {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();		 
-		this.openDeleteEntriesFromOntologyStatement();
-		this.openGetIndexedAnnotationStatsStatement();
+		this.openDeleteEntriesFromOntologyStatement(); 
 	}
 
 	@Override
 	protected void closePreparedStatements() throws SQLException {
 		super.closePreparedStatements();
 		this.addEntryStatement.close();		 
-		this.deleteEntriesFromOntologyStatement.close();
-		this.getIndexedAnnotationStatsStatement.close();
+		this.deleteEntriesFromOntologyStatement.close();		 
 	}
 	
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
@@ -276,11 +274,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(" DAT, ");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(" CXT WHERE ");
-		query.append(DirectAnnotationDao.name(this.resourceID));
-		query.append(".context_id=");
-		query.append(contextTableDao.getTableSQLName());
-		query.append(".id AND term_id IS NULL AND AND workflow_status= ");
+		query.append(" CXT WHERE DAT.context_id = CXT.id AND term_id IS NULL AND AND workflow_status= ");
 		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
@@ -408,37 +402,45 @@ public class IndexDao extends AbstractObrDao {
 	}	
 	
 	//**********************************Statistics Method****************
-	
-	private void openGetIndexedAnnotationStatsStatement(){
-	    StringBuffer queryb = new StringBuffer();
-		queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
-		queryb.append(this.getTableSQLName());		 	 
-		queryb.append(" AS IT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id = OT.id GROUP BY OT.id; ");
- 		this.getIndexedAnnotationStatsStatement = this.prepareSQLStatement(queryb.toString());
-	}
-	
+	 
 	/**
 	 * This method gives number of indexed annotations for each ontologyID 
+	 * @param dictionary 
+	 * @param withCompleteDictionary 
 	 *  
 	 * @return map containing number of indexed annotations for each ontologyID as key.
 	 */
-	public HashMap<Integer, Integer> getIndexedAnnotationStatistics(){
+	public HashMap<Integer, Integer> getIndexedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
-		 
+		
+		StringBuffer queryb = new StringBuffer();
+		if(withCompleteDictionary){
+			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS IT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT WHERE IT.concept_id=CT.id GROUP BY CT.ontology_id; "); 
+		}else{
+			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS IT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT, ");
+			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
+			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append( " GROUP BY OT.id; ");
+		}
+		
 		try {			 			
-			ResultSet rSet = this.executeSQLQuery(this.getIndexedAnnotationStatsStatement);
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
 				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
 			}			
 			rSet.close();
 		}
-		catch (MySQLNonTransientConnectionException e) {
-			this.openGetIndexedAnnotationStatsStatement();
-			return this.getIndexedAnnotationStatistics();
+		catch (MySQLNonTransientConnectionException e) {		 
+			return this.getIndexedAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot get indexed annotations statistics from "+this.getTableSQLName()+" .", e);

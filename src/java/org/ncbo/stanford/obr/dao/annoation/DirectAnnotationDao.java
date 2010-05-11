@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import obs.common.beans.DictionaryBean;
 import obs.common.utils.ExecutionTimer;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
@@ -117,7 +118,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, dictionary_id, workflow_staus) "); 
+		queryb.append(" (id, element_id, concept_id, context_id, dictionary_id, workflow_status) "); 
 		queryb.append("VALUES ( ?, ");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
@@ -505,21 +506,33 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	/**
 	 * 
 	 *  Get number of Mgrep Annotations for each ontlogyID
+	 * @param dictionary 
+	 * @param withCompleteDictionary 
 	 *  
 	 *  @return Map containing number of mgerp annotations for each ontology as key. 
 	 *   
 	 */
-	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(){
+	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
 		
 		StringBuffer queryb = new StringBuffer();		 
-		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
-		queryb.append(this.getTableSQLName());		 	 
-		queryb.append(" AS DAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL GROUP BY OT.id; ");
+		if(withCompleteDictionary){
+			queryb.append("SELECT CT.ontology_id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS DAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NOT NULL GROUP BY CT.ontology_id; "); 
+		}else{
+			queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS DAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT, ");
+			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL AND OT.dictionary_id = ");
+			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append( " GROUP BY OT.id; ");
+		} 
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
@@ -529,7 +542,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {			 
-			return this.getMgrepAnnotationStatistics();
+			return this.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot get mgrep annotations statistics from "+this.getTableSQLName()+" .", e);
@@ -540,21 +553,32 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	
 	/**
 	 *  Get number of reported annotations for each ontlogyID
+	 * @param dictionary 
+	 * @param withCompleteDictionary 
 	 *  
 	 *  @return Map containing number of reported annotations for each ontology as key. 
 	 */
-	public HashMap<Integer, Integer> getReportedAnnotationStatistics(){
+	public HashMap<Integer, Integer> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
 		
 		StringBuffer queryb = new StringBuffer();		 
-		queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
-		queryb.append(this.getTableSQLName());		 	 
-		queryb.append(" AS DAT, ");
-		queryb.append(conceptDao.getTableSQLName());
-		queryb.append(" AS CT, ");
-		queryb.append(ontologyDao.getTableSQLName());
-		queryb.append(" AS OT WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND DAT.term_id IS NULL GROUP BY OT.id; ");
-		
+		if(withCompleteDictionary){
+			queryb.append("SELECT CT.ontology_id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS DAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NULL GROUP BY CT.ontology_id; "); 
+		}else{
+			queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append(this.getTableSQLName());		 	 
+			queryb.append(" AS DAT, ");
+			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(" AS CT, ");
+			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NULL AND OT.dictionary_id = ");
+			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append( " GROUP BY OT.id; ");
+		}  
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
@@ -563,7 +587,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			rSet.close();
 		}
 		catch (MySQLNonTransientConnectionException e) {			 
-			return this.getReportedAnnotationStatistics();
+			return this.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot get reported annotations statistics from " +this.getTableSQLName()+" .", e);

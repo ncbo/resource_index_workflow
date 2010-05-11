@@ -3,6 +3,7 @@ package org.ncbo.stanford.obr.service.resource;
 import java.io.File;
 import java.util.HashSet;
 
+import obs.common.beans.DictionaryBean;
 import obs.obr.populate.Element;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Element.BadElementStructureException;
@@ -120,9 +121,11 @@ public interface ResourceUpdateService {
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for a resource.
+	 * @param withCompleteDictionary 
+	 * @param dictionary 
 	 * 
 	 */
-	public void calculateObrStatistics();
+	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary);
 	
 	/**
 	 * This method gets latest version of ontology for given virtual ontology id

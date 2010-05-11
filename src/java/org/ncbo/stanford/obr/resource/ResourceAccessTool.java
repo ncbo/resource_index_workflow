@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 
+import obs.common.beans.DictionaryBean;
 import obs.common.utils.Utilities;
 import obs.obr.populate.Resource;
 import obs.obr.populate.Structure;
@@ -293,10 +294,12 @@ public abstract class ResourceAccessTool implements StringHelper {
 	/**
 	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
+	 * @param withCompleteDictionary 
+	 * @param dictionary 
 	 * 
 	 */
-	public void calculateObrStatistics(){
-		resourceUpdateService.calculateObrStatistics();
+	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		resourceUpdateService.calculateObrStatistics(withCompleteDictionary, dictionary);
 	}
 	
 	
