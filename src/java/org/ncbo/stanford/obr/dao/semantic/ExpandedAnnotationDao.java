@@ -384,7 +384,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(EAT.id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());
@@ -392,7 +392,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			queryb.append(ExpansionTypeEnum.IS_A_CLOSURE.getType());
 			queryb.append(" GROUP BY CT.ontology_id; ");		 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());
@@ -436,7 +436,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(EAT.id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());
@@ -444,7 +444,7 @@ public class ExpandedAnnotationDao extends AbstractObrDao {
 			queryb.append(ExpansionTypeEnum.MAPPING.getType());
 			queryb.append(" GROUP BY CT.ontology_id; ");		 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());

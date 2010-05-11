@@ -192,6 +192,25 @@ public class ElementDao extends AbstractObrDao {
 		 
 	}
 	
+	public boolean resetDictionary(){
+		boolean updated = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("UPDATE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" SET dictionary_id = NULL;");
+		try{			 
+			this.executeSQLUpdate(queryb.toString());
+			updated = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {		 
+			return this.resetDictionary();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
+		}
+		return updated;
+	}
+	
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
 	
 	@Override

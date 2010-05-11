@@ -274,7 +274,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(" DAT, ");
 		query.append(contextTableDao.getTableSQLName());
-		query.append(" CXT WHERE DAT.context_id = CXT.id AND term_id IS NULL AND AND workflow_status= ");
+		query.append(" CXT WHERE DAT.context_id = CXT.id AND term_id IS NULL AND workflow_status= ");
 		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();

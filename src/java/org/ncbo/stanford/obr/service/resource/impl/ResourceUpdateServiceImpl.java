@@ -97,6 +97,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	}
 
 	public void reInitializeAllTablesExcept_ET() {
+		elementTableDao.resetDictionary();
 		directAnnotationTableDao.reInitializeSQLTable();
 		expandedAnnotationTableDao.reInitializeSQLTable();
 		indexTableDao.reInitializeSQLTable();
