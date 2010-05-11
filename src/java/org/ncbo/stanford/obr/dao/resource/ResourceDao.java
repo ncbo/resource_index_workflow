@@ -90,7 +90,7 @@ public class ResourceDao extends AbstractObrDao {
 					"workflow_completed_date DATETIME, " +
 					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +
 					"INDEX X_" + this.getTableSQLName() +"_resource_id (resource_id) " +				 
-				    ") ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
+				    ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 
 	@Override

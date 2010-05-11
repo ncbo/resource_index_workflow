@@ -44,7 +44,7 @@ public class ContexDao extends AbstractObrDao {
 					"name VARCHAR(50) NOT NULL UNIQUE, " +
 					"weight DOUBLE default '1.0', " +
 					"static_ontology_id VARCHAR(20) default '0'" +
-				")ENGINE=InnoDB ;";
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 
 	@Override
