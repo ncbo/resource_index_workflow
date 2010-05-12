@@ -63,8 +63,7 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	@Override
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
-		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT(20) UNSIGNED NOT NULL, " +
+		return "CREATE TABLE " + getTableSQLName() +" (" +					 
 					"element_id INT(11) UNSIGNED NOT NULL, " +
 					"concept_id INT(11) UNSIGNED NOT NULL, " +			
 					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +					 

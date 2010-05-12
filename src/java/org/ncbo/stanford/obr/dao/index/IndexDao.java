@@ -66,8 +66,7 @@ public class IndexDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"UNIQUE (element_id, concept_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
+					"UNIQUE (element_id, concept_id), " +					 
 					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id) " +					 
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
@@ -236,7 +235,7 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb3.append(" WHERE workflow_status = ");
 		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb3.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
