@@ -54,7 +54,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
 		
 		try {
-			AbstractObrDao.setSqlLogFile(new File("resource_index_workflow.sql"));
+			AbstractObrDao.setSqlLogFile(new File("resource_index_workflow_sql.log"));
 		} catch (IOException e) {
 			logger.error("Problem in creating SQL log file.", e);
 		}

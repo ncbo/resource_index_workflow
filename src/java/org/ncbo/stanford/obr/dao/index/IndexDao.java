@@ -310,7 +310,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(this.getTableSQLName());
 		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=SUM(");
 		query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
-		query.append("* EAT.expansion_value)+1)");			 
+		query.append("* EAT.parent_level)+1)");			 
 		query.append("*weight) FROM ");
 		query.append(IsaExpandedAnnotationDao.name(this.resourceID));
 		query.append(" EAT, ");
@@ -440,13 +440,13 @@ public class IndexDao extends AbstractObrDao {
 		
 		StringBuffer queryb = new StringBuffer();
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(IT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS IT, ");
 			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" AS CT WHERE IT.concept_id=CT.id GROUP BY CT.ontology_id; "); 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(IT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(IT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS IT, ");
 			queryb.append(conceptDao.getTableSQLName());

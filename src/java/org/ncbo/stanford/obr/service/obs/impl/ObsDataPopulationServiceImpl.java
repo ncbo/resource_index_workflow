@@ -133,8 +133,10 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			termsEntryFile = obsMasterDao.writeMasterTermEntries(localOntologyIDs); 
 			// Load file entries into slave term table. 
 			numberOfTermsAdded = termDao.populateSlaveTermTableFromFile(termsEntryFile);
+			logger.info("Number of term entries added in slave term table : " + numberOfTermsAdded);
 			numberOfStopwordsTermsRemoved = termDao.deleteEntriesForStopWords();
-			logger.info("Number of term entries added in slave term table : " + (numberOfTermsAdded - numberOfStopwordsTermsRemoved));
+			logger.info("Number of stopword term entries removed from slave term table : " + numberOfStopwordsTermsRemoved);
+			logger.info("Total Number of term entries added in slave term table : " + (numberOfTermsAdded - numberOfStopwordsTermsRemoved));
 		}finally {
 			 // Delete generated file.
 			 if(termsEntryFile!= null && termsEntryFile.exists()){

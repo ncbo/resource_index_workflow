@@ -494,13 +494,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
 			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NOT NULL GROUP BY CT.ontology_id; "); 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
 			queryb.append(conceptDao.getTableSQLName());
@@ -540,13 +540,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
 			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NULL GROUP BY CT.ontology_id; "); 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(DAT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
 			queryb.append(conceptDao.getTableSQLName());

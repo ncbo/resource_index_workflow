@@ -253,13 +253,13 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
-			queryb.append("SELECT CT.ontology_id, COUNT(EAT.id) AS COUNT FROM ");
+			queryb.append("SELECT CT.ontology_id, COUNT(EAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());
 			queryb.append(" AS CT WHERE EAT.concept_id=CT.id GROUP BY CT.ontology_id; ");		 
 		}else{
-			queryb.append("SELECT OT.id, COUNT(EAT.id) AS COUNT FROM ");
+			queryb.append("SELECT OT.id, COUNT(EAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
 			queryb.append(conceptDao.getTableSQLName());
