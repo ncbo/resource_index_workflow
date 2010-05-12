@@ -2,10 +2,11 @@ package org.ncbo.stanford.obr.service;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.index.IndexDao;
-import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
@@ -18,7 +19,8 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 	
 	protected static ElementDao elementTableDao;
 	protected static DirectAnnotationDao directAnnotationTableDao;
-	protected static ExpandedAnnotationDao expandedAnnotationTableDao;
+	protected static IsaExpandedAnnotationDao isaExpandedAnnotationTableDao;
+	protected static MapExpandedAnnotationDao mapExpandedAnnotationTableDao;
 	protected static IndexDao indexTableDao;
 	  
 	public AbstractResourceService(ResourceAccessTool resourceAccessTool) {
@@ -34,7 +36,9 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 					 
 			 directAnnotationTableDao= new DirectAnnotationDao(resourceAccessTool.getToolResource().getResourceID()) ;
 			
-			 expandedAnnotationTableDao= new ExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
+			 isaExpandedAnnotationTableDao= new IsaExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
+			 
+			 mapExpandedAnnotationTableDao= new MapExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
 			
 			 indexTableDao = new IndexDao(resourceAccessTool.getToolResource().getResourceID());
 			

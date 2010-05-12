@@ -99,7 +99,8 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public void reInitializeAllTablesExcept_ET() {
 		elementTableDao.resetDictionary();
 		directAnnotationTableDao.reInitializeSQLTable();
-		expandedAnnotationTableDao.reInitializeSQLTable();
+		isaExpandedAnnotationTableDao.reInitializeSQLTable();
+		mapExpandedAnnotationTableDao.reInitializeSQLTable();
 		indexTableDao.reInitializeSQLTable();
 		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
 		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
@@ -268,10 +269,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting ISA annotations
-		HashMap<Integer, Integer> isaAnnotations= expandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Integer> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting Mapping annotations
-		HashMap<Integer, Integer> mappingAnnotations= expandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		

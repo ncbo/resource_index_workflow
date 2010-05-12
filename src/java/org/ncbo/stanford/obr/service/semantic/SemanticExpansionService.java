@@ -40,5 +40,5 @@ public interface SemanticExpansionService {
 	 */
 	public void removeExpandedAnnotations(List<String> localOntologyIDs);
  
-	public void createIndexForExpandedAnnotationTable();
+	public void createIndexForExpandedAnnotationTables();
 }

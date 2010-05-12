@@ -10,7 +10,7 @@ import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;

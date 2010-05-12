@@ -365,6 +365,6 @@ public abstract class ResourceAccessTool implements StringHelper {
 
 	public void createIndexForAnnotationTables() {
 		annotationService.createIndexForAnnotationTable();
-		semanticExpansionService.createIndexForExpandedAnnotationTable(); 
+		semanticExpansionService.createIndexForExpandedAnnotationTables(); 
 	}	 
 }

@@ -186,4 +186,13 @@ public class ContexDao extends AbstractObrDao {
 			return sb.toString();
 		}
 	}
+
+	/**
+	 * This method loads obr_context table into memory.
+	 * 
+	 */
+	public void loadTableIntoMemory() {		 
+		callStoredProcedure("load_context_table_into_memory");
+		logger.info(this.getTableSQLName()+ " loaded in to memory.");
+	}
 }

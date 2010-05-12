@@ -218,7 +218,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected int executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
 		int nbRow=0;
 		try{
-			 CallableStatement callableStatement = tableConnection.prepareCall("CALL CommonBatchInsertProcedure(?,?, ?, ?)");
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL common_batch_insert(?,?, ?, ?)");
 			 callableStatement.setString(1, tableName);
 			 callableStatement.setString(2, query);
 			 callableStatement.setBoolean(3, disableKeys);
@@ -250,12 +250,12 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	 */
 	public void callLoadObsSlaveTablesIntoMemoryProcedure() throws SQLException{	 
 		try{
-			 CallableStatement callableStatement = tableConnection.prepareCall("CALL LoadObsTablesIntoMemory();");
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL load_obs_tables_into_memory();");
 			 callableStatement.execute();  
 			 
 			try{
 				if(AbstractObrDao.sqlLogFile != null){
-					AbstractObrDao.sqlLogBuffer.write("call LoadObsTablesIntoMemory();");
+					AbstractObrDao.sqlLogBuffer.write("call load_obs_tables_into_memory();");
 					AbstractObrDao.sqlLogBuffer.newLine();
 					AbstractObrDao.sqlLogBuffer.flush();
 				}
@@ -276,12 +276,14 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 			callSPQuery.append("CALL ");
 			callSPQuery.append(storedProcedureName);
 			callSPQuery.append("(");
-			for (String parameter : paramaters) {
-				callSPQuery.append("'");
-				callSPQuery.append(parameter);
-				callSPQuery.append("', ");
-			}
-			callSPQuery.delete(callSPQuery.length()-2, callSPQuery.length());
+			if(paramaters!= null && paramaters.length >0){
+				for (String parameter : paramaters) {
+					callSPQuery.append("'");
+					callSPQuery.append(parameter);
+					callSPQuery.append("', ");
+				}
+				callSPQuery.delete(callSPQuery.length()-2, callSPQuery.length());
+			} 
 			callSPQuery.append(" );");
 			  
 			CallableStatement callableStatement = tableConnection.prepareCall(callSPQuery.toString());

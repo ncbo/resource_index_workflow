@@ -10,12 +10,12 @@ import obs.common.beans.DictionaryBean;
 import obs.obr.populate.ObrWeight;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
+import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
-import org.ncbo.stanford.obr.dao.semantic.ExpandedAnnotationDao;
-import org.ncbo.stanford.obr.enumeration.ExpansionTypeEnum;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -63,16 +63,13 @@ public class IndexDao extends AbstractObrDao {
 	@Override
 	protected String creationQuery(){
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
 					"UNIQUE (element_id, concept_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_element_id (element_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id) " +
-					//"FOREIGN KEY (element_id) REFERENCES " + ElementDao.name(this.resourceID)  + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-					//"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() 		+ "(id) ON DELETE CASCADE ON UPDATE CASCADE" +												
-				")ENGINE=InnoDB ;";
+					"INDEX X_" + this.getTableSQLName() +"_concept_id (concept_id) " +					 
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
 	
 	@Override
@@ -144,6 +141,10 @@ public class IndexDao extends AbstractObrDao {
 	 * Returns the number of annotations added to the table. 
 	 */
 	public int indexation(ObrWeight weights){
+		
+		// Load obr_context table in memeory
+		contextTableDao.loadTableIntoMemory();
+		
 		int nbAnnotation = 0;
 		// Adds to _IT the direct annotations done with a term that is a preferredName.
 		String query1 = indexationQueryForMgrepAnnotations(weights);
@@ -192,7 +193,7 @@ public class IndexDao extends AbstractObrDao {
 		}
 		
 		// Adds to _IT the isa expanded annotations.
-		String query4 = indexationQueryForExpandedAnnotations(1, weights);
+		String query4 = indexationQueryForIsaExpandedAnnotations(weights);
 		try{
 			nbAnnotation = this.executeSQLUpdate(query4);
 			}
@@ -201,8 +202,23 @@ public class IndexDao extends AbstractObrDao {
 		}
 		logger.info(nbAnnotation + " annotations indexed with isa expanded annotations.");
 
+		// Switches the indexingDone flags on EAT
+		StringBuffer updatingQueryb2 = new StringBuffer();
+		updatingQueryb2.append("UPDATE ");
+		updatingQueryb2.append(IsaExpandedAnnotationDao.name(this.resourceID));
+		updatingQueryb2.append(" SET workflow_status = ");
+		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
+		updatingQueryb2.append(" WHERE workflow_status = ");
+		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
+		try{
+			nbAnnotation = this.executeWithStoreProcedure(IsaExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
+		}
+		
 		// Adds to _IT the mapping expanded annotations.
-		String query5 = indexationQueryForExpandedAnnotations(2,weights);
+		String query5 = indexationQueryForMapExpandedAnnotations(weights);
 		try{
 			nbAnnotation = this.executeSQLUpdate(query5);
 			}
@@ -212,24 +228,25 @@ public class IndexDao extends AbstractObrDao {
 		logger.info(nbAnnotation + " annotations indexed with mapping expanded annotations.");
 		
 		// Switches the indexingDone flags on EAT
-		StringBuffer updatingQueryb2 = new StringBuffer();
-		updatingQueryb2.append("UPDATE ");
-		updatingQueryb2.append(ExpandedAnnotationDao.name(this.resourceID));
-		updatingQueryb2.append(" SET workflow_status = ");
-		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
-		updatingQueryb2.append(" WHERE workflow_status = ");
-		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
+		StringBuffer updatingQueryb3 = new StringBuffer();
+		updatingQueryb3.append("UPDATE ");
+		updatingQueryb3.append(MapExpandedAnnotationDao.name(this.resourceID));
+		updatingQueryb3.append(" SET workflow_status = ");
+		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
+		updatingQueryb3.append(" WHERE workflow_status = ");
+		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(ExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
 		}
 		
+		
 		return this.numberOfEntry();
 	}
 	
-	private String indexationQueryForMgrepAnnotations( ObrWeight weights){
+	private String indexationQueryForMgrepAnnotations(ObrWeight weights){
 		/* INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
 		SELECT elementID, OBR_TR_DAT.conceptID, @s:=SUM(10*contextWeight)
 			FROM OBR_TR_DAT, OBR_CXT, OBS_TT
@@ -249,7 +266,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(" score FROM ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(" DAT, ");
-		query.append(contextTableDao.getTableSQLName());
+		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT, ");
 		query.append(termDao.getMemoryTableSQLName());
 		query.append(" TT WHERE DAT.context_id = CXT.id AND DAT.term_id= TT.id AND workflow_status= ");
@@ -273,14 +290,14 @@ public class IndexDao extends AbstractObrDao {
 		query.append("*weight) FROM ");
 		query.append(DirectAnnotationDao.name(this.resourceID));
 		query.append(" DAT, ");
-		query.append(contextTableDao.getTableSQLName());
+		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT WHERE DAT.context_id = CXT.id AND term_id IS NULL AND workflow_status= ");
 		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
-	}
-	
-	private String indexationQueryForExpandedAnnotations(int component, ObrWeight weights){
+	} 
+	 
+	private String indexationQueryForIsaExpandedAnnotations(ObrWeight weights){
 		/*INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
 	    	SELECT elementID, OBR_TR_EAT.conceptID, @s:=SUM(5*contextWeight)
 	        	FROM OBR_TR_EAT, OBR_CXT
@@ -292,29 +309,37 @@ public class IndexDao extends AbstractObrDao {
 		query.append("INSERT INTO ");
 		query.append(this.getTableSQLName());
 		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=SUM(");
-		switch (component) {
-		// case 1 is equivalent to function 3 in ObrWeights
-		case 1: query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
-				query.append("* EAT.expansion_value)+1)");
-			break;
-		case 2: query.append(weights.getMappingEA());
-			break;
-		}
+		query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
+		query.append("* EAT.expansion_value)+1)");			 
 		query.append("*weight) FROM ");
-		query.append(ExpandedAnnotationDao.name(this.resourceID));
+		query.append(IsaExpandedAnnotationDao.name(this.resourceID));
 		query.append(" EAT, ");
-		query.append(contextTableDao.getTableSQLName());
-		query.append(" CXT WHERE EAT.context_id= CXT.id AND");
-		switch (component) {
-		case 1: 
-			query.append(" expansion_type= "); // IS a closure expansion
-			query.append(ExpansionTypeEnum.IS_A_CLOSURE.getType()); 
-			break;
-		case 2: query.append(" expansion_type= ");  // Maping Expansion
-		         query.append(ExpansionTypeEnum.MAPPING.getType()); 
-			break;
-		}
-		query.append(" AND workflow_status=");
+		query.append(contextTableDao.getMemoryTableSQLName());
+		query.append(" CXT WHERE EAT.context_id= CXT.id AND workflow_status=");
+		query.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
+		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
+		
+		return query.toString();
+	}
+	
+	private String indexationQueryForMapExpandedAnnotations(ObrWeight weights){
+		/*INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
+	    	SELECT elementID, OBR_TR_EAT.conceptID, @s:=SUM(5*contextWeight)
+	        	FROM OBR_TR_EAT, OBR_CXT
+	        	WHERE OBR_TR_EAT.contextID=OBR_CXT.contextID
+	        	AND childConceptID IS NOT NULL AND indexingDone=false GROUP BY elementID, conceptID
+			ON DUPLICATE KEY UPDATE score=score+@s; */
+		
+		StringBuffer query = new StringBuffer();
+		query.append("INSERT INTO ");
+		query.append(this.getTableSQLName());
+		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=SUM(");
+		query.append(weights.getMappingEA());
+		query.append("*weight) FROM ");
+		query.append(MapExpandedAnnotationDao.name(this.resourceID));
+		query.append(" EAT, ");
+		query.append(contextTableDao.getMemoryTableSQLName());
+		query.append(" CXT WHERE EAT.context_id= CXT.id AND workflow_status=");
 		query.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();

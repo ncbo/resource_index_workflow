@@ -1,27 +1,22 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `resource_index`.`CommonBatchInsertProcedure`$$
+DROP PROCEDURE IF EXISTS `resource_index`.`common_batch_insert`$$
 
-CREATE DEFINER=`optra`@`%` PROCEDURE `CommonBatchInsertProcedure`(IN TableToPopulate VARCHAR(100),IN InsertQueryString text, IN DisableKeys BOOL, OUT RowsAffected BIGINT)
+CREATE DEFINER=`optra`@`%` PROCEDURE `common_batch_insert`(IN TableToPopulate VARCHAR(100),IN InsertQueryString text, IN DisableKeys BOOL, OUT RowsAffected BIGINT)
 BEGIN
-    # Define counter 
-    DECLARE counter BIGINT(20) unsigned DEFAULT 0; 
+        # Define counter 
+        DECLARE counter BIGINT(20) unsigned DEFAULT 0; 
 	
 	#Creating SQL queries 
-	SET @BulkInsertQuery = InsertQueryString;
-	SET @SetCounterQuery = Concat( 'SELECT IF (MAX(id) IS NULL, 0, MAX(id)) INTO @counter FROM ',TableToPopulate,'; ');
+	SET @BulkInsertQuery = InsertQueryString;	 
 	SET @DisableKeysQuery = Concat( 'ALTER TABLE ',TableToPopulate, ' DISABLE KEYS;');
 	SET @EnableKeysQuery =  Concat( 'ALTER TABLE ',TableToPopulate, ' ENABLE KEYS;');
 	 
 	# Prepare statements 
-	PREPARE InsertStmt FROM @BulkInsertQuery;
-	PREPARE SetCounterStmt FROM @SetCounterQuery;
+	PREPARE InsertStmt FROM @BulkInsertQuery;	 
 	PREPARE DisableKeysStmt FROM @DisableKeysQuery;
 	PREPARE EnableKeysStmt FROM @EnableKeysQuery;
-	
-	# Initialize counter used for id    
-	EXECUTE SetCounterStmt; 
-	
+	 
 	# Disbale keys
         IF DisableKeys=TRUE THEN 
 		EXECUTE DisableKeysStmt; 

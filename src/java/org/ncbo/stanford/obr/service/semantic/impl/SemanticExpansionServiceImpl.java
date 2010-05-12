@@ -36,7 +36,7 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 			logger.info("Executing isa transitive closure expansion... ");
 			int isaAnnotation; 
 			
-			isaAnnotation = expandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
+			isaAnnotation = isaExpandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
 				
 			logger.info(isaAnnotation);
 			nbAnnotation += isaAnnotation;
@@ -48,7 +48,7 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		if(mappingExpansion){
 			timer.start();
 			logger.info("Executing mapping expansion... ");
-			int mappingAnnotation = expandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
+			int mappingAnnotation = mapExpandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
 			logger.info(mappingAnnotation);
 			nbAnnotation += mappingAnnotation;
 			timer.end();
@@ -78,19 +78,30 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	public void removeExpandedAnnotations(List<String> localOntologyIDs) {
 		
 		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
-			expandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
+			isaExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
+			mapExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
 		 }else{
 			 for (String localOntologyID : localOntologyIDs) {
-				 expandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+				 isaExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+				 mapExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
 			}
 			 
 		 }	
 	}
 
-	public void createIndexForExpandedAnnotationTable() {
-		if(!expandedAnnotationTableDao.isIndexExist()){
-			expandedAnnotationTableDao.createIndex();	 
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.semantic.SemanticExpansionService#createIndexForExpandedAnnotationTable()
+	 */
+	public void createIndexForExpandedAnnotationTables() {
+		if(!isaExpandedAnnotationTableDao.indexesExist()){
+			isaExpandedAnnotationTableDao.createIndexes();	 
 		} 
+		
+		if(!mapExpandedAnnotationTableDao.indexesExist()){
+			mapExpandedAnnotationTableDao.createIndexes();	 
+		}  
+		
 	}
 
 }

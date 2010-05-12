@@ -5,10 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Iterator;
+
+import obs.common.utils.Utilities;
 
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -236,8 +240,46 @@ public class TermDao extends AbstractObsDao{
 	}
 	
 	/**
+	 * Deletes the rows corresponding to annotations done with a termName in the given String list.
+	 * @return Number of rows deleted. 
+	 */
+	public int deleteEntriesForStopWords(){		
+		int nbDelete = -1; 
+		HashSet<String> stopwords= Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS);
+		/* DELETE obs_term FROM obs_term WHERE obs_term.name IN();*/
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" FROM ");
+		queryb.append(this.getTableSQLName());		
+		queryb.append(" WHERE name IN(");
+		for(Iterator<String> it = stopwords.iterator(); it.hasNext();){
+			queryb.append("'");
+			queryb.append(it.next());
+			queryb.append("'");
+			if(it.hasNext()){
+				queryb.append(", ");
+			}
+		}
+		queryb.append(");");
+		try {
+			if(stopwords.size()>0){
+				nbDelete = this.executeSQLUpdate(queryb.toString());				 
+			}
+			else{
+				nbDelete = 0;
+			}
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" with given list of stopwords. -1 returned.", e);
+		}
+		return nbDelete;
+	}
+	
+	
+	/**
 	 * This class is representation for obs_term table entry.
-	 * @author k.palanisamy
+	 * @author  
 	 *
 	 */
 	public static class TermEntry{

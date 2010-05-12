@@ -16,7 +16,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;

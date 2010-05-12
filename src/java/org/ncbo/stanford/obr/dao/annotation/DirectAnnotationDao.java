@@ -1,4 +1,4 @@
-package org.ncbo.stanford.obr.dao.annoation;
+package org.ncbo.stanford.obr.dao.annotation;
 
 import java.io.File;
 import java.sql.PreparedStatement;
@@ -74,7 +74,6 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	protected String creationQuery(){
 		//logger.info("creation of the table "+ this.getTableSQLName());
 		return "CREATE TABLE " + this.getTableSQLName() +" (" +
-					"id BIGINT(20) UNSIGNED NOT NULL, " +
 					"element_id INT(11) UNSIGNED NOT NULL, " +
 					"concept_id INT(11) UNSIGNED NOT NULL, " +
 					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +
@@ -87,8 +86,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	}
 	
 	protected String getIndexCreationQuery(){
-		  return "ALTER TABLE " + this.getTableSQLName() +
-	  			" ADD PRIMARY KEY(id), " +
+		  return "ALTER TABLE " + this.getTableSQLName() +	  			 
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_element_id(element_id), " +
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_concept_id(concept_id), " +
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_dictionary_id(dictionary_id), " +
@@ -118,8 +116,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (id, element_id, concept_id, context_id, dictionary_id, workflow_status) "); 
-		queryb.append("VALUES ( ?, ");
+		queryb.append(" (element_id, concept_id, context_id, dictionary_id, workflow_status) "); 
+		queryb.append("VALUES (");
 			// sub query to get the elementID from the localElementID
 			queryb.append("(SELECT id FROM ");
 			queryb.append(ElementDao.name(this.resourceID));
@@ -142,21 +140,20 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Add an new entry in corresponding SQL table.
 	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
 	 */
-	private boolean addEntry(DirectAnnotationEntry entry, long id){
+	private boolean addEntry(DirectAnnotationEntry entry ){
 		boolean inserted = false;
-		try {
-			this.addEntryStatement.setLong(1, id);
-			this.addEntryStatement.setString (2, entry.getLocalElementID());
-			this.addEntryStatement.setString (3, entry.getLocalConceptID());
-			this.addEntryStatement.setString (4, entry.getContextName());
-			this.addEntryStatement.setInt    (5, entry.getDictionaryID());
-			this.addEntryStatement.setInt(6, entry.getWorkflowStatus());		 
+		try {		 
+			this.addEntryStatement.setString (1, entry.getLocalElementID());
+			this.addEntryStatement.setString (2, entry.getLocalConceptID());
+			this.addEntryStatement.setString (3, entry.getContextName());
+			this.addEntryStatement.setInt    (4, entry.getDictionaryID());
+			this.addEntryStatement.setInt(5, entry.getWorkflowStatus());		 
 			this.executeSQLUpdate(this.addEntryStatement);
 			inserted = true;
 		}
 		catch (MySQLNonTransientConnectionException e) {
 			this.openAddEntryStatement();
-			return this.addEntry(entry, id);
+			return this.addEntry(entry );
 		}
 		catch (MySQLIntegrityConstraintViolationException e){
 			//logger.error("Table " + this.getTableSQLName() + " already contains an entry for the concept: " + entry.getLocalConceptID() +".");
@@ -232,34 +229,14 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * @return the number of added entries
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
-		int nbInserted = 0;
-		long maxID =this.getMaximumID() + 1;
+		int nbInserted = 0;		 
 		for(DirectAnnotationEntry entry: entries){
-			if (this.addEntry(entry, maxID)){
-				nbInserted++;
-				maxID=maxID+1;
+			if (this.addEntry(entry)){
+				nbInserted++; 
 			}
 		}
 		return nbInserted;
-	} 
-	
-	private long getMaximumID(){ 
-		long maxID =0;
-		try {			 			
-			ResultSet rSet = this.executeSQLQuery("SELECT MAX(id) FROM " + this.getTableSQLName());
-			if(rSet.first()){
-				maxID = rSet.getLong(1);
-			} 
-			 		
-			rSet.close();
-		} 
-		catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot get maximum id  from "+this.getTableSQLName()+" .", e);
-		}
-		
-		return maxID;
-		
-	}
+	}  
 	 
 	//********************************* MGREP FUNCTIONS *****************************************************
 
@@ -327,11 +304,11 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		StringBuffer joinQuery = new StringBuffer();
 		joinQuery.append("INSERT INTO ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(" (id, element_id, concept_id, context_id, term_id, ");
+		joinQuery.append(" (element_id, concept_id, context_id, term_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append(".position_from, ");
 		joinQuery.append(this.getTableSQLName());
-		joinQuery.append(".position_to, dictionary_id, workflow_status) SELECT @counter:=@counter+1, element_id, concept_id, context_id, ");
+		joinQuery.append(".position_to, dictionary_id, workflow_status) SELECT element_id, concept_id, context_id, ");
 		joinQuery.append(this.getTableSQLName());
 		joinQuery.append("_MGREP.term_id, ");
 		joinQuery.append(this.getTableSQLName());

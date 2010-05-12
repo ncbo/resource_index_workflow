@@ -1,8 +1,8 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `resource_index`.`LoadObsTablesIntoMemeory`$$
+DROP PROCEDURE IF EXISTS `resource_index`.`load_obs_tables_into_memory`$$
 
-CREATE DEFINER=`optra`@`%` PROCEDURE `LoadObsTablesIntoMemeory`()
+CREATE DEFINER=`optra`@`%` PROCEDURE `load_obs_tables_into_memory`()
 BEGIN
     -- 
 	-- LOAD only the necessary part of obs_term and stuff it into memory.
@@ -12,9 +12,10 @@ BEGIN
     CREATE TABLE `obs_term_mem` (
 	 `id` int(11) unsigned,
 	 `concept_id` int(11) unsigned,
+	 `is_preferred` tinyint(1) NOT NULL,
 	 KEY `X_obs_term_mem_id` (`id`)
 	) ENGINE=MEMORY DEFAULT CHARSET=latin1
-	SELECT `id`, `concept_id` 
+	SELECT `id`, `concept_id`, `is_preferred`
 	FROM obs_term;
 	
 	--
@@ -54,7 +55,7 @@ BEGIN
 	-- Save the integer field as the new mapping_type field.	 
 	ALTER TABLE `obs_map_mem` DROP COLUMN mapping_type;
 	ALTER TABLE `obs_map_mem` CHANGE COLUMN 
-	mapping_type_id mapping_type int(11) unsigned NOT NULL;
+	mapping_type_id mapping_type TINYint(1) unsigned NOT NULL;
                 
         -- 
 	-- LOAD obs_map and stuff it into memory.
