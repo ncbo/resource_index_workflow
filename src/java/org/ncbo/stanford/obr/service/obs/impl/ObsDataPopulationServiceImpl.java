@@ -62,6 +62,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			populateRelationSlaveData(localOntologyIDs);
 			populateMappingSlaveData(localOntologyIDs);
 			populateSemanticTypeData(localOntologyIDs);
+			populateLSemanticTypeData();
 		}else{
 			logger.info("No new ontology found in master table.");
 		}

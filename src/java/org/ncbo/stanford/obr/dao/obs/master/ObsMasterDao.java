@@ -337,7 +337,7 @@ public class ObsMasterDao implements DaoFactory{
 		selectQuery.append(conceptDao.getTableSQLName());
 		selectQuery.append(" CT, ");
 		selectQuery.append(ontologyDao.getTableSQLName());
-		selectQuery.append(" OT WHERE ISAPT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");		
+		selectQuery.append(" OT WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");		
 		for (String localOntologyID : localOntologyIDs) {
 			selectQuery.append(localOntologyID);
 			selectQuery.append(", ");

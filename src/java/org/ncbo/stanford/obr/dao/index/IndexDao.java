@@ -184,7 +184,7 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb1.append(WorkflowStatusEnum.INDEXING_DONE.getStatus());
 		updatingQueryb1.append(" WHERE workflow_status = ");
 		updatingQueryb1.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
-		try{
+		try{			 
 			nbAnnotation = this.executeWithStoreProcedure(DirectAnnotationDao.name(this.resourceID), updatingQueryb1.toString(), true);
 			}
 		catch(SQLException e){
@@ -210,7 +210,7 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb2.append(" WHERE workflow_status = ");
 		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(IsaExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			 nbAnnotation = this.executeWithStoreProcedure(IsaExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
@@ -235,8 +235,8 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb3.append(" WHERE workflow_status = ");
 		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb3.toString(), true);
-			}
+			 nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb3.toString(), true);
+		  }
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
 		}

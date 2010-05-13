@@ -19,7 +19,7 @@ import org.ncbo.stanford.obr.util.MessageUtils;
  */
 public class LSemanticTypeDao extends AbstractObsDao {
 	
-	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.semantic.table.suffix");
+	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.l.semantic.table.suffix");
 		
 	private PreparedStatement addEntryStatement; 
 	
