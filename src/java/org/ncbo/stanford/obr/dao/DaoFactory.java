@@ -6,6 +6,8 @@ import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.map.MapDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.dao.obs.relation.RelationDao;
+import org.ncbo.stanford.obr.dao.obs.semantic.LSemanticTypeDao;
+import org.ncbo.stanford.obr.dao.obs.semantic.SemanticTypeDao;
 import org.ncbo.stanford.obr.dao.obs.term.TermDao;
 import org.ncbo.stanford.obr.dao.resource.ResourceDao;
 import org.ncbo.stanford.obr.dao.statistics.StatisticsDao;
@@ -39,6 +41,12 @@ public interface DaoFactory {
 	
 	/** Singleton data access object for relation table. */
 	public static final RelationDao relationDao = RelationDao.getInstance();
+	
+	/** Singleton data access object for semantic Type table. */
+	public static final SemanticTypeDao semanticTypeDao = SemanticTypeDao.getInstance();
+	
+	/** Singleton data access object for l semantic Type table. */
+	public static final LSemanticTypeDao lSemanticTypeDao = LSemanticTypeDao.getInstance();
 	 
 	/** Singleton data access object for context table. */
 	public static final ContexDao contextTableDao = ContexDao.getInstance();

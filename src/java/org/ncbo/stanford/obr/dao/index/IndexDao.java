@@ -146,14 +146,14 @@ public class IndexDao extends AbstractObrDao {
 		
 		int nbAnnotation = 0;
 		// Adds to _IT the direct annotations done with a term that is a preferredName.
-		String query1 = indexationQueryForMgrepAnnotations(weights);
+		String query1 = indexationQueryForDirectAnnotations(weights);
 		try{
 			nbAnnotation = this.executeSQLUpdate(query1);
 			}
 		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index annotations from _DAT (isPreferred=true)", e);
+			logger.error("** PROBLEM ** Cannot index annotations from _DAT  ", e);
 		}
-		logger.info(nbAnnotation + " annotations indexed with direct annotations (isPreferred=true).");
+		logger.info(nbAnnotation + " annotations indexed with direct annotations  .");
 		
 //		// Adds to _IT the direct annotations done with a term that is NOT preferredName.
 //		String query2 = indexationQueryForMgrepAnnotations(false, weights);
@@ -165,16 +165,16 @@ public class IndexDao extends AbstractObrDao {
 //		}
 //		logger.info(nbAnnotation + " annotations indexed with direct annotations (isPreferred=false).");
 
-		// TODO : Need to modify
+		 
 		// Adds to _IT the direct reported annotations.
-		String query3 = indexationQueryForReportedAnnotations(weights);
-		try{
-			nbAnnotation = this.executeSQLUpdate(query3);
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
-		}
-		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
+//		String query3 = indexationQueryForReportedAnnotations(weights);
+//		try{
+//			nbAnnotation = this.executeSQLUpdate(query3);
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot index reported annotations from _DAT.", e);
+//		}
+//		logger.info(nbAnnotation + " annotations indexed with direct reported annotations.");
 
 		// Switches the indexingDone flags on DAT
 		StringBuffer updatingQueryb1 = new StringBuffer();
@@ -245,6 +245,38 @@ public class IndexDao extends AbstractObrDao {
 		return this.numberOfEntry();
 	}
 	
+	private String indexationQueryForDirectAnnotations(ObrWeight weights){
+		/* INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
+		SELECT elementID, OBR_TR_DAT.conceptID, @s:=SUM(10*contextWeight)
+			FROM OBR_TR_DAT, OBR_CXT, OBS_TT
+			WHERE OBR_TR_DAT.contextID=OBR_CXT.contextID AND OBR_TR_DAT.termID=OBS_TT.termID
+			AND isPreferred=true AND OBR_TR_DAT.termID IS NOT NULL AND indexingDone=false GROUP BY elementID, conceptID
+		ON DUPLICATE KEY UPDATE score=score+@s;  */
+	
+		StringBuffer query = new StringBuffer();
+		query.append("INSERT INTO ");
+		query.append(this.getTableSQLName());
+		query.append(" (element_id, concept_id, score) SELECT element_id, DAT.concept_id, ");
+		query.append("IF(DAT.term_id IS NULL, @s:=SUM(");
+		query.append(weights.getReportedDA());
+		query.append("*weight), ");
+		query.append("IF(TT.is_preferred, @s:=SUM(");
+		query.append(weights.getPreferredNameDA());	
+		query.append("*weight), @s:=SUM(");
+		query.append(weights.getSynonymDA());	
+		query.append("*weight))");
+		query.append(") calc_score FROM ");
+		query.append(DirectAnnotationDao.name(this.resourceID));
+		query.append(" DAT LEFT JOIN ");
+		query.append(termDao.getMemoryTableSQLName());
+		query.append(" TT ON DAT.term_id= TT.id, ");
+		query.append(contextTableDao.getMemoryTableSQLName());
+		query.append(" CXT WHERE DAT.context_id = CXT.id AND workflow_status= ");
+		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
+		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
+		return query.toString();
+	}
+	
 	private String indexationQueryForMgrepAnnotations(ObrWeight weights){
 		/* INSERT INTO OBR_TR_IT (elementID, conceptID, score) 
 		SELECT elementID, OBR_TR_DAT.conceptID, @s:=SUM(10*contextWeight)
@@ -268,7 +300,7 @@ public class IndexDao extends AbstractObrDao {
 		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT, ");
 		query.append(termDao.getMemoryTableSQLName());
-		query.append(" TT WHERE DAT.context_id = CXT.id AND DAT.term_id= TT.id AND workflow_status= ");
+		query.append(" TT WHERE DAT.context_id = CXT.id AND DAT.term_id= TT.id  AND workflow_status= ");
 		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		query.append(" GROUP BY element_id, concept_id ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();

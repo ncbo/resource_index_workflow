@@ -77,19 +77,20 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"element_id INT(11) UNSIGNED NOT NULL, " +
 					"concept_id INT(11) UNSIGNED NOT NULL, " +
 					"context_id SMALLINT(5) UNSIGNED NOT NULL, " +
-					"term_id INT(11) UNSIGNED, " +				
 					"position_from INT(11), " +
 					"position_to INT(11), " +
+					"term_id INT(11) UNSIGNED, " +					
 					"dictionary_id SMALLINT(5) UNSIGNED NOT NULL, " +
 					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +					
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	protected String getIndexCreationQuery(){
-		  return "ALTER TABLE " + this.getTableSQLName() +	  			 
-	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_element_id(element_id), " +
-	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_concept_id(concept_id), " +
-	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_dictionary_id(dictionary_id), " +
+		  return "ALTER TABLE " + this.getTableSQLName() +	 
+	      // TODO: Commented indexes as per tracker item #2136 
+//	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_element_id(element_id), " +
+//	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_concept_id(concept_id), " +
+//	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_dictionary_id(dictionary_id), " +
 	  			" ADD INDEX IDX_"+ this.getTableSQLName() +"_workflow_status(workflow_status) "; 
 	}
 

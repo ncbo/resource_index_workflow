@@ -85,7 +85,7 @@ public class ElementDao extends AbstractObrDao {
 					"dictionary_id SMALLINT UNSIGNED, " +
 					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +
 					//"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
-				")ENGINE=InnoDB ;";
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	@Override

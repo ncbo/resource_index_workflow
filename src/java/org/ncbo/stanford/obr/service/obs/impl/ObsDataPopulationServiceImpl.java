@@ -61,6 +61,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		    populateTermsSlaveData(localOntologyIDs);		 
 			populateRelationSlaveData(localOntologyIDs);
 			populateMappingSlaveData(localOntologyIDs);
+			populateSemanticTypeData(localOntologyIDs);
 		}else{
 			logger.info("No new ontology found in master table.");
 		}
@@ -185,7 +186,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			// Remove all data from mapping table.			
 			mapDao.reInitializeSQLTable();
 			// Writes mapping entries to file from master map table.
-			mappingEntryFile = obsMasterDao.writeMasterMappingEntries(localOntologyIDs);
+			mappingEntryFile = obsMasterDao.writeMasterMappingEntries();
 			// Load file entries into slave mapping table. 
 			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);			
 			logger.info("Total Number of mapping entries added in slave map table : " + numberOfMappingsAdded);
@@ -198,6 +199,57 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			 }
 		}
 		return numberOfMappingsAdded;
+	}
+	
+	/**
+	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
+	 * slave relation table for given ontology versions {@code localOntologyIDs}.
+	 * 
+	 * @param localOntologyIDs a {@code List} of local ontology ids.
+	 * @return Number of relation entries added in slave relation table.
+	 */
+	public int populateSemanticTypeData(List<String> localOntologyIDs){	
+		int numberOfSemanticTypeAdded= 0;
+		File semanticTypeEntryFile = null;		
+		try{
+			// Writes 'is a parent' relation entries to file from master relation table.
+			semanticTypeEntryFile = obsMasterDao.writeMasterSemanticTypeEntries(localOntologyIDs);
+			// Load file entries into slave term table. 
+			numberOfSemanticTypeAdded = semanticTypeDao.populateSlaveSemanticTypeTableFromFile(semanticTypeEntryFile) ;
+			logger.info("Total Number of Semantic Type entries added in slave relation table : " + numberOfSemanticTypeAdded);
+		}finally {
+			 if(semanticTypeEntryFile!= null && semanticTypeEntryFile.exists()){
+				 semanticTypeEntryFile.delete();
+			 }
+		}  
+		return numberOfSemanticTypeAdded;
+	} 
+	
+	/**
+	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
+	 * slave LSemanticType table for given ontology versions {@code localOntologyIDs}.
+	 *  
+	 * @return Number of LSemanticType entries added in slave relation table.
+	 */
+	public int populateLSemanticTypeData(){
+		int numberOfSemanticTypeAdded= 0;
+		File semanticTypeEntryFile = null;	
+		try{
+			logger.info("Re-initialize slave lSemanticType table.");
+			// Remove all data from mapping table.			
+			lSemanticTypeDao.reInitializeSQLTable();
+			// Writes 'is a parent' relation entries to file from master LSemanticType table.
+			semanticTypeEntryFile = obsMasterDao.writeMasterLSemanticTypeEntries();
+			// Load file entries into slave term table. 
+			numberOfSemanticTypeAdded = lSemanticTypeDao.populateSlaveLSemanticTypeTableFromFile(semanticTypeEntryFile) ;
+			logger.info("Total Number of L Semantic Type entries added in slave relation table : " + numberOfSemanticTypeAdded);
+		}finally {
+			 if(semanticTypeEntryFile!= null && semanticTypeEntryFile.exists()){
+				 semanticTypeEntryFile.delete();
+			 }
+		} 
+		return numberOfSemanticTypeAdded;
+		
 	}
 
 	/**
@@ -219,6 +271,12 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		boolean status = false;
 		 // remove ontology from relation table
 		 status =relationDao.deleteEntriesFromOntology(localOntologyID);
+		 if(!status){
+			 logger.error("Problem in removing ontology version " + localOntologyID + " from relation table.");
+		 }
+		 
+		 // remove ontology from relation table
+		 status =semanticTypeDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from relation table.");
 		 }

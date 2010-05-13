@@ -44,7 +44,8 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected static Logger logger = Logger.getLogger(AbstractObrDao.class);
 	
 	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
-	protected static final String OBS_MEMORY_SUFFIX = "_mem";
+	protected static final String OBS_PREFIX = MessageUtils.getMessage("obs.tables.prefix");
+	protected static final String OBR_MEMORY_SUFFIX = MessageUtils.getMessage("obr.memory.table.suffix");
 		
 	// Database connection properties.
 	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
@@ -159,7 +160,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	}
 	
 	public String getMemoryTableSQLName() {
-		return this.tableSQLName + OBS_MEMORY_SUFFIX;
+		return (this.tableSQLName + OBR_MEMORY_SUFFIX).replace(OBS_PREFIX, OBR_PREFIX);
 	}
 	
 	public static Connection getTableConnection() {
