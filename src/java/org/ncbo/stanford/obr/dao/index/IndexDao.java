@@ -186,9 +186,10 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb1.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		try{			 
 			nbAnnotation = this.executeWithStoreProcedure(DirectAnnotationDao.name(this.resourceID), updatingQueryb1.toString(), true);
+			logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + DirectAnnotationDao.name(this.resourceID));
 			}
 		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _DAT.", e);
+			logger.error("** PROBLEM ** Cannot switch workflow_status flags on DAT.", e);
 		}
 		
 		// Adds to _IT the isa expanded annotations.
@@ -211,6 +212,7 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
 			 nbAnnotation = this.executeWithStoreProcedure(IsaExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			 logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + IsaExpandedAnnotationDao.name(this.resourceID));
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
@@ -236,6 +238,7 @@ public class IndexDao extends AbstractObrDao {
 		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
 			 nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb3.toString(), true);
+			 logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + MapExpandedAnnotationDao.name(this.resourceID));
 		  }
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);

@@ -77,7 +77,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		this.tableSQLName = OBR_PREFIX + resourceID.toLowerCase() + suffix ;
 		if(!this.exist(this.getTableSQLName())){
 			try{
-				 logger.info(this.creationQuery());
+				//logger.info(this.creationQuery());
 				this.executeSQLUpdate(this.creationQuery());
 			}
 			catch (SQLException e) {
