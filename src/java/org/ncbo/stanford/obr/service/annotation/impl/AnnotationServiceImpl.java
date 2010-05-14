@@ -43,12 +43,16 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */
 	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
 			HashSet<String> stopwords) {
-		int nbAnnotation;		 
+		int nbAnnotation =0;		 
 
 		// processes direct mgrep annotations
-		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
-		 		withCompleteDictionary, stopwords);
-
+		
+		if(elementTableDao.containElementsForMgrepAnnotation(dictionary.getDictionaryID())){
+			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
+			 		withCompleteDictionary, stopwords);
+		} else{
+			logger.info("No element present in "+ elementTableDao.getTableSQLName()+ " for MGRAP annotation.");
+		}
 		// processes direct reported annotations
 		nbAnnotation += this.reportExistingAnnotations(dictionary);
 

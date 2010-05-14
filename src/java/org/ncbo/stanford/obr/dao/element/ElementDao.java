@@ -421,6 +421,36 @@ public class ElementDao extends AbstractObrDao {
 	}
 	
 	/**
+	 * This method checks whether non annotated elements are present.
+	 * 
+	 * @param dictionaryID
+	 * @return
+	 */
+	public boolean containElementsForMgrepAnnotation(int dictionaryID){
+		boolean result = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT count(id) FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		queryb.append(dictionaryID);		 
+		queryb.append(";");
+		
+		try{
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			if(rSet.first()){
+				int nonAnnotatedElement = rSet.getInt(1);
+				if(nonAnnotatedElement> 0){
+					result = true;
+				}
+			} 
+		}catch (SQLException e) {
+			 logger.error("Problem in getting non annotated element count", e);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Updates the field dictionaryID of all the rows in the table where the dictionaryID is null or < to the given one. 
 	 * Returns the number of updated elements. (to be verified)
 	 * 
