@@ -101,7 +101,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		directAnnotationTableDao.reInitializeSQLTable();
 		isaExpandedAnnotationTableDao.reInitializeSQLTable();
 		mapExpandedAnnotationTableDao.reInitializeSQLTable();
-		indexTableDao.reInitializeSQLTable();
+		aggregationTableDao.reInitializeSQLTable();
 		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
 		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
 	}
@@ -260,7 +260,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		timer.start();
 		
 		// Getting Indexed annotations
-		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Integer> indexedAnnotations= aggregationTableDao.getIndexedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
 		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);

@@ -163,6 +163,10 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		return (this.tableSQLName + OBR_MEMORY_SUFFIX).replace(OBS_PREFIX, OBR_PREFIX);
 	}
 	
+	public String getTempTableSQLName() {
+		return this.tableSQLName +"_temp";
+	}
+	
 	public static Connection getTableConnection() {
 		return tableConnection;
 	}

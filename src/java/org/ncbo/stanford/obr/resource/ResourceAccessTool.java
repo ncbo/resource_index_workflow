@@ -14,10 +14,10 @@ import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.context.ContexDao.ContextEntry;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
+import org.ncbo.stanford.obr.service.aggregation.AggregationService;
+import org.ncbo.stanford.obr.service.aggregation.impl.AggregationServiceImpl;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
 import org.ncbo.stanford.obr.service.annotation.impl.AnnotationServiceImpl;
-import org.ncbo.stanford.obr.service.index.IndexationService;
-import org.ncbo.stanford.obr.service.index.impl.IndexationServiceImpl;
 import org.ncbo.stanford.obr.service.obs.ontology.OntologyService;
 import org.ncbo.stanford.obr.service.obs.ontology.impl.OntologyServiceImpl;
 import org.ncbo.stanford.obr.service.resource.ResourceUpdateService;
@@ -51,7 +51,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	protected ResourceUpdateService resourceUpdateService;
 	protected AnnotationService annotationService;
 	protected SemanticExpansionService semanticExpansionService;
-	protected IndexationService indexationService;	  
+	protected AggregationService aggregationService;	  
 	  	
 	/**
 	 * Constructs a new ResourceAccessTool associated to a new Resource constructed with the given information
@@ -70,7 +70,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 		
 		this.annotationService = new AnnotationServiceImpl(this);
 		this.semanticExpansionService = new SemanticExpansionServiceImpl(this);
-		this.indexationService= new IndexationServiceImpl(this);
+		this.aggregationService= new AggregationServiceImpl(this);
 		
 		// Adds the structure's contexts in OBR_CXT
 		ContextEntry context;
@@ -156,19 +156,19 @@ public abstract class ResourceAccessTool implements StringHelper {
 
 
 	/**
-	 * @return the indexationService
+	 * @return the aggregationService
 	 */
-	public IndexationService getIndexationService() {
-		return indexationService;
+	public AggregationService getAggregationService() {
+		return aggregationService;
 	}
 
 
 
 	/**
-	 * @param indexationService the indexationService to set
+	 * @param aggregationService the aggregationService to set
 	 */
-	public void setIndexationService(IndexationService indexationService) {
-		this.indexationService = indexationService;
+	public void setAggregationService(AggregationService aggregationService) {
+		this.aggregationService = aggregationService;
 	}
 
 
@@ -326,7 +326,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 */
 	public void removeOntologies(List<String> localOntologyIDs){
 		// Remove entries from indexing table  
-		indexationService.removeIndexation(localOntologyIDs);
+		aggregationService.removeAggregation(localOntologyIDs);
 		// Remove entries from expanded annotation table  
 		semanticExpansionService.removeExpandedAnnotations(localOntologyIDs);
 		// Remove entries from annotation table.
