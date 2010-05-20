@@ -146,7 +146,7 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
-			this.executeWithStoreProcedure(annotationDao.getTableSQLName(), updatingQueryb.toString(), true);
+			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot execute the mapping expansion query on table " + this.getTableSQLName() +". 0 returned", e);

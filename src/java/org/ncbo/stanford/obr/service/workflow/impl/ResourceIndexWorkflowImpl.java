@@ -235,6 +235,14 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ nbExpandedAnnotation
 				+ " new expanded annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".");
+		 
+		// Aggregation step to annotations.
+		int nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+				obrWeights);
+		toolLogger.info(nbEntry + " elements indexed (with "
+				+ nbIndexedAnnotation
+				+ " new indexed annotations) from resource "
+				+ resourceAccessTool.getToolResource().getResourceID() + ".");	
 		
 		//Create indexes on Annotation and expanded annotation table.
 		toolLogger.info("Creating indexes on Annotation and expanded annotation table starts ..");
@@ -242,16 +250,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		timer.start();
 		resourceAccessTool.createIndexForAnnotationTables();
 		timer.end();
-		toolLogger.info("Creating indexes on Annotation and expanded annotation table completed in "
-				+ timer.millisecondsToTimeString(timer.duration()));		 
-		
-		// Aggregation step to annotations.
-		int nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
-				obrWeights);
-		toolLogger.info(nbEntry + " elements indexed (with "
-				+ nbIndexedAnnotation
-				+ " new indexed annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".");			
+		toolLogger.info("Created indexes on Annotation and expanded annotation table in "
+				+ timer.millisecondsToTimeString(timer.duration()));
 			 
 		return nbIndexedAnnotation;  
 		

@@ -275,6 +275,11 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		} 
 	}
 	
+	/**
+	 *  
+	 * @param storedProcedureName
+	 * @param paramaters
+	 */
 	public void callStoredProcedure(String storedProcedureName, String... paramaters){	 
 		try{
 			StringBuffer callSPQuery = new StringBuffer();
@@ -312,9 +317,13 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		 
 	}
 	
-	
 	/**
+	 * 
 	 * Executes the SQL query on the given prepared statement and returns the number of row in the table. 
+	 *
+	 * @param stmt
+	 * @return
+	 * @throws SQLException
 	 */
 	protected int executeSQLUpdate(PreparedStatement stmt) throws SQLException {
 		int nbRow;

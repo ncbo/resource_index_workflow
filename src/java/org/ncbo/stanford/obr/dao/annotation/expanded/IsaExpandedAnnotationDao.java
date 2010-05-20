@@ -145,7 +145,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
-			this.executeWithStoreProcedure(annotationDao.getTableSQLName(), updatingQueryb.toString(), true);
+			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot execute the isa transitive closure on table " + this.getTableSQLName() +". 0 returned", e);

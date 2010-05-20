@@ -179,7 +179,7 @@ public class AggregationDao extends AbstractObrDao {
 		updatingQueryb1.append(" WHERE workflow_status = ");
 		updatingQueryb1.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
 		try{			 
-			nbAnnotation = this.executeWithStoreProcedure(DirectAnnotationDao.name(this.resourceID), updatingQueryb1.toString(), true);
+			nbAnnotation = this.executeSQLUpdate(updatingQueryb1.toString());
 			logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + DirectAnnotationDao.name(this.resourceID));
 			}
 		catch(SQLException e){
@@ -205,7 +205,7 @@ public class AggregationDao extends AbstractObrDao {
 		updatingQueryb2.append(" WHERE workflow_status = ");
 		updatingQueryb2.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			 nbAnnotation = this.executeWithStoreProcedure(IsaExpandedAnnotationDao.name(this.resourceID), updatingQueryb2.toString(), true);
+			 nbAnnotation = this.executeSQLUpdate(updatingQueryb2.toString());
 			 logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + IsaExpandedAnnotationDao.name(this.resourceID));
 			}
 		catch(SQLException e){
@@ -231,21 +231,21 @@ public class AggregationDao extends AbstractObrDao {
 		updatingQueryb3.append(" WHERE workflow_status = ");
 		updatingQueryb3.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
 		try{
-			 nbAnnotation = this.executeWithStoreProcedure(MapExpandedAnnotationDao.name(this.resourceID), updatingQueryb3.toString(), true);
+			 nbAnnotation = this.executeSQLUpdate(updatingQueryb3.toString());
 			 logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " + MapExpandedAnnotationDao.name(this.resourceID));
 		  }
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot switch workflow_status flags on " + MapExpandedAnnotationDao.name(this.resourceID), e);
 		}
 		
-		String query6 = "CREATE INDEX "+getTempTableSQLName()+"_elt_cpt ON "+ getTempTableSQLName()+ "(element_id, concept_id); ";
-		try{
-			nbAnnotation = this.executeSQLUpdate(query6);
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
-		}
-		logger.info("Index "+getTempTableSQLName()+"_elt_cpt added to temp table "+ getTempTableSQLName());
+//		String query6 = "CREATE INDEX "+getTempTableSQLName()+"_elt_cpt ON "+ getTempTableSQLName()+ "(element_id, concept_id); ";
+//		try{
+//			nbAnnotation = this.executeSQLUpdate(query6);
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
+//		}
+//		logger.info("Index "+getTempTableSQLName()+"_elt_cpt added to temp table "+ getTempTableSQLName());
 		
 		// Populate Aggregation table  from temp table
 		String query7 = populateAggregationTableFromTempTable();
