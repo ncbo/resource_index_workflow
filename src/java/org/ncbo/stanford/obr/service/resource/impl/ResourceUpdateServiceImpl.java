@@ -260,7 +260,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		timer.start();
 		
 		// Getting Indexed annotations
-		HashMap<Integer, Integer> indexedAnnotations= aggregationTableDao.getIndexedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Integer> indexedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
 		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);

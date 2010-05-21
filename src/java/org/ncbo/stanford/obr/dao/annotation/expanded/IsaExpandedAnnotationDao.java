@@ -17,25 +17,21 @@ import org.ncbo.stanford.obr.util.MessageUtils;
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 
 /**
- * This class is a representation for the the OBR DB OBR_XX_EAT table. The table contains 
+ * This class is a representation for the the OBR DB obr_xx_isa_annotation table. The table contains 
  * the following columns:
  * 
- * <ul>
- * <li> id 			            		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
- * <li> elementID  	            			INT UNSIGNED NOT NULL FOREIGN KEY,
- * <li> conceptID							INT UNSIGNED NOT NULL FOREIGN KEY,
- * <li> contextID							SMALLINT UNSIGNED NOT NULL FOREIGN KEY,
- * <li> dictionaryID						SMALLINT UNSIGNED NOT NULL FOREIGN KEY,
- * <li> childConceptID						INT UNSIGNED FOREIGN KEY,
- * <li> level								SMALLINT UNSIGNED,	
- * <li> mappedConceptID						INT UNSIGNED FOREIGN KEY,
- * <li> mappingType							VARVHAR(20),  
- * <li> distantConceptID					INT UNSIGNED FOREIGN KEY,
- * <li> distance							SMALLINT UNSIGNED,
- * <li> indexingDone						BOOL     
+ * <ul> 
+ * <li> `element_id` int(11) unsigned NOT NULL,
+ * <li> `concept_id` int(11) unsigned NOT NULL,
+ * <li> `context_id` smallint(5) unsigned NOT NULL,
+ * <li> `position_from` int(11) unsigned DEFAULT NULL,
+ * <li> `position_to` int(11) unsigned DEFAULT NULL,
+ * <li> `child_concept_id` int(11) unsigned DEFAULT NULL,
+ * <li> `parent_level` smallint(5) unsigned NOT NULL,
+ * <li> `workflow_status` tinyint(1) unsigned NOT NULL DEFAULT '0',  
  * </ul>
  *  
- * @author Adrien Coulet, Clement Jonquet
+ * @author Adrien Coulet, Clement Jonquet, Kuladip Yadav
  * @version OBR_v0.2		
  * @created 13-Nov-2008
  *
