@@ -150,7 +150,7 @@ public class AggregationDao extends AbstractObrDao {
 	public int aggregation(ObrWeight weights){
 		ExecutionTimer timer = new ExecutionTimer();	
 		// Load obr_context table in memeory
-		contextTableDao.loadTableIntoMemory();
+		contextTableDao.loadTableIntoMemory(this.resourceID);
 		// Create temp table.
 		try{
 			this.executeSQLUpdate(tempTableCreationQuery());
