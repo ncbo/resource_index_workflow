@@ -66,8 +66,7 @@ public class AggregationDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"UNIQUE element_id(element_id, concept_id), " +					 
-					"INDEX IDX_" + this.getTableSQLName() +"_score(score) " +					 
+					"UNIQUE element_id(element_id, concept_id) " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
 	
@@ -151,13 +150,13 @@ public class AggregationDao extends AbstractObrDao {
 		ExecutionTimer timer = new ExecutionTimer();	
 		// Load obr_context table in memeory
 		contextTableDao.loadTableIntoMemory(this.resourceID);
-		// Create temp table.
-		try{
-			this.executeSQLUpdate(tempTableCreationQuery());
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot create temporary table " + getTempTableSQLName(), e);
-		}
+//		// Create temp table.
+//		try{
+//			this.executeSQLUpdate(tempTableCreationQuery());
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot create temporary table " + getTempTableSQLName(), e);
+//		}
 		
 		int nbAnnotation = 0;
 		// Adds the direct annotations done to aggregation table 
@@ -263,35 +262,35 @@ public class AggregationDao extends AbstractObrDao {
 		logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " 
 				+ MapExpandedAnnotationDao.name(this.resourceID) 
 				+ " in  : " + timer.millisecondsToTimeString(timer.duration())); 
-		// Populate Aggregation table  from temp table
-		String populateAggregationTableQuery = populateAggregationTableFromTempTable();
-		timer.reset();
-		timer.start();
-		try{
-			nbAnnotation = this.executeSQLUpdate(populateAggregationTableQuery);
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
-		}
-		timer.end();		 
-		logger.info(nbAnnotation + " entries updated in aggregation table form temp table in " + timer.millisecondsToTimeString(timer.duration()));
-		
-		// Deletes the temporary table
-		StringBuffer dropTempTableQuery = new StringBuffer();
-		dropTempTableQuery.append("DROP TABLE ");
-		dropTempTableQuery.append(this.getTempTableSQLName());
-		dropTempTableQuery.append(";");
-		timer.reset();
-		timer.start();
-		try{
-			this.executeSQLUpdate(dropTempTableQuery.toString());
-			
-			}
-		catch(SQLException e){
-			logger.error("** PROBLEM ** Cannot delete the temporary table.", e);
-		} 
-		timer.end();	
-		logger.info("Dropped temp table : " + this.getTempTableSQLName() +" in : " + timer.millisecondsToTimeString(timer.duration()));
+//		// Populate Aggregation table  from temp table
+//		String populateAggregationTableQuery = populateAggregationTableFromTempTable();
+//		timer.reset();
+//		timer.start();
+//		try{
+//			nbAnnotation = this.executeSQLUpdate(populateAggregationTableQuery);
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
+//		}
+//		timer.end();		 
+//		logger.info(nbAnnotation + " entries updated in aggregation table form temp table in " + timer.millisecondsToTimeString(timer.duration()));
+//		
+//		// Deletes the temporary table
+//		StringBuffer dropTempTableQuery = new StringBuffer();
+//		dropTempTableQuery.append("DROP TABLE ");
+//		dropTempTableQuery.append(this.getTempTableSQLName());
+//		dropTempTableQuery.append(";");
+//		timer.reset();
+//		timer.start();
+//		try{
+//			this.executeSQLUpdate(dropTempTableQuery.toString());
+//			
+//			}
+//		catch(SQLException e){
+//			logger.error("** PROBLEM ** Cannot delete the temporary table.", e);
+//		} 
+//		timer.end();	
+//		logger.info("Dropped temp table : " + this.getTempTableSQLName() +" in : " + timer.millisecondsToTimeString(timer.duration()));
 		
 		return this.numberOfEntry();
 	}
@@ -323,14 +322,14 @@ public class AggregationDao extends AbstractObrDao {
  
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
-		query.append(this.getTempTableSQLName());
+		query.append(this.getTableSQLName());
 		query.append(" (element_id, concept_id, score) SELECT element_id, DAT.concept_id, ");
-		query.append("IF(DAT.term_id IS NULL, (");
+		query.append("IF(DAT.term_id IS NULL, @s:=(");
 		query.append(weights.getReportedDA());
 		query.append("*weight), ");
-		query.append("IF(TT.is_preferred,(");
+		query.append("IF(TT.is_preferred,@s:=(");
 		query.append(weights.getPreferredNameDA());	
-		query.append("*weight),(");
+		query.append("*weight),@s:=(");
 		query.append(weights.getSynonymDA());	
 		query.append("*weight))");
 		query.append(") calc_score FROM ");
@@ -341,15 +340,15 @@ public class AggregationDao extends AbstractObrDao {
 		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT WHERE DAT.context_id = CXT.id AND workflow_status= ");
 		query.append(WorkflowStatusEnum.MAPPING_DONE.getStatus());
-		query.append(";");
+		query.append(" ON DUPLICATE KEY UPDATE score=score+@s ;");
 		return query.toString();
 	} 
 	 
 	private String aggregationQueryForIsaExpandedAnnotations(ObrWeight weights){
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
-		query.append(this.getTempTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, (");
+		query.append(this.getTableSQLName());
+		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=(");
 		query.append("FLOOR(10*EXP(-").append(weights.getIsaFactor());
 		query.append("* EAT.parent_level)+1)");			 
 		query.append("*weight) FROM ");
@@ -358,7 +357,7 @@ public class AggregationDao extends AbstractObrDao {
 		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT WHERE EAT.context_id= CXT.id AND workflow_status=");
 		query.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
-		query.append(";");
+		query.append(" ON DUPLICATE KEY UPDATE score=score+@s;");
 		
 		return query.toString();
 	}
@@ -366,8 +365,8 @@ public class AggregationDao extends AbstractObrDao {
 	private String aggregationQueryForMapExpandedAnnotations(ObrWeight weights){
 		StringBuffer query = new StringBuffer();
 		query.append("INSERT INTO ");
-		query.append(this.getTempTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, (");
+		query.append(this.getTableSQLName());
+		query.append(" (element_id, concept_id, score) SELECT element_id, EAT.concept_id, @s:=(");
 		query.append(weights.getMappingEA());
 		query.append("*weight) FROM ");
 		query.append(MapExpandedAnnotationDao.name(this.resourceID));
@@ -375,7 +374,7 @@ public class AggregationDao extends AbstractObrDao {
 		query.append(contextTableDao.getMemoryTableSQLName());
 		query.append(" CXT WHERE EAT.context_id= CXT.id AND workflow_status=");
 		query.append(WorkflowStatusEnum.INDEXING_NOT_DONE.getStatus());
-		query.append(";");
+		query.append(" ON DUPLICATE KEY UPDATE score=score+@s;");
 		return query.toString();
 	}
 		
