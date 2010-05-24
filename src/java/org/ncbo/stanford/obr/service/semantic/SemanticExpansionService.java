@@ -30,7 +30,7 @@ public interface SemanticExpansionService {
 	 * @param distanceExpansion   {@code boolean} for mapping expansion
 	 * @return                    the number of direct annotations created. 
 	 */
-	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
+	public long semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion);
 
 	/**
 	 * Method removes expanded annotations for given ontology versions.Entries are remove from 

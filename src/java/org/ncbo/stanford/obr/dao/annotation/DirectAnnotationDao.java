@@ -242,8 +242,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * the information in the table.
 	 * Returns the number of annotations added to the table. 
 	 */
-	public int loadMgrepFile(File mgrepFile, int dictionaryID){
-		int nbAnnotation;
+	public long loadMgrepFile(File mgrepFile, int dictionaryID){
+		long nbAnnotation;
 		ExecutionTimer timer = new ExecutionTimer();
 
 		// Creates a temporary table with the same columns than the Mgrep result file
@@ -434,8 +434,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Deletes the rows corresponding to annotations done with a termName in the given String list.
 	 * @return Number of rows deleted. 
 	 */
-	public int deleteEntriesFromStopWords(HashSet<String> stopwords){
-		int nbDelete = -1; 
+	public long deleteEntriesFromStopWords(HashSet<String> stopwords){
+		long nbDelete = -1; 
 		/* DELETE OBR_GEO_DAT FROM OBR_GEO_DAT, OBS_TT
 		WHERE OBR_GEO_DAT.termID=OBS_TT.termID AND termName IN ();*/
 		StringBuffer queryb = new StringBuffer();

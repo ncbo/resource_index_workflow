@@ -183,14 +183,14 @@ public class TermDao extends AbstractObsDao{
 	 * @param termEntryFile File containing term table entries.
 	 * @return Number of entries populated in term table.
 	 */
-	public int populateSlaveTermTableFromFile(File termEntryFile) {
+	public long populateSlaveTermTableFromFile(File termEntryFile) {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(termEntryFile.getAbsolutePath());
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");		
-		int nbInserted =0;
+		long nbInserted =0;
 		try{
 			 nbInserted = this.executeSQLUpdate(queryb.toString());
 			
@@ -243,8 +243,8 @@ public class TermDao extends AbstractObsDao{
 	 * Deletes the rows corresponding to annotations done with a termName in the given String list.
 	 * @return Number of rows deleted. 
 	 */
-	public int deleteEntriesForStopWords(){		
-		int nbDelete = -1; 
+	public long deleteEntriesForStopWords(){		
+		long nbDelete = -1; 
 		HashSet<String> stopwords= Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS);
 		/* DELETE obs_term FROM obs_term WHERE obs_term.name IN();*/
 		StringBuffer queryb = new StringBuffer();

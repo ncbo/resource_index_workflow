@@ -101,8 +101,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of concept entries added in slave concept table.
 	 */
-	public int populateConceptsSlaveData(List<String> localOntologyIDs) {
-		int numberOfConceptsAdded= 0;
+	public long populateConceptsSlaveData(List<String> localOntologyIDs) {
+		long numberOfConceptsAdded= 0;
 		File conceptEntryFile = null;		
 		try{
 			// Writes concept entries to file from master concept table. 
@@ -126,9 +126,9 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of term entries added in slave term table.
 	 */
-	public int populateTermsSlaveData(List<String> localOntologyIDs) {		
-		int numberOfTermsAdded= 0;
-		int numberOfStopwordsTermsRemoved= 0;
+	public long populateTermsSlaveData(List<String> localOntologyIDs) {		
+		long numberOfTermsAdded= 0;
+		long numberOfStopwordsTermsRemoved= 0;
 		File termsEntryFile = null;		
 		try{
 			// Writes term entries to file from master term table.
@@ -155,8 +155,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of relation entries added in slave relation table.
 	 */
-	public int populateRelationSlaveData(List<String> localOntologyIDs){	
-		int numberOfRelationsAdded= 0;
+	public long populateRelationSlaveData(List<String> localOntologyIDs){	
+		long numberOfRelationsAdded= 0;
 		File relationEntryFile = null;		
 		try{
 			// Writes 'is a parent' relation entries to file from master relation table.
@@ -179,8 +179,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of mapping entries added in slave map table.
 	 */
-	public int populateMappingSlaveData(List<String> localOntologyIDs){	
-		int numberOfMappingsAdded = 0 ;
+	public long populateMappingSlaveData(List<String> localOntologyIDs){	
+		long numberOfMappingsAdded = 0 ;
 		File mappingEntryFile = null;
 		try{
 			logger.info("Re-initialize slave Mapping table.");
@@ -192,7 +192,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);			
 			logger.info("Total Number of mapping entries added in slave map table : " + numberOfMappingsAdded);
 		    
-			int mappingTypeEntries= mapDao.populateMappingTypeTable();
+			long mappingTypeEntries= mapDao.populateMappingTypeTable();
 			logger.info("Total Number of mapping type entries added in slave mapping_type table : " + mappingTypeEntries);
 		}finally {
 			 if(mappingEntryFile!= null && mappingEntryFile.exists()){
@@ -209,8 +209,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of relation entries added in slave relation table.
 	 */
-	public int populateSemanticTypeData(List<String> localOntologyIDs){	
-		int numberOfSemanticTypeAdded= 0;
+	public long populateSemanticTypeData(List<String> localOntologyIDs){	
+		long numberOfSemanticTypeAdded= 0;
 		File semanticTypeEntryFile = null;		
 		try{
 			// Writes 'is a parent' relation entries to file from master relation table.
@@ -232,8 +232,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 *  
 	 * @return Number of LSemanticType entries added in slave relation table.
 	 */
-	public int populateLSemanticTypeData(){
-		int numberOfSemanticTypeAdded= 0;
+	public long populateLSemanticTypeData(){
+		long numberOfSemanticTypeAdded= 0;
 		File semanticTypeEntryFile = null;	
 		try{
 			logger.info("Re-initialize slave lSemanticType table.");

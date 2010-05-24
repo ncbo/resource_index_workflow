@@ -27,17 +27,14 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	 * @param distanceExpansion   {@code boolean} for mapping expansion
 	 * @return                    the number of direct annotations created. 
 	 */
-	public int semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion){
-		int nbAnnotation = 0;
+	public long semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion){
+		long nbAnnotation = 0;
 		ExecutionTimer timer = new ExecutionTimer();
 		// isaClosure expansion
 		if(isaClosureExpansion){
 			timer.start();
 			logger.info("Executing isa transitive closure expansion... ");
-			int isaAnnotation; 
-			
-			isaAnnotation = isaExpandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
-				
+			long isaAnnotation = isaExpandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
 			logger.info(isaAnnotation);
 			nbAnnotation += isaAnnotation;
 			timer.end();
@@ -48,7 +45,7 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		if(mappingExpansion){
 			timer.start();
 			logger.info("Executing mapping expansion... ");
-			int mappingAnnotation = mapExpandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
+			long mappingAnnotation = mapExpandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
 			logger.info(mappingAnnotation);
 			nbAnnotation += mappingAnnotation;
 			timer.end();

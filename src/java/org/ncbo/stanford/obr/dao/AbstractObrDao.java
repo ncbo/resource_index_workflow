@@ -192,8 +192,8 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	/**
 	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
 	 */
-	protected int executeSQLUpdate(String query) throws SQLException {
-		int nbRow;
+	protected long executeSQLUpdate(String query) throws SQLException {
+		long nbRow;
 		try{
 			tableStatement = tableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			nbRow = tableStatement.executeUpdate(query);
@@ -220,14 +220,14 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	/**
 	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
 	 */
-	protected int executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
-		int nbRow=0;
+	protected long executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
+		long nbRow=0;
 		try{
 			 CallableStatement callableStatement = tableConnection.prepareCall("CALL common_batch_insert(?,?, ?, ?)");
 			 callableStatement.setString(1, tableName);
 			 callableStatement.setString(2, query);
 			 callableStatement.setBoolean(3, disableKeys);
-			 callableStatement.registerOutParameter(4, java.sql.Types.INTEGER);
+			 callableStatement.registerOutParameter(4, java.sql.Types.BIGINT);
 			 callableStatement.execute();
 			 nbRow = callableStatement.getInt(4);			  
 			 
@@ -325,8 +325,8 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	 * @return
 	 * @throws SQLException
 	 */
-	protected int executeSQLUpdate(PreparedStatement stmt) throws SQLException {
-		int nbRow;
+	protected long executeSQLUpdate(PreparedStatement stmt) throws SQLException {
+		long nbRow;
 		try{
 			nbRow = stmt.executeUpdate();
 			try{

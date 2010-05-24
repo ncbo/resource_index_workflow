@@ -44,7 +44,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of concept entries added in slave concept table.
 	 */
-	public int populateConceptsSlaveData(List<String> localOntologyIDs);
+	public long populateConceptsSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates new term presents in OBS master database which are not present in 
@@ -53,7 +53,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of term entries added in slave term table.
 	 */
-	public int populateTermsSlaveData(List<String> localOntologyIDs);
+	public long populateTermsSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
@@ -62,7 +62,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of relation entries added in slave relation table.
 	 */
-	public int populateRelationSlaveData(List<String> localOntologyIDs);
+	public long populateRelationSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates new concept mapping entries presents in OBS master database which are not present in 
@@ -71,7 +71,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of mapping entries added in slave map table.
 	 */
-	public int populateMappingSlaveData(List<String> localOntologyIDs);
+	public long populateMappingSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * This method gets list of ontology versions present in master ontology id

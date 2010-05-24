@@ -23,9 +23,9 @@ public interface AnnotationService {
 	 * @param withCompleteDictionary if true uses complete dictionary for annotation otherwise uses delta dictionary
 	 * @param dictionary Latest dictionary bean
 	 * @param stopwords {@code Set} of string used as stopwords
-	 * @return {@code int} the number of direct annotations created. 
+	 * @return {@code long} the number of direct annotations created. 
 	 */
-	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, HashSet<String> stopwords);
+	public long resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, HashSet<String> stopwords);
 	
 	/**
 	 * Method removes annotations for given ontology versions.
@@ -41,7 +41,7 @@ public interface AnnotationService {
 	 * @param dictionaryID 
 	 * @return Number of rows containing in temporary table
 	 */
-	public int createTemporaryElementTable(int dictionaryID);
+	public long createTemporaryElementTable(int dictionaryID);
 	
 	/**
 	 * 

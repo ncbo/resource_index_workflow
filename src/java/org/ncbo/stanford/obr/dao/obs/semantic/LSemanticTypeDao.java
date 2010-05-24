@@ -76,8 +76,8 @@ public class LSemanticTypeDao extends AbstractObsDao {
 	 * @param conceptEntryFile File containing concept table entries.
 	 * @return Number of entries populated in concept table.
 	 */
-	public int populateSlaveLSemanticTypeTableFromFile(File lSemanticTypeEntryFile) {
-		int nbInserted =0 ;
+	public long populateSlaveLSemanticTypeTableFromFile(File lSemanticTypeEntryFile) {
+		long nbInserted =0 ;
 		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");

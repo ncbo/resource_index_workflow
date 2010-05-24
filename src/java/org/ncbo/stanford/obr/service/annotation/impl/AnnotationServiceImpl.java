@@ -41,9 +41,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param stopwords {@code Set} of string used as stopwords
 	 * @return {@code int} the number of direct annotations created. 
 	 */
-	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
+	public long resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
 			HashSet<String> stopwords) {
-		int nbAnnotation =0;		 
+		long nbAnnotation =0;		 
 
 		// processes direct mgrep annotations
 		
@@ -69,9 +69,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * with a dictionaryID < to the latest one are selected (or the one with
 	 * null); Returns the number of annotations added to _DAT.
 	 */
-	private int conceptRecognitionWithMgrep(DictionaryBean dictionary,
+	private long conceptRecognitionWithMgrep(DictionaryBean dictionary,
 			boolean withCompleteDictionary, HashSet<String> stopwords) {
-		int nbDirectAnnotation = 0;
+		long nbDirectAnnotation = 0;
 		ExecutionTimer timer = new ExecutionTimer();
 
 		logger.info("** Concept recognition with Mgrep:");
@@ -162,8 +162,8 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 
 	}
 
-	private int processMgrepFile(File mgrepFile, int dictionaryID) {
-		int nbAnnotation = -1;
+	private long processMgrepFile(File mgrepFile, int dictionaryID) {
+		long nbAnnotation = -1;
 		logger.info("Processing of the result file...");
 		nbAnnotation = directAnnotationTableDao.loadMgrepFile(mgrepFile,
 				dictionaryID);
@@ -279,7 +279,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param dictionaryID 
 	 * @return Number of rows containing in temporary table
 	 */ 
-	public int createTemporaryElementTable(int dictionaryID) {
+	public long createTemporaryElementTable(int dictionaryID) {
 		 return elementTableDao.createTemporaryTable(dictionaryID, resourceAccessTool.getMaxNumberOfElementsToProcess());		
 	}
 	

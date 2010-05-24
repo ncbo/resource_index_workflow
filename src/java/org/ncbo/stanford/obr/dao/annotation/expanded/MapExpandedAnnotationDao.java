@@ -109,8 +109,8 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	 * @param DirectAnnotationDao
 	 * @return Returns the number of mapping annotations created in the corresponding _EAT.
 	 */
-	public int mappingExpansion(DirectAnnotationDao annotationDao){
-		int nbAnnotation;	 
+	public long mappingExpansion(DirectAnnotationDao annotationDao){
+		long nbAnnotation;	 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, mapped_concept_id, mapping_type, indexing_done)
 		//			SELECT element_id, MAPT.mapped_concept_id, context_id, DAT.concept_id, mapping_type, false 

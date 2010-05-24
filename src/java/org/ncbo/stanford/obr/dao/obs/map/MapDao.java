@@ -109,14 +109,14 @@ public class MapDao extends AbstractObsDao{
 		return inserted;	
 	} 
 	
-	public int populateMappingTypeTable() {
+	public long populateMappingTypeTable() {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT IGNORE INTO ");
 		queryb.append(mapppingTypeDao.getTableSQLName());
 		queryb.append(" (mapping_type) SELECT DISTINCT mapping_type FROM ");
 		queryb.append(this.getTableSQLName());
 		queryb.append("; ");		
-		int nbInserted =0 ;		
+		long nbInserted =0 ;		
 		try{
 			 nbInserted = this.executeSQLUpdate(queryb.toString());
 			
@@ -132,7 +132,7 @@ public class MapDao extends AbstractObsDao{
 	 * @param mappingEntryFile File containing term table entries.
 	 * @return Number of entries populated in mapping table.
 	 */
-	public int populateSlaveMappingTableFromFile(File mappingEntryFile) {
+	public long populateSlaveMappingTableFromFile(File mappingEntryFile) {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");
 		queryb.append(mappingEntryFile.getAbsolutePath());
@@ -140,7 +140,7 @@ public class MapDao extends AbstractObsDao{
 		queryb.append(this.getTableSQLName());
 		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES");
 		
-		int nbInserted =0 ;
+		long nbInserted =0 ;
 		
 		try{
 			 nbInserted = this.executeSQLUpdate(queryb.toString());

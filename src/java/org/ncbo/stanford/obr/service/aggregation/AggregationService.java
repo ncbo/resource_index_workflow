@@ -22,7 +22,7 @@ public interface AggregationService {
 	 * @return The number of annotations created in the index. 
 	 * 
 	 */
-	public int aggregation(ObrWeight weights);
+	public long aggregation(ObrWeight weights);
 	
 	/**
 	 * Method removes indexing done for given ontology versions.

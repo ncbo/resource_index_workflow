@@ -146,10 +146,10 @@ public class ElementDao extends AbstractObrDao {
 	 * @param maxNumberOfElementsToProcess 
 	 * @return number of rows inserted in temporary table.
 	 */
-	public int createTemporaryTable(int dictionaryID, int maxNumberOfElementsToProcess){
+	public long createTemporaryTable(int dictionaryID, int maxNumberOfElementsToProcess){
 		// Delete temporary table if exist
 		deleteTemporaryTable();
-		int noRows =0;
+		long noRows =0;
 		StringBuffer createQuery = new StringBuffer();
 		createQuery.append("CREATE TEMPORARY TABLE ");	 
 		createQuery.append(this.getTableSQLName());		 
@@ -456,8 +456,8 @@ public class ElementDao extends AbstractObrDao {
 	 * 
 	 * @param useTemporaryElementTable 
 	 */
-	public int updateDictionary(int dictionaryID){
-		int nbUpdated;
+	public long updateDictionary(int dictionaryID){
+		long nbUpdated;
 		StringBuffer updatingQueryb = new StringBuffer();		 
 		updatingQueryb.append("UPDATE ");
 		updatingQueryb.append(this.getTableSQLName());

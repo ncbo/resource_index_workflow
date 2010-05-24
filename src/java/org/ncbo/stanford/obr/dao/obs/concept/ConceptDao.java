@@ -117,8 +117,8 @@ public class ConceptDao extends AbstractObsDao {
 	 * @param conceptEntryFile File containing concept table entries.
 	 * @return Number of entries populated in concept table.
 	 */
-	public int populateSlaveConceptTableFromFile(File conceptEntryFile) {
-		int nbInserted =0 ;
+	public long populateSlaveConceptTableFromFile(File conceptEntryFile) {
+		long nbInserted =0 ;
 		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");

@@ -146,7 +146,7 @@ public class AggregationDao extends AbstractObrDao {
 	 * Index the content of _DAT and _EAT in the table by computing the right score.
 	 * Returns the number of annotations added to the table. 
 	 */
-	public int aggregation(ObrWeight weights){
+	public long aggregation(ObrWeight weights){
 		ExecutionTimer timer = new ExecutionTimer();	
 		// Load obr_context table in memeory
 		contextTableDao.loadTableIntoMemory(this.resourceID);
@@ -158,7 +158,7 @@ public class AggregationDao extends AbstractObrDao {
 //			logger.error("** PROBLEM ** Cannot create temporary table " + getTempTableSQLName(), e);
 //		}
 		
-		int nbAnnotation = 0;
+		long nbAnnotation = 0;
 		// Adds the direct annotations done to aggregation table 
 		String directAnnotationAggregationQuery = aggregationQueryForDirectAnnotations(weights);
 		timer.start();

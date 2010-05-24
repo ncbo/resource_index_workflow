@@ -359,7 +359,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * @param dictionaryID 
 	 * @return Number of rows containing in temporary table
 	 */
-	public int createTemporaryElementTable(int dictionaryID) {		 
+	public long createTemporaryElementTable(int dictionaryID) {		 
 		return annotationService.createTemporaryElementTable(dictionaryID);
 	}
 

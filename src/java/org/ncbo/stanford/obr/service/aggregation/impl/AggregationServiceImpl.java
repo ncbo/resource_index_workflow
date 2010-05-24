@@ -22,8 +22,8 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 	 * This function implements the step 4 of the OBR workflow.
 	 * Returns the number of annotations created in the index. 
 	 */
-	public int aggregation(ObrWeight weights){
-		int nbAnnotation;
+	public long aggregation(ObrWeight weights){
+		long nbAnnotation;
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		nbAnnotation = aggregationTableDao.aggregation(weights);

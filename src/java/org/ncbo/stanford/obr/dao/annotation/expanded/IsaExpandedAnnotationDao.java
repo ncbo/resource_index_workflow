@@ -109,8 +109,8 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	 * @param maxLevel {@code int} if greater than zero then restrict is closure expansion annotations upto this level  
 	 * @return {@code int} the number of isaClosure annotations created in the corresponding _EAT.
 	 */
-	public int isaClosureExpansion(DirectAnnotationDao annotationDao){
-		int nbAnnotation;		 
+	public long isaClosureExpansion(DirectAnnotationDao annotationDao){
+		long nbAnnotation;		 
 		// Query Used :
 		// 		INSERT obr_tr_expanded_annotation(element_id, concept_id, context_id, child_concept_id, parent_level, indexing_done)
 		//			SELECT element_id, ISAPT.parent_concept_id, context_id, DAT.concept_id, level, false 

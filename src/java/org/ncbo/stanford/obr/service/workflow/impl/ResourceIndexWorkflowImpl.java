@@ -52,12 +52,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	  
 	public ResourceIndexWorkflowImpl() {
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
-		
-		try {
-			AbstractObrDao.setSqlLogFile(new File("resource_index_workflow_sql.log"));
-		} catch (IOException e) {
-			logger.error("Problem in creating SQL log file.", e);
-		}
+		// Disable sql logger
+//		try {
+//			AbstractObrDao.setSqlLogFile(new File("resource_index_workflow_sql.log"));
+//		} catch (IOException e) {
+//			logger.error("Problem in creating SQL log file.", e);
+//		}
 	}
 	
 	/**
@@ -174,7 +174,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.dictionary.complete"));
 		
 		// Execute the workflow according to resource type. 
-		int nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+		long nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
 				
 		// Update obr_statistics table.
 		if(nbIndexedAnnotation > 0) {
@@ -199,14 +199,14 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * @param dictionary {@code DictionaryBean) containing latest dictionary
 	 * @param toolLogger {@code Logger} object for given resourceAccessTool
 	 */
-	private int executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
+	private long executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
 		
 		int nbEntry ;		
 		// Total number of entries found in element table.		 
 		nbEntry = resourceAccessTool.numberOfElement();	 
 		
 		// Processing direct annotations
-		int nbDirectAnnotation = resourceAccessTool.getAnnotationService()
+		long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
 				.resourceAnnotation(withCompleteDictionary, dictionary, 
 						Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
 		
@@ -228,7 +228,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.expansion.distance"));
 
 		// Creating semantic expansion annotation.
-		int nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
+		long nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
 				.semanticExpansion(isaClosureExpansion, mappingExpansion,
 						distanceExpansion);
 		toolLogger.info(nbEntry + " elements annotated (with "
@@ -237,7 +237,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ resourceAccessTool.getToolResource().getResourceID() + ".");
 		 
 		// Aggregation step to annotations.
-		int nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+		long nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
 				obrWeights);
 		toolLogger.info(nbEntry + " elements indexed (with "
 				+ nbIndexedAnnotation

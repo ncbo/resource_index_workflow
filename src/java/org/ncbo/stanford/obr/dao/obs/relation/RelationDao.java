@@ -116,8 +116,8 @@ public class RelationDao extends AbstractObsDao{
 	 * @param relationEntryFile File containing relation table entries.
 	 * @return Number of entries populated in relation table.
 	 */
-	public int populateSlaveRelationTableFromFile(File relationEntryFile) {
-		int nbInserted =0 ;
+	public long populateSlaveRelationTableFromFile(File relationEntryFile) {
+		long nbInserted =0 ;
 
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");
