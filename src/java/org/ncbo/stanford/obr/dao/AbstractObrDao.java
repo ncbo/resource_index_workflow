@@ -229,7 +229,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 			 callableStatement.setBoolean(3, disableKeys);
 			 callableStatement.registerOutParameter(4, java.sql.Types.BIGINT);
 			 callableStatement.execute();
-			 nbRow = callableStatement.getInt(4);			  
+			 nbRow = callableStatement.getLong(4);			  
 			 
 			try{
 				if(AbstractObrDao.sqlLogFile != null){
