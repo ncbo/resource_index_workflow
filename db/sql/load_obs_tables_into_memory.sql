@@ -5,8 +5,8 @@ DROP PROCEDURE IF EXISTS `resource_index`.`load_obs_tables_into_memory`$$
 CREATE DEFINER=`optra`@`%` PROCEDURE `load_obs_tables_into_memory`()
 BEGIN
     -- 
-	-- LOAD only the necessary part of obr_term and stuff it into memory.
-	-- 
+    -- LOAD only the necessary part of obr_term and stuff it into memory.
+    -- 
     DROP TABLE IF EXISTS `resource_index`.`obr_term_mem`;       
        
     CREATE TABLE `obr_term_mem` (
@@ -58,7 +58,7 @@ BEGIN
 	mapping_type_id mapping_type TINYint(1) unsigned NOT NULL;
                 
         -- 
-	-- LOAD obr_map and stuff it into memory.
+	-- LOAD obs_relation and stuff it into memory.
 	-- 	
 	DROP TABLE IF EXISTS `resource_index`.`obr_relation_mem`;		
 	
@@ -71,6 +71,33 @@ BEGIN
 	SELECT `concept_id`, `parent_concept_id`, `level`
 	FROM obs_relation; 
 	
+	-- 
+	-- LOAD obr_concept and stuff it into memory.
+	-- 
+	DROP TABLE IF EXISTS `resource_index`.`obr_concept_mem`;	
+	
+	CREATE TABLE `obr_concept_mem` (
+	  `id` int(11) NOT NULL,   
+	  `ontology_id` int(11) NOT NULL,  
+	   KEY `X_obr_concept_mem_id` (`id`),
+	  KEY `X_obs_concept_ontology_id` (`ontology_id`)  
+	) ENGINE=MEMORY DEFAULT CHARSET=latin1 
+	SELECT id, ontology_id from obs_concept;
+	
+	-- 
+	-- LOAD obs_ontology and stuff it into memory.
+	-- 
+	DROP TABLE IF EXISTS `resource_index`.`obr_ontology_mem`;
+	
+	CREATE TABLE `obr_ontology_mem` (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,   
+	  `local_ontology_id` varchar(246) NOT NULL,
+	  `dictionary_id` smallint(5) unsigned NOT NULL,
+	   KEY `X_obr_ontology_mem_id` (`id`),  
+	   KEY `X_obr_ontology_mem_local_ontology_id` (`local_ontology_id`),
+	   KEY `X_obs_ontology_dictionary_id` (`dictionary_id`)
+	) ENGINE=MEMORY DEFAULT CHARSET=latin1	
+	SELECT id, local_ontology_id, dictionary_id from obs_ontology;
 END$$
 
 DELIMITER ;
