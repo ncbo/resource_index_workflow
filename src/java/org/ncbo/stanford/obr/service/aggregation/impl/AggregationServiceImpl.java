@@ -26,9 +26,10 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 		long nbAnnotation;
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
+		logger.info("*** Executing aggregation process.... ");
 		nbAnnotation = aggregationTableDao.aggregation(weights);
 		timer.end();
-		logger.info("Aggregation processed in: " + timer.millisecondsToTimeString(timer.duration()));
+		logger.info("### Aggregation processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		return nbAnnotation;
 	} 
 	

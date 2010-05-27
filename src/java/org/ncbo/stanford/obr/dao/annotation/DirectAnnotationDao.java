@@ -14,8 +14,6 @@ import obs.common.utils.ExecutionTimer;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.MessageUtils;
@@ -361,9 +359,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("DELETE DAT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" DAT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName( ));	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
 
@@ -403,9 +401,9 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		queryb.append("DELETE DAT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" DAT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName( ));	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE DAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
 		
@@ -494,15 +492,15 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append("SELECT CT.ontology_id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NOT NULL GROUP BY CT.ontology_id; "); 
 		}else{
 			queryb.append("SELECT OT.id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT, ");
-			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL AND OT.dictionary_id = ");
 			queryb.append(dictionary.getDictionaryID());				 
 			queryb.append( " GROUP BY OT.id; ");
@@ -540,15 +538,15 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append("SELECT CT.ontology_id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT WHERE DAT.concept_id=CT.id AND DAT.term_id IS NULL GROUP BY CT.ontology_id; "); 
 		}else{
 			queryb.append("SELECT OT.id, COUNT(DAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS DAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT, ");
-			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NULL AND OT.dictionary_id = ");
 			queryb.append(dictionary.getDictionaryID());				 
 			queryb.append( " GROUP BY OT.id; ");

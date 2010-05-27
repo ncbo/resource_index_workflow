@@ -15,8 +15,6 @@ import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -149,14 +147,7 @@ public class AggregationDao extends AbstractObrDao {
 	public long aggregation(ObrWeight weights){
 		ExecutionTimer timer = new ExecutionTimer();	
 		// Load obr_context table in memeory
-		contextTableDao.loadTableIntoMemory(this.resourceID);
-//		// Create temp table.
-//		try{
-//			this.executeSQLUpdate(tempTableCreationQuery());
-//			}
-//		catch(SQLException e){
-//			logger.error("** PROBLEM ** Cannot create temporary table " + getTempTableSQLName(), e);
-//		}
+		contextTableDao.loadTableIntoMemory(this.resourceID); 
 		
 		long nbAnnotation = 0;
 		// Adds the direct annotations done to aggregation table 
@@ -169,7 +160,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot aggregate annotations from annotation table ", e);
 		}
 		timer.end();
-		logger.info(nbAnnotation + " annotations aggregated with direct annotations in : " + timer.millisecondsToTimeString(timer.duration()));
+		logger.info("\t" + nbAnnotation + " annotations aggregated with direct annotations in : " + timer.millisecondsToTimeString(timer.duration()));
         
 		// Changing the workflow_status flags on DAT
 		StringBuffer updatingQueryb1 = new StringBuffer();
@@ -189,7 +180,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot switch workflow_status flags on DAT.", e);
 		}
 		timer.end();
-		logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()
+		logger.info("\tWorkflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()
 				+ " in table " + DirectAnnotationDao.name(this.resourceID) 
 				+ " in :" + timer.millisecondsToTimeString(timer.duration()));
 		 
@@ -204,7 +195,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index isa expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info(nbAnnotation + " annotations indexed with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
+		logger.info("\t" +nbAnnotation + " annotations indexed with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
 
 		// Switches the indexingDone flags on EAT
 		StringBuffer updatingQueryb2 = new StringBuffer();
@@ -223,7 +214,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot switch indexingDone flags on _EAT.", e);
 		}
 		timer.end();
-		logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " 
+		logger.info("\tworkflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " 
 				+ IsaExpandedAnnotationDao.name(this.resourceID)
 				+ " in : " + timer.millisecondsToTimeString(timer.duration()));
 
@@ -239,7 +230,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info(nbAnnotation + " annotations indexed with mapping expanded annotations in : " 
+		logger.info("\t" + nbAnnotation + " annotations indexed with mapping expanded annotations in : " 
 				+ timer.millisecondsToTimeString(timer.duration()));
 		
 		// Switches the workflow_status flags on mapping annotation
@@ -259,58 +250,11 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot switch workflow_status flags on " + MapExpandedAnnotationDao.name(this.resourceID), e);
 		} 
 		timer.end();
-		logger.info("workflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " 
+		logger.info("\tworkflow_status updated to "+ WorkflowStatusEnum.INDEXING_DONE.getStatus()+ " in table " 
 				+ MapExpandedAnnotationDao.name(this.resourceID) 
-				+ " in  : " + timer.millisecondsToTimeString(timer.duration())); 
-//		// Populate Aggregation table  from temp table
-//		String populateAggregationTableQuery = populateAggregationTableFromTempTable();
-//		timer.reset();
-//		timer.start();
-//		try{
-//			nbAnnotation = this.executeSQLUpdate(populateAggregationTableQuery);
-//			}
-//		catch(SQLException e){
-//			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
-//		}
-//		timer.end();		 
-//		logger.info(nbAnnotation + " entries updated in aggregation table form temp table in " + timer.millisecondsToTimeString(timer.duration()));
-//		
-//		// Deletes the temporary table
-//		StringBuffer dropTempTableQuery = new StringBuffer();
-//		dropTempTableQuery.append("DROP TABLE ");
-//		dropTempTableQuery.append(this.getTempTableSQLName());
-//		dropTempTableQuery.append(";");
-//		timer.reset();
-//		timer.start();
-//		try{
-//			this.executeSQLUpdate(dropTempTableQuery.toString());
-//			
-//			}
-//		catch(SQLException e){
-//			logger.error("** PROBLEM ** Cannot delete the temporary table.", e);
-//		} 
-//		timer.end();	
-//		logger.info("Dropped temp table : " + this.getTempTableSQLName() +" in : " + timer.millisecondsToTimeString(timer.duration()));
-		
+				+ " in  : " + timer.millisecondsToTimeString(timer.duration()));  		
 		return this.numberOfEntry();
-	}
-	
-	/**
-	 * Create query for populating aggregation table from temp table.
-	 * 
-	 * @return
-	 */
-	private String populateAggregationTableFromTempTable() {
-		
-		StringBuffer query = new StringBuffer();
-		query.append("INSERT INTO ");
-		query.append(this.getTableSQLName());
-		query.append(" (element_id, concept_id, score) SELECT element_id,  concept_id, SUM(score) FROM ");
-		query.append(getTempTableSQLName()); 
-		query.append(" GROUP BY element_id, concept_id;");
-		
-		return query.toString();
-	}
+	} 
 
 	/**
 	 *  
@@ -390,9 +334,9 @@ public class AggregationDao extends AbstractObrDao {
 		queryb.append("DELETE IT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" IT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName( ));	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE IT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
 
@@ -432,9 +376,9 @@ public class AggregationDao extends AbstractObrDao {
 		queryb.append("DELETE IT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" IT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName());	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE IT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
 		
@@ -476,15 +420,15 @@ public class AggregationDao extends AbstractObrDao {
 			queryb.append("SELECT CT.ontology_id, COUNT(IT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS IT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT WHERE IT.concept_id=CT.id GROUP BY CT.ontology_id; "); 
 		}else{
 			queryb.append("SELECT OT.id, COUNT(IT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS IT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT, ");
-			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
 			queryb.append(dictionary.getDictionaryID());				 
 			queryb.append( " GROUP BY OT.id; ");

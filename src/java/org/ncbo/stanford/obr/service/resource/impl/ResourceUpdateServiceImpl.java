@@ -255,7 +255,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
-		logger.info("Processing of statistics started...");
+		logger.info("*** Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
@@ -284,16 +284,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 		// Get resource id (primary key) from ResourceTable
 		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
-
-		// Get list of onltogyID used for indexing 
-		ArrayList<Integer> ontologyListFromStatsTables = statisticsDao.getOntolgyIDsForResource(resource_id);
-		
+		 
 		// Iterating for each ontologies
 		for (Integer ontologyID : indexedAnnotations.keySet()) {			
-			
-			ontologyListFromStatsTables.remove(ontologyID);
-			
-			
+			 
 			if(indexedAnnotations.get(ontologyID)!= null){
 				indexed = indexedAnnotations.get(ontologyID).intValue();
 			}else{
@@ -330,19 +324,14 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
-		int noOfEntiesUpdated=statisticsDao.addEntries(entries);
+		int noOfEntiesUpdated=statisticsDao.addEntries(entries); 
 		
-		// Remove non updated entries from stats table.
-		for (Integer integer : ontologyListFromStatsTables) {
-			statisticsDao.deleteEntry(resource_id, integer);
-		}
-		
-		logger.info("Number of entries added/updated in statistics table are :" + noOfEntiesUpdated);
+		logger.info("\tNumber of entries added/updated in statistics table are :" + noOfEntiesUpdated);
 		timer.end();
-		logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName()
+		logger.info("\tResource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " statistics processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
-		logger.info("Processing of statistics completed.");
+		logger.info("### Processing of statistics completed.\n");
 		
 	} 
 	

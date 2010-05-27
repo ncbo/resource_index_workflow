@@ -456,7 +456,7 @@ public class OntologyDao extends AbstractObsDao{
 	
 	/**
 	 * This class is representation for obs_ontology table entry.
-	 * @author k.palanisamy
+	 * @author Kuladip Yadav
 	 *
 	 */
 	public static class OntologyEntry{

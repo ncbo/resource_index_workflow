@@ -7,7 +7,7 @@ import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.service.statistics.StatisticsService;
 
 /**
- * @author k.palanisamy
+ * @author Kuladip Yadav
  *
  */
 public class StatisticsServiceImpl implements StatisticsService, DaoFactory{

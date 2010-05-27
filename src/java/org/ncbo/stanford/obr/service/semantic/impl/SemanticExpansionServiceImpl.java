@@ -29,37 +29,44 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	 */
 	public long semanticExpansion(boolean isaClosureExpansion, boolean mappingExpansion, boolean distanceExpansion){
 		long nbAnnotation = 0;
+		ExecutionTimer timer1 = new ExecutionTimer();
+		timer1.start();
+		logger.info("*** Executing  annotation expansion process... ");
 		ExecutionTimer timer = new ExecutionTimer();
 		// isaClosure expansion
 		if(isaClosureExpansion){
 			timer.start();
-			logger.info("Executing isa transitive closure expansion... ");
+			logger.info("\t** Executing isa transitive closure expansion... ");
 			long isaAnnotation = isaExpandedAnnotationTableDao.isaClosureExpansion(directAnnotationTableDao);
-			logger.info(isaAnnotation);
+			logger.info("\t\t" +isaAnnotation);
 			nbAnnotation += isaAnnotation;
 			timer.end();
-			logger.info("Isa transitive closure expansion  processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			logger.info("\t## Isa transitive closure expansion  processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			timer.reset();
 		}
 		// mapping expansion
 		if(mappingExpansion){
 			timer.start();
-			logger.info("Executing mapping expansion... ");
+			logger.info("\t** Executing mapping expansion... ");
 			long mappingAnnotation = mapExpandedAnnotationTableDao.mappingExpansion(directAnnotationTableDao);
-			logger.info(mappingAnnotation);
+			logger.info("\t\t" + mappingAnnotation);
 			nbAnnotation += mappingAnnotation;
 			timer.end();
-			logger.info("Mapping expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			logger.info("\t## Mapping expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			timer.reset();
 		}
 		// distance expansion
 		if(distanceExpansion){
 			timer.start();
-			logger.info("Distance semantic expansion not implemeted yet.");
+			logger.info("\t** Distance semantic expansion not implemeted yet.");
 			timer.end();
-			logger.info("Distance expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
+			logger.info("\t## Distance expansion processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			timer.reset();
 		}
+		
+		timer1.end();
+		logger.info("### Annotation expansion processed in: " + timer1.millisecondsToTimeString(timer1.duration()));
+		
 		return nbAnnotation;
 	}
 	

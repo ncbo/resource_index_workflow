@@ -9,8 +9,6 @@ import java.util.List;
 import obs.common.beans.DictionaryBean;
 
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
-import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -168,9 +166,9 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		queryb.append("DELETE EAT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" EAT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName());	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE EAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
 		this.deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
@@ -209,9 +207,9 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		queryb.append("DELETE EAT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" EAT, ");
-		queryb.append(ConceptDao.name( ));	
+		queryb.append(conceptDao.getMemoryTableSQLName( ));	
 		queryb.append(" CT, ");
-		queryb.append(OntologyDao.name());
+		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT ");
 		queryb.append(" WHERE EAT.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");
 		
@@ -254,15 +252,15 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append("SELECT CT.ontology_id, COUNT(EAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT WHERE EAT.concept_id=CT.id GROUP BY CT.ontology_id; ");		 
 		}else{
 			queryb.append("SELECT OT.id, COUNT(EAT.concept_id) AS COUNT FROM ");
 			queryb.append(this.getTableSQLName());		 	 
 			queryb.append(" AS EAT, ");
-			queryb.append(conceptDao.getTableSQLName());
+			queryb.append(conceptDao.getMemoryTableSQLName());
 			queryb.append(" AS CT, ");
-			queryb.append(ontologyDao.getTableSQLName());
+			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
 			queryb.append(dictionary.getDictionaryID());				 
 			queryb.append( " GROUP BY OT.id; ");

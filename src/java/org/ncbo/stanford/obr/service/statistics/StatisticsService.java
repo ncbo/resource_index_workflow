@@ -4,7 +4,7 @@
 package org.ncbo.stanford.obr.service.statistics;
 
 /**
- * @author k.palanisamy
+ * @author Kuladip Yadav
  *
  */
 public interface StatisticsService{
