@@ -1,4 +1,4 @@
-package org.ncbo.stanford.obr.service.index.impl;
+package org.ncbo.stanford.obr.service.aggregation.impl;
 
 import java.util.List;
 
@@ -8,11 +8,11 @@ import obs.obr.populate.ObrWeight;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
-import org.ncbo.stanford.obr.service.index.IndexationService;
+import org.ncbo.stanford.obr.service.aggregation.AggregationService;
 
-public class IndexationServiceImpl extends AbstractResourceService implements IndexationService{
+public class AggregationServiceImpl extends AbstractResourceService implements AggregationService{
 
-	public IndexationServiceImpl(ResourceAccessTool resourceAccessTool) {
+	public AggregationServiceImpl(ResourceAccessTool resourceAccessTool) {
 		super(resourceAccessTool);
 	} 
 
@@ -22,13 +22,14 @@ public class IndexationServiceImpl extends AbstractResourceService implements In
 	 * This function implements the step 4 of the OBR workflow.
 	 * Returns the number of annotations created in the index. 
 	 */
-	public int indexation(ObrWeight weights){
-		int nbAnnotation;
+	public long aggregation(ObrWeight weights){
+		long nbAnnotation;
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
-		nbAnnotation = indexTableDao.indexation(weights);
+		logger.info("*** Executing aggregation process.... ");
+		nbAnnotation = aggregationTableDao.aggregation(weights);
 		timer.end();
-		logger.info("Indexation processed in: " + timer.millisecondsToTimeString(timer.duration()));
+		logger.info("### Aggregation processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		return nbAnnotation;
 	} 
 	
@@ -40,12 +41,12 @@ public class IndexationServiceImpl extends AbstractResourceService implements In
 	 * 
 	 * @param {@code List} of localOntologyID containing ontology versions.
 	 */
-	public void removeIndexation(List<String> localOntologyIDs) {
+	public void removeAggregation(List<String> localOntologyIDs) {
 		 if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
-			 indexTableDao.deleteEntriesFromOntologies(localOntologyIDs);	
+			 aggregationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	
 		 }else{
 			 for (String localOntologyID : localOntologyIDs) {
-				 indexTableDao.deleteEntriesFromOntology(localOntologyID);
+				 aggregationTableDao.deleteEntriesFromOntology(localOntologyID);
 			}
 			 
 		 }		 	

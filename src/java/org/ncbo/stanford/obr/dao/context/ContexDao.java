@@ -44,7 +44,7 @@ public class ContexDao extends AbstractObrDao {
 					"name VARCHAR(50) NOT NULL UNIQUE, " +
 					"weight DOUBLE default '1.0', " +
 					"static_ontology_id VARCHAR(20) default '0'" +
-				");";
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 
 	@Override
@@ -185,5 +185,15 @@ public class ContexDao extends AbstractObrDao {
 			sb.append("]");
 			return sb.toString();
 		}
+	}
+
+	/**
+	 * This method loads obr_context table into memory.
+	 * @param resourceID 
+	 * 
+	 */
+	public void loadTableIntoMemory(String resourceID) {		 
+		callStoredProcedure("load_context_table_into_memory", resourceID);
+		logger.info("\t" +this.getTableSQLName()+ " loaded in to memory.");
 	}
 }

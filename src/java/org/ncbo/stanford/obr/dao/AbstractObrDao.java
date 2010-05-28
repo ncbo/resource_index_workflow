@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -43,6 +44,8 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	protected static Logger logger = Logger.getLogger(AbstractObrDao.class);
 	
 	protected static final String OBR_PREFIX = MessageUtils.getMessage("obr.tables.prefix");
+	protected static final String OBS_PREFIX = MessageUtils.getMessage("obs.tables.prefix");
+	protected static final String OBR_MEMORY_SUFFIX = MessageUtils.getMessage("obr.memory.table.suffix");
 		
 	// Database connection properties.
 	private static final String DATABASE_CONNECTION_STRING = MessageUtils.getMessage("obr.jdbc.url");
@@ -74,7 +77,7 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		this.tableSQLName = OBR_PREFIX + resourceID.toLowerCase() + suffix ;
 		if(!this.exist(this.getTableSQLName())){
 			try{
-				 logger.info(this.creationQuery());
+				//logger.info(this.creationQuery());
 				this.executeSQLUpdate(this.creationQuery());
 			}
 			catch (SQLException e) {
@@ -156,6 +159,14 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		return this.tableSQLName;
 	}
 	
+	public String getMemoryTableSQLName() {
+		return (this.tableSQLName + OBR_MEMORY_SUFFIX).replace(OBS_PREFIX, OBR_PREFIX);
+	}
+	
+	public String getTempTableSQLName() {
+		return this.tableSQLName +"_temp";
+	}
+	
 	public static Connection getTableConnection() {
 		return tableConnection;
 	}
@@ -181,8 +192,8 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	/**
 	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
 	 */
-	protected int executeSQLUpdate(String query) throws SQLException {
-		int nbRow;
+	protected long executeSQLUpdate(String query) throws SQLException {
+		long nbRow;
 		try{
 			tableStatement = tableConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			nbRow = tableStatement.executeUpdate(query);
@@ -207,10 +218,115 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	}
 	
 	/**
-	 * Executes the SQL query on the given prepared statement and returns the number of row in the table. 
+	 * Executes the given SQL query with the table generic statement and returns the number of row in the table. 
 	 */
-	protected int executeSQLUpdate(PreparedStatement stmt) throws SQLException {
-		int nbRow;
+	protected long executeWithStoreProcedure(String tableName, String query, boolean disableKeys) throws SQLException {
+		long nbRow=0;
+		try{
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL common_batch_insert(?,?, ?, ?)");
+			 callableStatement.setString(1, tableName);
+			 callableStatement.setString(2, query);
+			 callableStatement.setBoolean(3, disableKeys);
+			 callableStatement.registerOutParameter(4, java.sql.Types.BIGINT);
+			 callableStatement.execute();
+			 nbRow = callableStatement.getLong(4);			  
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(query);
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (CommunicationsException e) {
+			reOpenConnectionIfClosed();			 
+		}		 
+		return nbRow;
+	}
+	
+	/**
+	 * 
+	 * Call the store procedure LoadObsSlaveTablesIntoMemeory
+	 * 
+	 */
+	public void callLoadObsSlaveTablesIntoMemoryProcedure() throws SQLException{	 
+		try{
+			 CallableStatement callableStatement = tableConnection.prepareCall("CALL load_obs_tables_into_memory();");
+			 callableStatement.execute();  
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write("call load_obs_tables_into_memory();");
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (SQLException e) {
+			 logger.error("Problem in calling LoadObsSlaveTablesIntoMemeoryProcedure", e);	
+			 throw e;
+		} 
+	}
+	
+	/**
+	 *  
+	 * @param storedProcedureName
+	 * @param paramaters
+	 */
+	public void callStoredProcedure(String storedProcedureName, String... paramaters){	 
+		try{
+			StringBuffer callSPQuery = new StringBuffer();
+			callSPQuery.append("CALL ");
+			callSPQuery.append(storedProcedureName);
+			callSPQuery.append("(");
+			if(paramaters!= null && paramaters.length >0){
+				for (String parameter : paramaters) {
+					callSPQuery.append("'");
+					callSPQuery.append(parameter);
+					callSPQuery.append("', ");
+				}
+				callSPQuery.delete(callSPQuery.length()-2, callSPQuery.length());
+			} 
+			callSPQuery.append(" );");
+			  
+			CallableStatement callableStatement = tableConnection.prepareCall(callSPQuery.toString());
+			callableStatement.execute();  
+			 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(callSPQuery.toString());
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (SQLException e) {
+			 logger.error("Problem in calling stored procedure " + storedProcedureName, e);		 
+		}
+		 
+		 
+	}
+	
+	/**
+	 * 
+	 * Executes the SQL query on the given prepared statement and returns the number of row in the table. 
+	 *
+	 * @param stmt
+	 * @return
+	 * @throws SQLException
+	 */
+	protected long executeSQLUpdate(PreparedStatement stmt) throws SQLException {
+		long nbRow;
 		try{
 			nbRow = stmt.executeUpdate();
 			try{

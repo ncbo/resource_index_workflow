@@ -10,7 +10,7 @@ import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
@@ -41,35 +41,30 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param stopwords {@code Set} of string used as stopwords
 	 * @return {@code int} the number of direct annotations created. 
 	 */
-	public int resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
+	public long resourceAnnotation(boolean withCompleteDictionary, DictionaryBean dictionary, 
 			HashSet<String> stopwords) {
-		int nbAnnotation;
-		boolean useTemporaryElementTable;	
-		 
-		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-			useTemporaryElementTable =false; 
-		}else{
-			useTemporaryElementTable =true; 
-		} 
-
+		long nbAnnotation =0;		 
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		logger.info("*** Executing  Direct Annotation process... ");
 		// processes direct mgrep annotations
-		nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
-		 		withCompleteDictionary, stopwords);
-
+		
+		if(elementTableDao.containElementsForMgrepAnnotation(dictionary.getDictionaryID())){
+			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
+			 		withCompleteDictionary, stopwords);
+		} else{
+			logger.info("\tNo element present in "+ elementTableDao.getTableSQLName()+ " for MGRAP annotation.");
+		}
 		// processes direct reported annotations
 		nbAnnotation += this.reportExistingAnnotations(dictionary);
 
 		// updates the dictionary column in _ET
-		logger.info("Updating the dictionary field in ElementTable...");
-		  
-		// Update dictionary id for element table.
-		try{
-			elementTableDao.updateDictionary(dictionary.getDictionaryID(), useTemporaryElementTable);	
-		}finally{
-			if(useTemporaryElementTable){
-				elementTableDao.deleteTemporaryTable();
-			} 
-		}
+		logger.info("\tUpdating the dictionary field in ElementTable...");		  
+		// Update dictionary id for element table.		 
+		elementTableDao.updateDictionary(dictionary.getDictionaryID());	
+		
+		timer.end();
+		logger.info("### Direct processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			
 		return nbAnnotation;
 	}
@@ -79,12 +74,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * with a dictionaryID < to the latest one are selected (or the one with
 	 * null); Returns the number of annotations added to _DAT.
 	 */
-	private int conceptRecognitionWithMgrep(DictionaryBean dictionary,
+	private long conceptRecognitionWithMgrep(DictionaryBean dictionary,
 			boolean withCompleteDictionary, HashSet<String> stopwords) {
-		int nbDirectAnnotation = 0;
+		long nbDirectAnnotation = 0;
+		ExecutionTimer timer1 = new ExecutionTimer();
 		ExecutionTimer timer = new ExecutionTimer();
 
-		logger.info("** Concept recognition with Mgrep:");
+		logger.info("\t** Concept recognition with Mgrep:");
+		timer1.start();
 		// Checks if the dictionary file exists
 		File dictionaryFile;
 		try {
@@ -96,26 +93,20 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 						.dictionaryFileName(dictionary));
 			}
 			if (dictionaryFile.createNewFile()) {
-				logger.info("Re-creation of the dictionaryFile...");
-				HashSet<String> localOntologyIDs = null;
-				
-				// For big resources get list of ontologies used for annotation.
-				if(resourceAccessTool.getResourceType() == ResourceType.BIG){
-					localOntologyIDs= resourceAccessTool.getOntolgiesForAnnotation();
-				}
+				logger.info("\t\tRe-creation of the dictionaryFile...");			 
 				
 				if (withCompleteDictionary) {
-					dictionaryDao.writeDictionaryFile(dictionaryFile,localOntologyIDs);
+					dictionaryDao.writeDictionaryFile(dictionaryFile);
 				} else {
 					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
-							.getDictionaryID(),localOntologyIDs);
+							.getDictionaryID());
 				}
 			}
 		} catch (IOException e) {
 			dictionaryFile = null;
 			logger
 					.error(
-							"** PROBLEM ** Cannot create the dictionaryFile. null returned.",
+							"\t\t** PROBLEM ** Cannot create the dictionaryFile. null returned.",
 							e);
 		}
 
@@ -125,7 +116,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		File resourceFile = this.writeMgrepResourceFile(dictionary
 				.getDictionaryID());
 		timer.end();
-		logger.info("ResourceFile created in: "
+		logger.info("\t\tResourceFile created in: "
 				+ timer.millisecondsToTimeString(timer.duration()) + "\n");
 
 		// Calls Mgrep
@@ -133,7 +124,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		timer.start();
 		File mgrepFile = this.mgrepCall(dictionaryFile, resourceFile);
 		timer.end();
-		logger.info("Mgrep executed in: "
+		logger.info("\t\tMgrep executed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
 
 		// Process the Mgrep result file
@@ -142,23 +133,18 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		nbDirectAnnotation = this.processMgrepFile(mgrepFile, dictionary
 				.getDictionaryID());
 		timer.end();
-		logger.info("MgrepFile processed in: "
+		logger.info("\t\tMgrepFile processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
 
 		// Deletes the files created for Mgrep and generated by Mgrep
 		resourceFile.delete();
-		mgrepFile.delete();
-
-		// Removes Mgrep annotations done with the given list of stopwords
-		timer.reset();
-		timer.start();
-		int nbDelete = directAnnotationTableDao
-				.deleteEntriesFromStopWords(stopwords);
+		mgrepFile.delete(); 
+		
 		timer.end();
-		logger.info(nbDelete + " annotations removed with stopword list in: "
+		logger.info("\t## Total MGREP processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
 
-		return nbDirectAnnotation - nbDelete;
+		return nbDirectAnnotation;
 	}
 
 	private File mgrepCall(File dictionaryFile, File resourceFile) {
@@ -177,8 +163,8 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 
 	}
 
-	private int processMgrepFile(File mgrepFile, int dictionaryID) {
-		int nbAnnotation = -1;
+	private long processMgrepFile(File mgrepFile, int dictionaryID) {
+		long nbAnnotation = -1;
 		logger.info("Processing of the result file...");
 		nbAnnotation = directAnnotationTableDao.loadMgrepFile(mgrepFile,
 				dictionaryID);
@@ -204,18 +190,11 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 				+ dictionaryID + "_MGREP.txt";
 		File mgrepResourceFile = new File(name);
 		try {
-			mgrepResourceFile.createNewFile();
-			
-			boolean useTemporaryElementTable;			
-			if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-				useTemporaryElementTable =false; 
-			}else{
-				useTemporaryElementTable =true; 
-			}
+			mgrepResourceFile.createNewFile();	 
 			
 			elementTableDao.writeNonAnnotatedElements(mgrepResourceFile,
 					dictionaryID, resourceAccessTool.getToolResource()
-							.getResourceStructure(), useTemporaryElementTable);
+							.getResourceStructure());
 		} catch (IOException e) {
 			logger.error(
 					"** PROBLEM ** Cannot create Mgrep file for exporting resource "
@@ -238,14 +217,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		int nbReported;
 		ExecutionTimer timer = new ExecutionTimer();
 
-		logger.info("Processing of existing reported annotations...");
+		logger.info("\t** Processing of existing reported annotations...");
 		timer.start();
 		nbReported = directAnnotationTableDao.addEntries(getExistingAnnotations(dictionary.getDictionaryID(),
 						resourceAccessTool.getToolResource()
 								.getResourceStructure()));
 
 		timer.end();
-		logger.info(nbReported + " reported annotations processed in: "
+		logger.info("\t## " +nbReported + " reported annotations processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
 
 		return nbReported;
@@ -260,21 +239,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
 		
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		
-		boolean useTemporaryElementTable;			
-		if(resourceAccessTool.getResourceType() == ResourceType.SMALL){
-			useTemporaryElementTable =false; 
-		}else{
-			useTemporaryElementTable =true; 
-		}
-		
+		 
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, useTemporaryElementTable));				
+				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
 			}
 			
 		}
@@ -308,7 +280,13 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param dictionaryID 
 	 * @return Number of rows containing in temporary table
 	 */ 
-	public int createTemporaryElementTable(int dictionaryID) {
+	public long createTemporaryElementTable(int dictionaryID) {
 		 return elementTableDao.createTemporaryTable(dictionaryID, resourceAccessTool.getMaxNumberOfElementsToProcess());		
+	}
+	
+	public void createIndexForAnnotationTable() {	
+		if(!directAnnotationTableDao.isIndexExist()){
+			 directAnnotationTableDao.createIndex();		 
+		} 
 	}
 }

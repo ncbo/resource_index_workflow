@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.ncbo.stanford.obr.service.index;
+package org.ncbo.stanford.obr.service.aggregation;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import obs.obr.populate.ObrWeight;
  * @author Kuladip Yadav
  *
  */
-public interface IndexationService {
+public interface AggregationService {
 	
 	/**
 	 * Processes the resource direct & expanded annotations to produce the index and
@@ -22,13 +22,13 @@ public interface IndexationService {
 	 * @return The number of annotations created in the index. 
 	 * 
 	 */
-	public int indexation(ObrWeight weights);
+	public long aggregation(ObrWeight weights);
 	
 	/**
 	 * Method removes indexing done for given ontology versions.
 	 * 
 	 * @param {@code List} of localOntologyID String containing ontology version.
 	 */
-	public void removeIndexation(List<String> localOntologyID);
+	public void removeAggregation(List<String> localOntologyID);
 
 }

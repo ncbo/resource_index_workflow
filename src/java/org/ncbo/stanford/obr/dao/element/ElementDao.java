@@ -16,7 +16,8 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.annoation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
+import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.StringUtilities;
 
@@ -82,8 +83,9 @@ public class ElementDao extends AbstractObrDao {
 					"id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"local_element_id VARCHAR(255) NOT NULL UNIQUE, " +
 					"dictionary_id SMALLINT UNSIGNED, " +
-					"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
-				");";
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +
+					//"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName()  + "(dictionary_id) ON DELETE CASCADE ON UPDATE CASCADE"+
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	@Override
@@ -144,10 +146,10 @@ public class ElementDao extends AbstractObrDao {
 	 * @param maxNumberOfElementsToProcess 
 	 * @return number of rows inserted in temporary table.
 	 */
-	public int createTemporaryTable(int dictionaryID, int maxNumberOfElementsToProcess){
+	public long createTemporaryTable(int dictionaryID, int maxNumberOfElementsToProcess){
 		// Delete temporary table if exist
 		deleteTemporaryTable();
-		int noRows =0;
+		long noRows =0;
 		StringBuffer createQuery = new StringBuffer();
 		createQuery.append("CREATE TEMPORARY TABLE ");	 
 		createQuery.append(this.getTableSQLName());		 
@@ -188,6 +190,25 @@ public class ElementDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot drop tempor Table " + this.getTableSQLName() + TEMP_TABLE_SUFFIX, e);
 		}
 		 
+	}
+	
+	public boolean resetDictionary(){
+		boolean updated = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("UPDATE ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" SET dictionary_id = NULL;");
+		try{			 
+			this.executeSQLUpdate(queryb.toString());
+			updated = true;
+		}		
+		catch (MySQLNonTransientConnectionException e) {		 
+			return this.resetDictionary();
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot update dictionary ID on table " + this.getTableSQLName(), e);
+		}
+		return updated;
 	}
 	
 	/****************************************** FUNCTIONS ON THE TABLE ***************************/ 
@@ -351,16 +372,12 @@ public class ElementDao extends AbstractObrDao {
 	 * Writes the given file with all the non annotated elements according to a given dictionaryID. 
 	 * @param useTemporaryElementTable 
 	 */
-	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure, boolean useTemporaryElementTable){
+	public void writeNonAnnotatedElements(File mgrepResourceFile, int dictionaryID, Structure structure){
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT * FROM ");
-		queryb.append(this.getTableSQLName());
-		if(useTemporaryElementTable){
-			queryb.append(TEMP_TABLE_SUFFIX);
-		}else{
-			queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-			queryb.append(dictionaryID);
-		} 
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		queryb.append(dictionaryID);		 
 		queryb.append(";");
 		
 		//loads the contextName-contextID in a temporary structure to avoid querying the DB when executing the resultset streaming
@@ -404,34 +421,50 @@ public class ElementDao extends AbstractObrDao {
 	}
 	
 	/**
+	 * This method checks whether non annotated elements are present.
+	 * 
+	 * @param dictionaryID
+	 * @return
+	 */
+	public boolean containElementsForMgrepAnnotation(int dictionaryID){
+		boolean result = false;
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT count(id) FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		queryb.append(dictionaryID);		 
+		queryb.append(";");
+		
+		try{
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			if(rSet.first()){
+				int nonAnnotatedElement = rSet.getInt(1);
+				if(nonAnnotatedElement> 0){
+					result = true;
+				}
+			} 
+		}catch (SQLException e) {
+			 logger.error("Problem in getting non annotated element count", e);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Updates the field dictionaryID of all the rows in the table where the dictionaryID is null or < to the given one. 
 	 * Returns the number of updated elements. (to be verified)
 	 * 
 	 * @param useTemporaryElementTable 
 	 */
-	public int updateDictionary(int dictionaryID, boolean useTemporaryElementTable){
-		int nbUpdated;
-		StringBuffer updatingQueryb = new StringBuffer();
-		
-		if(useTemporaryElementTable){
-			updatingQueryb.append("UPDATE ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(" ET, ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(TEMP_TABLE_SUFFIX);
-			updatingQueryb.append(" TEMP SET ET.dictionary_id=");
-			updatingQueryb.append(dictionaryID);
-			updatingQueryb.append(" WHERE ET.id = TEMP.id");
-			
-		}else{
-			updatingQueryb.append("UPDATE ");
-			updatingQueryb.append(this.getTableSQLName());
-			updatingQueryb.append(" SET dictionary_id=");
-			updatingQueryb.append(dictionaryID);
-			updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-			updatingQueryb.append(dictionaryID);
-		}
-		
+	public long updateDictionary(int dictionaryID){
+		long nbUpdated;
+		StringBuffer updatingQueryb = new StringBuffer();		 
+		updatingQueryb.append("UPDATE ");
+		updatingQueryb.append(this.getTableSQLName());
+		updatingQueryb.append(" SET dictionary_id=");
+		updatingQueryb.append(dictionaryID);
+		updatingQueryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		updatingQueryb.append(dictionaryID);		
 		updatingQueryb.append(";");
 		try{
 			nbUpdated = this.executeSQLUpdate(updatingQueryb.toString());
@@ -449,17 +482,14 @@ public class ElementDao extends AbstractObrDao {
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
 	 * @param useTemporaryElementTable 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, boolean useTemporaryElementTable ){		
+	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
 		try{				
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("SELECT local_element_id, ");
 			queryb.append(contextName+" FROM ");
-			queryb.append(this.getTableSQLName());
-			if(useTemporaryElementTable){
-				queryb.append(TEMP_TABLE_SUFFIX);
-			} 
+			queryb.append(this.getTableSQLName());			 
 			queryb.append(" WHERE dictionary_id IS NULL ");
 			
 			if(isNewVirsion){
@@ -481,8 +511,8 @@ public class ElementDao extends AbstractObrDao {
 								new DirectAnnotationEntry(localElementID, 
 										splittedLocalConceptIDs[i].replace(structure.getOntoID(contextName), localOntologyID),
 										contextName, 
-										dictionaryID, // dictionaryID for existing annotations
-										false, false, false, false));// for now the semantic distance expansion is not done
+										dictionaryID,  // dictionaryID for existing annotations
+										WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus()));// for now the semantic distance expansion is not done
 						}
 					}
 					catch (Exception e) {

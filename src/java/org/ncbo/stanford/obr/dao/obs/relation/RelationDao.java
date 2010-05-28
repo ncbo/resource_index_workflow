@@ -77,12 +77,12 @@ public class RelationDao extends AbstractObsDao{
 		"id INT(11) NOT NULL PRIMARY KEY, " +
 		"concept_id INT(11) NOT NULL, " +
 		"parent_concept_id INT(11) NOT NULL, " +
-		"level INT(11) NOT NULL, " +
-		//"UNIQUE (localConceptID, parentLocalConceptID), " +
-		"FOREIGN KEY (concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"FOREIGN KEY (parent_concept_id) REFERENCES " + conceptDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		"level INT(11) NOT NULL, " +	 
+		//"UNIQUE (localConceptID, parentLocalConceptID), " +	 
+		"INDEX X_" + getTableSQLName() +"_concept_id (concept_id), " +
+		"INDEX X_" + getTableSQLName() +"_parent_concept_id (parent_concept_id), " +
 		"INDEX X_" + getTableSQLName() +"_level (level)" +
-		");";
+		") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	/**
@@ -116,8 +116,8 @@ public class RelationDao extends AbstractObsDao{
 	 * @param relationEntryFile File containing relation table entries.
 	 * @return Number of entries populated in relation table.
 	 */
-	public int populateSlaveRelationTableFromFile(File relationEntryFile) {
-		int nbInserted =0 ;
+	public long populateSlaveRelationTableFromFile(File relationEntryFile) {
+		long nbInserted =0 ;
 
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");
@@ -174,7 +174,7 @@ public class RelationDao extends AbstractObsDao{
 	
 	/**
 	 * This class is representation for obs_relaiton table entry.
-	 * @author k.palanisamy
+	 * @author Kuladip Yadav
 	 *
 	 */
 	public static class RelationEntry{

@@ -53,10 +53,12 @@ public class ConceptDao extends AbstractObsDao {
 		"id INT(11) NOT NULL PRIMARY KEY, " +		
 		"local_concept_id VARCHAR(246) NOT NULL UNIQUE, " +
 		"ontology_id INT(11) NOT NULL, " +
-		"is_toplevel BOOL NOT NULL, " +
-		"FOREIGN KEY (ontology_id) REFERENCES " + ontologyDao.getTableSQLName() + "(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		"is_toplevel BOOL NOT NULL, " +	 
+		"full_id TEXT, " +
+		"INDEX X_" + this.getTableSQLName() +"_local_concept_id (local_concept_id), " +
+		"INDEX X_" + this.getTableSQLName() +"_ontology_id (ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() +"_isTopLevel (is_toplevel)" +
-	");";
+	")ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";
 }
 	@Override
 	protected void openPreparedStatements() {
@@ -115,8 +117,8 @@ public class ConceptDao extends AbstractObsDao {
 	 * @param conceptEntryFile File containing concept table entries.
 	 * @return Number of entries populated in concept table.
 	 */
-	public int populateSlaveConceptTableFromFile(File conceptEntryFile) {
-		int nbInserted =0 ;
+	public long populateSlaveConceptTableFromFile(File conceptEntryFile) {
+		long nbInserted =0 ;
 		
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("LOAD DATA LOCAL INFILE '");

@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.service.obs;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -21,6 +22,12 @@ public interface ObsDataPopulationService {
 	public void populateObsSlaveData(boolean withLatestDictionary);
 	
 	/**
+	 * This method load obs table and stuff into memory.  
+	 * It creates obs tables with MEMORY storage engin.
+	 */
+	public void loadObsSlaveTablesIntoMemory() throws SQLException;	
+	
+	/**
 	 * Populates new ontology versions present in OBS master database which are not present in 
 	 * slave ontology table with particular dictionary. 
 	 *  
@@ -37,7 +44,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of concept entries added in slave concept table.
 	 */
-	public int populateConceptsSlaveData(List<String> localOntologyIDs);
+	public long populateConceptsSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates new term presents in OBS master database which are not present in 
@@ -46,7 +53,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of term entries added in slave term table.
 	 */
-	public int populateTermsSlaveData(List<String> localOntologyIDs);
+	public long populateTermsSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
@@ -55,7 +62,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of relation entries added in slave relation table.
 	 */
-	public int populateRelationSlaveData(List<String> localOntologyIDs);
+	public long populateRelationSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * Populates new concept mapping entries presents in OBS master database which are not present in 
@@ -64,7 +71,7 @@ public interface ObsDataPopulationService {
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of mapping entries added in slave map table.
 	 */
-	public int populateMappingSlaveData(List<String> localOntologyIDs);
+	public long populateMappingSlaveData(List<String> localOntologyIDs);
 	
 	/**
 	 * This method gets list of ontology versions present in master ontology id

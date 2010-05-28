@@ -1,21 +1,24 @@
 package org.ncbo.stanford.obr.util;
 
 import java.io.File;
-import java.net.InetAddress;
 
 import org.apache.log4j.Logger;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
-public class FileResourceParameters {
+public class FileResourceParameters implements StringHelper{
 	
 	// Logger for this class
 	private static Logger logger = Logger.getLogger(FileResourceParameters.class);
-
-	// Remote host name
-	public static final String REMOTE_HOST_DEV2 	= MessageUtils.getMessage("obr.remote.host");
+  
+	// OBR schema host name
+	public static final String OBR_SCHEMA_HOST 	= MessageUtils.getMessage("obr.schema.host.name");
+	
+	// SVN code path
+	public static final String SVN_CODE_PATH = MessageUtils.getMessage("obr.svn.code.path");
 	
 	// Local & remote paths
 	public static final String LOCAL_FOLDER 		= MessageUtils.getMessage("obr.local.path");
-	private static final String NCBODATA_FOLDER 	= MessageUtils.getMessage("obr.remote.path");
+	private static final String NCBODATA_OBR_FOLDER 	= MessageUtils.getMessage("obr.ncbodata.path");
 	
 	// Folder names
 	public static final String RESULT_FOLDER     	= MessageUtils.getMessage("obr.result.dir");
@@ -51,7 +54,7 @@ public class FileResourceParameters {
 	}
 	
 	public static String resourceLogFolder(){
-		return selectRightFolder(RESOURCE_LOG_FOLDER);
+		return selectRightFolder(RESOURCE_LOG_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING );
 	}
 	 
 	public static String blackListFolder(){
@@ -82,12 +85,11 @@ public class FileResourceParameters {
 	private static String selectRightFolder(String folderName){
 		String folder = folderName;
 		try{
-			InetAddress addr = InetAddress.getLocalHost();
-		    String hostname = addr.getHostName();
-		    if (hostname.equals(REMOTE_HOST_DEV2)){
-		    	folder = NCBODATA_FOLDER + folderName;
+			File ncboDataObrFolder = new File(NCBODATA_OBR_FOLDER);
+		    if (ncboDataObrFolder.exists()){
+		    	folder = NCBODATA_OBR_FOLDER + folderName;
 			}
-		    else{
+		    else{		    	 
 		    	folder = LOCAL_FOLDER + folderName;
 		    }
 		} catch (Exception e){
@@ -98,6 +100,5 @@ public class FileResourceParameters {
 			folderFile.mkdirs();
 		}
 		return folder;
-	}
-
+	} 
 }

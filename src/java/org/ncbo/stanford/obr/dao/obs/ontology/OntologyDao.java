@@ -76,10 +76,11 @@ public class OntologyDao extends AbstractObsDao{
 		"status INT(11) NOT NULL, " +
 		"virtual_ontology_id VARCHAR(246) NOT NULL, " +
 		"format VARCHAR(32) DEFAULT NULL, "+
-		"dictionary_id SMALLINT NOT NULL, " +
+		"dictionary_id SMALLINT UNSIGNED NOT NULL, " +
+		"INDEX X_" + this.getTableSQLName() + "_local_ontology_id (local_ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() + "_virtualOntologyID (virtual_ontology_id), " +
-		"FOREIGN KEY (dictionary_id) REFERENCES " + dictionaryDao.getTableSQLName() + "(id)" +
-		");";
+		"INDEX X_" + this.getTableSQLName() + "_dictionary_id (dictionary_id)" +
+		")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
 	@Override
@@ -455,7 +456,7 @@ public class OntologyDao extends AbstractObsDao{
 	
 	/**
 	 * This class is representation for obs_ontology table entry.
-	 * @author k.palanisamy
+	 * @author Kuladip Yadav
 	 *
 	 */
 	public static class OntologyEntry{

@@ -1,6 +1,7 @@
 package org.ncbo.stanford.obr.service.obs.impl;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		    populateTermsSlaveData(localOntologyIDs);		 
 			populateRelationSlaveData(localOntologyIDs);
 			populateMappingSlaveData(localOntologyIDs);
+			populateSemanticTypeData(localOntologyIDs);
+			populateLSemanticTypeData();
 		}else{
 			logger.info("No new ontology found in master table.");
 		}
@@ -98,8 +101,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of concept entries added in slave concept table.
 	 */
-	public int populateConceptsSlaveData(List<String> localOntologyIDs) {
-		int numberOfConceptsAdded= 0;
+	public long populateConceptsSlaveData(List<String> localOntologyIDs) {
+		long numberOfConceptsAdded= 0;
 		File conceptEntryFile = null;		
 		try{
 			// Writes concept entries to file from master concept table. 
@@ -123,8 +126,9 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of term entries added in slave term table.
 	 */
-	public int populateTermsSlaveData(List<String> localOntologyIDs) {		
-		int numberOfTermsAdded= 0;
+	public long populateTermsSlaveData(List<String> localOntologyIDs) {		
+		long numberOfTermsAdded= 0;
+		long numberOfStopwordsTermsRemoved= 0;
 		File termsEntryFile = null;		
 		try{
 			// Writes term entries to file from master term table.
@@ -132,13 +136,16 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			// Load file entries into slave term table. 
 			numberOfTermsAdded = termDao.populateSlaveTermTableFromFile(termsEntryFile);
 			logger.info("Number of term entries added in slave term table : " + numberOfTermsAdded);
+			numberOfStopwordsTermsRemoved = termDao.deleteEntriesForStopWords();
+			logger.info("Number of stopword term entries removed from slave term table : " + numberOfStopwordsTermsRemoved);
+			logger.info("Total Number of term entries added in slave term table : " + (numberOfTermsAdded - numberOfStopwordsTermsRemoved));
 		}finally {
 			 // Delete generated file.
 			 if(termsEntryFile!= null && termsEntryFile.exists()){
 				 termsEntryFile.delete();
 			 }
 		}		
-		return numberOfTermsAdded;
+		return numberOfTermsAdded- numberOfStopwordsTermsRemoved;
 	} 
 	
 	/**
@@ -148,8 +155,8 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of relation entries added in slave relation table.
 	 */
-	public int populateRelationSlaveData(List<String> localOntologyIDs){	
-		int numberOfRelationsAdded= 0;
+	public long populateRelationSlaveData(List<String> localOntologyIDs){	
+		long numberOfRelationsAdded= 0;
 		File relationEntryFile = null;		
 		try{
 			// Writes 'is a parent' relation entries to file from master relation table.
@@ -172,24 +179,78 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param localOntologyIDs a {@code List} of local ontology ids.
 	 * @return Number of mapping entries added in slave map table.
 	 */
-	public int populateMappingSlaveData(List<String> localOntologyIDs){	
-		int numberOfMappingsAdded = 0 ;
+	public long populateMappingSlaveData(List<String> localOntologyIDs){	
+		long numberOfMappingsAdded = 0 ;
 		File mappingEntryFile = null;
 		try{
 			logger.info("Re-initialize slave Mapping table.");
-			// Remove all data from mapping table.
+			// Remove all data from mapping table.			
 			mapDao.reInitializeSQLTable();
 			// Writes mapping entries to file from master map table.
-			mappingEntryFile = obsMasterDao.writeMasterMappingEntries(localOntologyIDs);
+			mappingEntryFile = obsMasterDao.writeMasterMappingEntries();
 			// Load file entries into slave mapping table. 
-			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);
+			numberOfMappingsAdded = mapDao.populateSlaveMappingTableFromFile(mappingEntryFile);			
 			logger.info("Total Number of mapping entries added in slave map table : " + numberOfMappingsAdded);
+		    
+			long mappingTypeEntries= mapDao.populateMappingTypeTable();
+			logger.info("Total Number of mapping type entries added in slave mapping_type table : " + mappingTypeEntries);
 		}finally {
 			 if(mappingEntryFile!= null && mappingEntryFile.exists()){
 				 mappingEntryFile.delete();
 			 }
 		}
 		return numberOfMappingsAdded;
+	}
+	
+	/**
+	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
+	 * slave relation table for given ontology versions {@code localOntologyIDs}.
+	 * 
+	 * @param localOntologyIDs a {@code List} of local ontology ids.
+	 * @return Number of relation entries added in slave relation table.
+	 */
+	public long populateSemanticTypeData(List<String> localOntologyIDs){	
+		long numberOfSemanticTypeAdded= 0;
+		File semanticTypeEntryFile = null;		
+		try{
+			// Writes 'is a parent' relation entries to file from master relation table.
+			semanticTypeEntryFile = obsMasterDao.writeMasterSemanticTypeEntries(localOntologyIDs);
+			// Load file entries into slave term table. 
+			numberOfSemanticTypeAdded = semanticTypeDao.populateSlaveSemanticTypeTableFromFile(semanticTypeEntryFile) ;
+			logger.info("Total Number of Semantic Type entries added in slave relation table : " + numberOfSemanticTypeAdded);
+		}finally {
+			 if(semanticTypeEntryFile!= null && semanticTypeEntryFile.exists()){
+				 semanticTypeEntryFile.delete();
+			 }
+		}  
+		return numberOfSemanticTypeAdded;
+	} 
+	
+	/**
+	 * Populates <b>is a parent</b> relation table entries presents in OBS master database which are not present in 
+	 * slave LSemanticType table for given ontology versions {@code localOntologyIDs}.
+	 *  
+	 * @return Number of LSemanticType entries added in slave relation table.
+	 */
+	public long populateLSemanticTypeData(){
+		long numberOfSemanticTypeAdded= 0;
+		File semanticTypeEntryFile = null;	
+		try{
+			logger.info("Re-initialize slave lSemanticType table.");
+			// Remove all data from mapping table.			
+			lSemanticTypeDao.reInitializeSQLTable();
+			// Writes 'is a parent' relation entries to file from master LSemanticType table.
+			semanticTypeEntryFile = obsMasterDao.writeMasterLSemanticTypeEntries();
+			// Load file entries into slave term table. 
+			numberOfSemanticTypeAdded = lSemanticTypeDao.populateSlaveLSemanticTypeTableFromFile(semanticTypeEntryFile) ;
+			logger.info("Total Number of L Semantic Type entries added in slave relation table : " + numberOfSemanticTypeAdded);
+		}finally {
+			 if(semanticTypeEntryFile!= null && semanticTypeEntryFile.exists()){
+				 semanticTypeEntryFile.delete();
+			 }
+		} 
+		return numberOfSemanticTypeAdded;
+		
 	}
 
 	/**
@@ -211,6 +272,12 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		boolean status = false;
 		 // remove ontology from relation table
 		 status =relationDao.deleteEntriesFromOntology(localOntologyID);
+		 if(!status){
+			 logger.error("Problem in removing ontology version " + localOntologyID + " from relation table.");
+		 }
+		 
+		 // remove ontology from relation table
+		 status =semanticTypeDao.deleteEntriesFromOntology(localOntologyID);
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from relation table.");
 		 }
@@ -238,5 +305,13 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		 if(!status){
 			 logger.error("Problem in removing ontology version " + localOntologyID + " from ontology table.");
 		 }
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.obs.ObsDataPopulationService#loadObsSlaveTablesIntoMemeory()
+	 */
+	public void loadObsSlaveTablesIntoMemory() throws SQLException {
+		ontologyDao.callLoadObsSlaveTablesIntoMemoryProcedure();
 	}
 }

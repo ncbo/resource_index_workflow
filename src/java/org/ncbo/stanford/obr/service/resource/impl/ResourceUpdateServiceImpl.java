@@ -97,9 +97,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	}
 
 	public void reInitializeAllTablesExcept_ET() {
+		elementTableDao.resetDictionary();
 		directAnnotationTableDao.reInitializeSQLTable();
-		expandedAnnotationTableDao.reInitializeSQLTable();
-		indexTableDao.reInitializeSQLTable();
+		isaExpandedAnnotationTableDao.reInitializeSQLTable();
+		mapExpandedAnnotationTableDao.reInitializeSQLTable();
+		aggregationTableDao.reInitializeSQLTable();
 		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
 		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
 	}
@@ -251,51 +253,46 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * for current resource.
 	 * 
 	 */
-	public void calculateObrStatistics() {
+	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
-		logger.info("Processing of statistics started...");
-		ExecutionTimer timer = new ExecutionTimer();
-		timer.start();
-		
-		// Getting Indexed annotations
-		HashMap<Integer, Integer> indexedAnnotations= indexTableDao.getIndexedAnnotationStatistics();
-
-		// Getting MGREP annotations
-		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics();
-		
-		// Getting REPORTED annotations
-		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics();
-		
-		// Getting ISA annotations
-		HashMap<Integer, Integer> isaAnnotations= expandedAnnotationTableDao.getISAAnnotationStatistics();
-		
-		// Getting Mapping annotations
-		HashMap<Integer, Integer> mappingAnnotations= expandedAnnotationTableDao.getMappingAnnotationStatistics();
-		
-		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
-		
-		int indexed;
+		int aggregated;
 		int mgrep;
 		int reported;
 		int isA ;
 		int mapping;
 		
+		logger.info("*** Processing of statistics started...");
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		
+		// Getting Aggregated annotations
+		HashMap<Integer, Integer> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
+
+		// Getting MGREP annotations
+		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting REPORTED annotations
+		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting ISA annotations
+		HashMap<Integer, Integer> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting Mapping annotations
+		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
+		 
+		
 		// Get resource id (primary key) from ResourceTable
 		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
-
-		// Get list of onltogyID used for indexing 
-		ArrayList<Integer> ontologyListFromStatsTables = statisticsDao.getOntolgyIDsForResource(resource_id);
-		
+		 
 		// Iterating for each ontologies
-		for (Integer ontologyID : indexedAnnotations.keySet()) {			
-			
-			ontologyListFromStatsTables.remove(ontologyID);
-			
-			
-			if(indexedAnnotations.get(ontologyID)!= null){
-				indexed = indexedAnnotations.get(ontologyID).intValue();
+		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
+			 
+			if(aggregatedAnnotations.get(ontologyID)!= null){
+				aggregated = aggregatedAnnotations.get(ontologyID).intValue();
 			}else{
-				indexed = 0;
+				aggregated = 0;
 			}
 			
 			if(mgrepAnnotations.get(ontologyID)!= null){
@@ -323,24 +320,19 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 			} 
 			
 			// Creating entry for OBR_STATS table
-			StatisticsEntry entry= new StatisticsEntry(resource_id, ontologyID.intValue(), indexed, mgrep, reported, isA, mapping);
+			StatisticsEntry entry= new StatisticsEntry(resource_id, ontologyID.intValue(), aggregated, mgrep, reported, isA, mapping);
 			entries.add(entry);
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
-		int noOfEntiesUpdated=statisticsDao.addEntries(entries);
+		int noOfEntiesUpdated=statisticsDao.addEntries(entries); 
 		
-		// Remove non updated entries from stats table.
-		for (Integer integer : ontologyListFromStatsTables) {
-			statisticsDao.deleteEntry(resource_id, integer);
-		}
-		
-		logger.info("Number of entries added/updated in statistics table are :" + noOfEntiesUpdated);
+		logger.info("\tNumber of entries added/updated in statistics table are :" + noOfEntiesUpdated);
 		timer.end();
-		logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName()
+		logger.info("\tResource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " statistics processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
-		logger.info("Processing of statistics completed.");
+		logger.info("### Processing of statistics completed.\n");
 		
 	} 
 	

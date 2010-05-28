@@ -5,7 +5,7 @@ import org.ncbo.stanford.obr.service.workflow.impl.ResourceIndexWorkflowImpl;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 /**
- * Main class for resource index population which is responsible for population of diffrent resources 
+ * Main class for resource index population which is responsible for population of different resources 
  * and annotate them with updated obs data.
  * 
  * @author Kuladip Yadav
@@ -25,20 +25,27 @@ public class PopulateResourceIndex {
 		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
 		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
 		
-		// Populate obs tables from master database 
-		if(poluateSlaveTables){	
-			resourceIndexWorkflow.populateObsSlaveTables();
-		}	
-		
-		// Populate resource index data
-		if(processResources){
-			 resourceIndexWorkflow.startResourceIndexWorkflow();
-		}
-	   
-		// remove duplicates.
-		if(removeDuplicateOntologies){
-			resourceIndexWorkflow.removeOntologyDuplicates();
-		}
+		try{
+			// Populate obs tables from master database 
+			if(poluateSlaveTables){	
+				resourceIndexWorkflow.populateObsSlaveTables();
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+			}				
+			
+			// Populate resource index data
+			if(processResources){
+				 resourceIndexWorkflow.startResourceIndexWorkflow();
+			}
+		   
+			// Remove duplicates.
+			if(removeDuplicateOntologies){
+				resourceIndexWorkflow.removeOntologyDuplicates();
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+			}
+			
+		}catch (Exception e) {
+			 e.printStackTrace();
+		} 
 
 	}
 

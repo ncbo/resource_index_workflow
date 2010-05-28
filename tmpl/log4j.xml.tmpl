@@ -7,7 +7,7 @@
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern"
-				value="%d %p [%c] - %m %n" />
+				value="%d - %m %n" />
 		</layout>
 	</appender>
 
@@ -18,7 +18,7 @@
 		<param name="MaxBackupIndex" value="@maxlogbackupindex@" />
 		<param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %p [%c] - %m %n" />
+			<param name="ConversionPattern" value="%d - %m %n" />
 		</layout>
 	</appender>
 

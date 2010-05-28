@@ -55,6 +55,8 @@ public class ObsMasterDao implements DaoFactory{
 	private static final String RELATION_ENTRIES_FILENAME = "OBS_MASTER_RELATION_TABLE";
 	/** Constant for mapping table entries file. */
 	private static final String MAPPING_ENTRIES_FILENAME = "OBS_MASTER_MAPPING_TABLE";	
+	/** Constant for semantic type table entries file. */
+	private static final String SEMANTIC_ENTRIES_FILENAME = "OBS_MASTER_SEMATIC_TYPE_TABLE";
 	
 	/**
 	 * Default constructor for {@code ObsMasterDao}.
@@ -211,7 +213,7 @@ public class ObsMasterDao implements DaoFactory{
 	 */
 	public File writeMasterConceptEntries(List<String> localOntologyIDs){		 
 		StringBuffer selectQuery = new StringBuffer();
-		selectQuery.append("SELECT CT.id, CT.local_concept_id, CT.ontology_id, CT.is_toplevel FROM ");
+		selectQuery.append("SELECT CT.id, CT.local_concept_id, CT.ontology_id, CT.is_toplevel, CT.full_id FROM ");
 		selectQuery.append(conceptDao.getTableSQLName());
 		selectQuery.append(" CT, ");
 		selectQuery.append(ontologyDao.getTableSQLName());
@@ -304,11 +306,11 @@ public class ObsMasterDao implements DaoFactory{
 	 * @param localOntologyIDs list of local ontology ids.
 	 * @return {@code File} containing mapping entries.
 	 */
-	public File writeMasterMappingEntries(List<String> localOntologyIDs){		 
+	public File writeMasterMappingEntries(){		 
 		StringBuffer selectQuery = new StringBuffer();
 		selectQuery.append("SELECT MAPT.id,  MAPT.concept_id,  MAPT.mapped_concept_id, MAPT.mapping_type FROM ");
 		selectQuery.append(mapDao.getTableSQLName());
-		selectQuery.append(" MAPT; ");		
+		selectQuery.append(" MAPT; ");
 		
 		try {	
 			return writeQueryResultFile(selectQuery.toString(), MAPPING_ENTRIES_FILENAME);
@@ -319,6 +321,60 @@ public class ObsMasterDao implements DaoFactory{
 		
 		return null;
 	}
+	
+	/**
+	 * This method get SemanticType table entries from master relation tables for given ontology versions
+	 * and write the result into text file.
+	 * 
+	 * @param localOntologyIDs list of local ontology ids.
+	 * @return {@code File} containing relation entries.
+	 */
+	public File writeMasterSemanticTypeEntries(List<String> localOntologyIDs){		 
+		StringBuffer selectQuery = new StringBuffer();
+		selectQuery.append("SELECT ST.id, ST.concept_id, ST.semantic_type_id FROM ");
+		selectQuery.append(semanticTypeDao.getTableSQLName());
+		selectQuery.append(" ST, ");
+		selectQuery.append(conceptDao.getTableSQLName());
+		selectQuery.append(" CT, ");
+		selectQuery.append(ontologyDao.getTableSQLName());
+		selectQuery.append(" OT WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id IN (");		
+		for (String localOntologyID : localOntologyIDs) {
+			selectQuery.append(localOntologyID);
+			selectQuery.append(", ");
+		}		
+		selectQuery.delete(selectQuery.length()-2, selectQuery.length());
+		selectQuery.append("); ");	
+		
+		try {		
+			return writeQueryResultFile(selectQuery.toString(), SEMANTIC_ENTRIES_FILENAME);			
+		}  
+		catch ( Exception e) {
+			logger.error("** PROBLEM ** Cannot get entries from master ralation table.", e);
+		}		
+		return null;
+	}
+	
+	/**
+	 * This method get LSemanticType table entries from master relation tables for given ontology versions
+	 * and write the result into text file.
+	 * 
+	 * @param localOntologyIDs list of local ontology ids.
+	 * @return {@code File} containing relation entries.
+	 */
+	public File writeMasterLSemanticTypeEntries(){		 
+		StringBuffer selectQuery = new StringBuffer();
+		selectQuery.append("SELECT ST.id, ST.semantic_type, ST.description FROM ");
+		selectQuery.append(lSemanticTypeDao.getTableSQLName());
+		selectQuery.append(" ST;");			
+		try {		
+			return writeQueryResultFile(selectQuery.toString(), SEMANTIC_ENTRIES_FILENAME);			
+		}  
+		catch ( Exception e) {
+			logger.error("** PROBLEM ** Cannot get entries from master ralation table.", e);
+		}		
+		return null;
+	}
+	
 	
 	/**
 	 * Method executes mysql command on master database by firing given {@code sqlQuery} 

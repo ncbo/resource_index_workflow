@@ -63,7 +63,10 @@ obs.ontology.table.suffix=ontology
 obs.concept.table.suffix=concept
 obs.term.table.suffix=term
 obs.map.table.suffix=map
+obs.mappig_type.table.suffix=mapping_type
 obs.relation.table.suffix=relation
+obs.semantic.table.suffix=semantic_type
+obs.l.semantic.table.suffix=l_semantic_type
 
 # Configuring master OBS database
 obs.master.schema.name=@obsmasterschemaname@
@@ -90,8 +93,11 @@ obr.tables.prefix=obr_
 obr.element.table.suffix=_element
 obr.temp.element.table.suffix=_tmp
 obr.annotation.table.suffix=_annotation
-obr.expanded.annotation.table.suffix=_expanded_annotation
-obr.index.table.suffix=_index
+obr.isa.expanded.annotation.table.suffix=_isa_annotation
+obr.map.expanded.annotation.table.suffix=_map_annotation
+obr.distance.expanded.annotation.table.suffix=_dist_annotation
+obr.aggregation.table.suffix=_aggregation
+obr.memory.table.suffix=_mem
 
 obr.dictionary.table.suffix=dictionary
 obr.resource.table.suffix=resource
@@ -117,10 +123,9 @@ obr.grants.jdbc.url=@obrgrantsjdbcurl@
 obr.grants.jdbc.username=@obrgrantsjdbcusername@
 obr.grants.jdbc.password=@obrgrantsjdbcpassword@
 
-# File parameters 
-obr.remote.host=ncbolabs-dev2
+# File parameters
 obr.local.path=files/
-obr.remote.path=/ncbodata/OBR/resource_index/
+obr.ncbodata.path=/ncbodata/OBR/resource_index/
 obr.mgrep.dir=mgrep/mgrep3.0/
 obr.mgrep.input.dir=mgrep/mgrepInputs/
 obr.mgrep.output.dir=mgrep/mgrepOutputs/
@@ -128,7 +133,9 @@ obr.dictionary.dir=dictionaries/
 obr.resource.dir=resources/
 obr.result.dir=results/
 obr.blacklists.dir=blacklists/
-obr.logs.dir=logs/obr/
+obr.logs.dir=logs/
 obr.logs.suffix=_resource.log
 
+obr.svn.code.path=@obrsvncodepath@
+obr.schema.host.name=@obrschemahostname@
 obr.common.log.file=@obrlogfilename@
