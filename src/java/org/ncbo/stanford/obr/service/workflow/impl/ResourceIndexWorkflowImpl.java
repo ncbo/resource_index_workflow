@@ -351,6 +351,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			}
 
 		}		
+		
+		// Deleting entries from statistics table.
+		statisticsDao.deleteEntriesFromOntologies(localOntologyIDs);
+		
 		timer.end();
 		logger.info("\t## The Remove ontology from OBR tables processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		 

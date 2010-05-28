@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
@@ -21,7 +22,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * <li> id                  SMALLINT UNSIGNED  
  * <li> resource_id          INT UNSIGNED NOT NULL 
  * <li>	ontology_id          INT UNSIGNED NOT NULL 
- * <li>	indexed_annotations  INT UNSIGNED 
+ * <li>	aggregated_annotations  INT UNSIGNED 
  * <li>	mgrep_annotations    INT UNSIGNED 
  * <li>	reported_annotations INT UNSIGNED 
  * <li>	isa_annotations      INT UNSIGNED 
@@ -42,7 +43,7 @@ public class StatisticsDao extends AbstractObrDao {
 	private static PreparedStatement getOntolgyIDsForResourceStatement;
 	private static PreparedStatement deleteEntryStatement;
 	private static PreparedStatement deleteStatisticsForResourceStatement;
-	private static PreparedStatement deleteEntriesFromOntologyStatement;
+	 
 		
 	private StatisticsDao() {
 		super(EMPTY_STRING, TABLE_SUFFIX);
@@ -58,7 +59,7 @@ public class StatisticsDao extends AbstractObrDao {
 					"id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"resource_id INT UNSIGNED NOT NULL, " +
 					"ontology_id INT UNSIGNED NOT NULL, " +
-					"indexed_annotations INT UNSIGNED," +
+					"aggregated_annotations INT UNSIGNED," +
 					"mgrep_annotations INT UNSIGNED," +
 					"reported_annotations INT UNSIGNED," +
 					"isa_annotations INT UNSIGNED," +
@@ -75,8 +76,7 @@ public class StatisticsDao extends AbstractObrDao {
 		this.openAddEntryStatement();
 		this.openGetOntolgyIDsForResourceStatement();
 		this.openDeleteEntryStatement();
-		this.openDeleteStatisticsForResourceStatement();
-		this.openDeleteEntriesFromOntologyStatement();
+		this.openDeleteStatisticsForResourceStatement(); 
 	}
 
 	@Override
@@ -85,8 +85,7 @@ public class StatisticsDao extends AbstractObrDao {
 		addEntryStatement.close();
 		getOntolgyIDsForResourceStatement.close();
 		deleteEntryStatement.close();
-		deleteStatisticsForResourceStatement.close();
-		deleteEntriesFromOntologyStatement.close();
+		deleteStatisticsForResourceStatement.close();		 
 	}
 
 	private static class ContextTableHolder {
@@ -107,8 +106,8 @@ public class StatisticsDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT INTO ");
 		queryb.append(this.getTableSQLName());
-		queryb.append(" (resource_id, ontology_id, indexed_annotations, mgrep_annotations, reported_annotations, isa_annotations, mapping_annotations) VALUES (?,?,?,?,?,?,?) ");	
-		queryb.append(" ON DUPLICATE KEY UPDATE indexed_annotations=?, mgrep_annotations= ?, reported_annotations= ?, isa_annotations=?, mapping_annotations=? ;");
+		queryb.append(" (resource_id, ontology_id, aggregated_annotations, mgrep_annotations, reported_annotations, isa_annotations, mapping_annotations) VALUES (?,?,?,?,?,?,?) ");	
+		queryb.append(" ON DUPLICATE KEY UPDATE aggregated_annotations=?, mgrep_annotations= ?, reported_annotations= ?, isa_annotations=?, mapping_annotations=? ;");
 		addEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 
@@ -121,13 +120,13 @@ public class StatisticsDao extends AbstractObrDao {
 		try {
 			addEntryStatement.setInt(1, entry.getResourceID());
 			addEntryStatement.setInt(2, entry.getOntologyID());
-			addEntryStatement.setInt(3, entry.getIndexedAnnotations());
+			addEntryStatement.setInt(3, entry.getAggregatedAnnotations());
 			addEntryStatement.setInt(4, entry.getMgrepAnnotations());
 			addEntryStatement.setInt(5, entry.getReportedAnnotations());
 			addEntryStatement.setInt(6, entry.getIsaAnnotations());
 			addEntryStatement.setInt(7, entry.getMappingAnnotations());
 			
-			addEntryStatement.setInt(8, entry.getIndexedAnnotations());
+			addEntryStatement.setInt(8, entry.getAggregatedAnnotations());
 			addEntryStatement.setInt(9, entry.getMgrepAnnotations());
 			addEntryStatement.setInt(10, entry.getReportedAnnotations());
 			addEntryStatement.setInt(11, entry.getIsaAnnotations());
@@ -273,41 +272,50 @@ public class StatisticsDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for resourceID: " +resourceID + ". False returned.", e);
 		}
 		return deleted;
-	}	
-	
-	private void openDeleteEntriesFromOntologyStatement(){
-		/*DELETE STAT FROM obs_statistics STAT,obs_ontology OT
-		 	WHERE STAT.ontology_id = OT.id and OT.local_ontology_id = ? 
-		 */
-		StringBuffer queryb = new StringBuffer();
-		queryb.append("DELETE STAT FROM");
-		queryb.append(this.getTableSQLName());			
-		queryb.append(" STAT, ");
-		queryb.append(OntologyDao.name());
-		queryb.append(" OT, ");
-		queryb.append(" WHERE ");
-		queryb.append(" STAT.ontology_id = OT.id and OT.local_ontology_id=? ");		
-		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
-	}
+	} 
 	
 	/**
-	 * Deletes the rows for the given local_ontology_id.
+	 * Deletes the rows for the given list of local_ontology_id.
 	 * 
 	 * @return true if the rows were successfully removed. 
 	 */
-	public boolean deleteEntriesFromOntology(String localOntologyID){
+	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){
 		boolean deleted = false;
+		
+		if(localOntologyIDs== null ||localOntologyIDs.size()==0 ){
+			return deleted;
+		}
+		
 		try{
-			deleteEntriesFromOntologyStatement.setString(1, localOntologyID);
-			executeSQLUpdate(deleteEntriesFromOntologyStatement);
+			/*
+			DELETE STAT FROM obs_statistics STAT,obs_ontology OT
+		 	WHERE STAT.ontology_id = OT.id and OT.local_ontology_id IN(?, ?, ?);
+		    */
+			StringBuffer queryb = new StringBuffer();
+			queryb.append("DELETE STAT FROM");
+			queryb.append(this.getTableSQLName());			
+			queryb.append(" STAT, ");
+			queryb.append(OntologyDao.name());
+			queryb.append(" OT, ");
+			queryb.append(" WHERE ");
+			queryb.append(" STAT.ontology_id = OT.id and OT.local_ontology_id IN ( ");			
+			for (String localOntologyID : localOntologyIDs) {
+				queryb.append(localOntologyID);
+				queryb.append(", ");
+			}
+			queryb.delete(queryb.length(), queryb.length()-2);
+			queryb.append(");");
+			
+			executeSQLUpdate(queryb.toString());
+			
 			deleted = true;
 		}		
 		catch (MySQLNonTransientConnectionException e) {
-			this.openDeleteEntriesFromOntologyStatement();
-			return this.deleteEntriesFromOntology(localOntologyID);
+		 
+			return this.deleteEntriesFromOntologies(localOntologyIDs);
 		}
 		catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for local_ontology_id: "+ localOntologyID+". False returned.", e);
+			logger.error("** PROBLEM ** Cannot delete entries from "+this.getTableSQLName()+" for ontology ids. False returned.", e);
 		}
 		return deleted;
 	}
@@ -324,7 +332,7 @@ public class StatisticsDao extends AbstractObrDao {
 
 		private int resourceID;
 		private int ontologyID;
-		private int indexedAnnotations;
+		private int aggregatedAnnotations;
 		private int mgrepAnnotations;
 		private int reportedAnnotations;
 		private int isaAnnotations;
@@ -332,13 +340,13 @@ public class StatisticsDao extends AbstractObrDao {
 	 
 				
 		public StatisticsEntry(int resourceID, int ontologyID,
-				int indexedAnnotations, int mgrepAnnotations,
+				int aggregatedAnnotations, int mgrepAnnotations,
 				int reportedAnnotations, int isaAnnotations,
 				int mappingAnnotations) {
 			super();
 			this.resourceID = resourceID;
 			this.ontologyID = ontologyID;
-			this.indexedAnnotations = indexedAnnotations;
+			this.aggregatedAnnotations = aggregatedAnnotations;
 			this.mgrepAnnotations = mgrepAnnotations;
 			this.reportedAnnotations = reportedAnnotations;
 			this.isaAnnotations = isaAnnotations;
@@ -361,15 +369,14 @@ public class StatisticsDao extends AbstractObrDao {
 		 */
 		public int getOntologyID() {
 			return ontologyID;
-		}
-
-
+		} 
 
 		/**
-		 * @return the indexedAnnotations
+		 * 
+		 * @return aggregatedAnnotations
 		 */
-		public int getIndexedAnnotations() {
-			return indexedAnnotations;
+		public int getAggregatedAnnotations() {
+			return aggregatedAnnotations;
 		}
 
 
@@ -417,7 +424,7 @@ public class StatisticsDao extends AbstractObrDao {
 			sb.append(", ");
 			sb.append(this.ontologyID);
 			sb.append(", ");
-			sb.append(this.indexedAnnotations);
+			sb.append(this.aggregatedAnnotations);
 			sb.append(", ");
 			sb.append(this.mgrepAnnotations);
 			sb.append(", ");

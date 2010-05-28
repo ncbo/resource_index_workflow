@@ -255,12 +255,18 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
+		int aggregated;
+		int mgrep;
+		int reported;
+		int isA ;
+		int mapping;
+		
 		logger.info("*** Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
-		// Getting Indexed annotations
-		HashMap<Integer, Integer> indexedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
+		// Getting Aggregated annotations
+		HashMap<Integer, Integer> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
 		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
@@ -275,23 +281,18 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
-		
-		int indexed;
-		int mgrep;
-		int reported;
-		int isA ;
-		int mapping;
+		 
 		
 		// Get resource id (primary key) from ResourceTable
 		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
 		 
 		// Iterating for each ontologies
-		for (Integer ontologyID : indexedAnnotations.keySet()) {			
+		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
 			 
-			if(indexedAnnotations.get(ontologyID)!= null){
-				indexed = indexedAnnotations.get(ontologyID).intValue();
+			if(aggregatedAnnotations.get(ontologyID)!= null){
+				aggregated = aggregatedAnnotations.get(ontologyID).intValue();
 			}else{
-				indexed = 0;
+				aggregated = 0;
 			}
 			
 			if(mgrepAnnotations.get(ontologyID)!= null){
@@ -319,7 +320,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 			} 
 			
 			// Creating entry for OBR_STATS table
-			StatisticsEntry entry= new StatisticsEntry(resource_id, ontologyID.intValue(), indexed, mgrep, reported, isA, mapping);
+			StatisticsEntry entry= new StatisticsEntry(resource_id, ontologyID.intValue(), aggregated, mgrep, reported, isA, mapping);
 			entries.add(entry);
 		}
 		
