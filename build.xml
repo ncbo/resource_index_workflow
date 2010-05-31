@@ -153,9 +153,9 @@
 		          Build OBS_v1_common project	                        
 			 ================================= -->
 	<target name="build_dependencies">
-		<echo>Building OBS_v1_common project Starts...</echo>
+		<echo>Building obs_v1_common project Starts...</echo>
 		<ant antfile="${obs.common.dir}/build.xml" target="build" inheritall="false"/>
-		<echo>Building OBS_v1_common project Ends...</echo>
+		<echo>Building obs_v1_common project Ends...</echo>
 		<echo>...</echo>				 
 		<echo>...</echo> 
 	</target>
