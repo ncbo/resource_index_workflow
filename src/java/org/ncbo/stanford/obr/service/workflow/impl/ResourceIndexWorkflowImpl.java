@@ -135,10 +135,13 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 */
 	public void resourceProcessing(ResourceAccessTool resourceAccessTool) {
 		ExecutionTimer timer = new ExecutionTimer();
+		ExecutionTimer timer1 = new ExecutionTimer();
 		
 		// Creating logger for resourceAcessTool
 		Logger toolLogger = ResourceAccessTool.getLogger();
-		
+		timer1.start();
+		toolLogger.info("**** Resource "
+				+ resourceAccessTool.getToolResource().getResourceID() + " processing");
 		// Adds resource entry into Resource Table(OBR_RT)
 		resourceAccessTool.addResourceTableEntry();
 
@@ -184,7 +187,11 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		} 
 		// Update resource table entry for latest dictionary and date for resource workflow completed
 		resourceAccessTool.updateResourceWorkflowInfo();
-		 	
+		
+		timer1.end();
+		toolLogger.info("#### Resource " + resourceAccessTool.getToolResource().getResourceName()
+				+ " processed in: "
+				+ timer1.millisecondsToTimeString(timer1.duration()));		
 	}
 	
 	/**
