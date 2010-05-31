@@ -16,6 +16,8 @@ import org.ncbo.stanford.obr.util.helper.StringHelper;
 public class MicadReadWeb implements StringHelper {
 	
 	protected static Logger logger = Logger.getLogger(MicadReadWeb.class);
+	// Constant used to specify max number of reconnect
+	private static final int MAX_RECONNECT = 5; 	
 
 //Main method for testing MicadReadWeb independently
 /*	public static void main(String[] args){
@@ -264,14 +266,13 @@ public class MicadReadWeb implements StringHelper {
 			 bufRdr  = new BufferedReader(inputStreamReader);
 			
 		} catch (Exception e) {
-			//if(reconnectNumber < MAX_RECONNECT){
-				reconnectNumber++;
-			
+			 if(reconnectNumber < MAX_RECONNECT){
+				reconnectNumber++;			
 				logger.info("Trying to get content for the given URL " + urlString + " again after "+(reconnectNumber*5000)+"ms.");			
 				return getResponseForURL(urlString ,reconnectNumber);
-			/*}else{
-				logger.error("** PROBLEM ** Cannot get content for the given URL " + urlString + ". Null has been returned.", e);
-			}*/
+			 }else{
+				logger.error("** PROBLEM ** Cannot get content for the given URL " + urlString + ". Null has been returned." );
+			} 
 		}        
        		
 		return bufRdr;

@@ -25,6 +25,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.AbstractXmlResourceAccessTool;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 /**
@@ -153,7 +154,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		try {			
 			//Extracts all data Files
 			for(int i=0;i<aersZip.length;i++){				
-				nbElement += processZipFile( AERS_URL_ZIP + aersZip[i], aersExtract[i]);
+				nbElement += processZipFile( AERS_URL_ZIP + aersZip[i], FileResourceParameters.resourceFolder() + aersExtract[i]);
 			}
 		} catch (FileNotFoundException e) {
 			logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e); 
@@ -205,10 +206,10 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 		Element element;
 		//parse using builder to get DOM representation of the XML file
 		String subDir=SUB_G_DIR;
-		String[] children = new File(file.getName()+SLASH_STRING+subDir).list();
+		String[] children = new File(file.getAbsolutePath()+SLASH_STRING+subDir).list();
 		if(children==null){
 			subDir=SUB_Q_DIR;
-			children = new File(file.getName()+SLASH_STRING+subDir).list();
+			children = new File(file.getAbsolutePath()+SLASH_STRING+subDir).list();
 		}
 		
 		Document dom=null;
@@ -219,11 +220,11 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 				aersElement=null;
 				element=null;
 				//Add file path with main directory, '/', sgml, '/' and file name
-				String filePath=file.getName()+SLASH_STRING+subDir+SLASH_STRING+fileName;
+				String filePath=file.getAbsolutePath()+SLASH_STRING+subDir+SLASH_STRING+fileName;
 				
 				//Replacing file content which contains '&' instead of '&amp;' 
 				logger.info("Replacing the '&' instead of '&amp;' from "+filePath +" file...");
-				cleanXml(file.getName()+SLASH_STRING+subDir+SLASH_STRING,fileName);
+				cleanXml(file.getAbsolutePath()+SLASH_STRING+subDir+SLASH_STRING,fileName);
 				
 				//Parsing the file
 				logger.info("Parsing "+filePath +" file...");
