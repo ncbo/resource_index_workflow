@@ -64,7 +64,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		elementTableDao.updateDictionary(dictionary.getDictionaryID());	
 		
 		timer.end();
-		logger.info("### Direct processed in: " + timer.millisecondsToTimeString(timer.duration()));
+		logger.info("### Direct annotation processed in: " + timer.millisecondsToTimeString(timer.duration()));
 			
 		return nbAnnotation;
 	}

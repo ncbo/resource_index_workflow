@@ -23,6 +23,19 @@ obr.app.maxlogfilesize=10000KB
 obr.app.maxlogbackupindex=15
  
 ####################################################
+# Common libraries and share code bases 
+####################################################
+# If placed outside project directories
+shared.lib.dir=../shared_libs
+ontologyaccess.dir=../OntologyAccess
+obs.common.dir=../obs_v1_common
+
+# if placed in same project directory
+#shared.lib.dir=shared_libs
+#ontologyaccess.dir=OntologyAccess
+#obs.common.dir=obs_v1_common
+ 
+####################################################
 # OBS Schema/Tables properties 
 ####################################################
 obs.schema.name=obs_hibernate

@@ -11,12 +11,9 @@
 	<property name="dist.dir" value="dist" /> 
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="${web.dir}/WEB-INF/lib" />
-	<property name="tmpl.dir" value="tmpl" />
-	<property name="shared.lib.dir" value="${basedir}/../shared_libs"/>
+	<property name="tmpl.dir" value="tmpl" />	 
 	<property name="protege.lib.dir" value="${shared.lib.dir}/protege_jars"/>
 	<property name="cananolab.lib.dir" value="${shared.lib.dir}/cananolab_jars"/>
-	<property name="ontologyaccess.dir" value="${basedir}/../OntologyAccess"/>	 
-	<property name="obs.common.dir" value="${basedir}/../obs_v1_common"/>
 	<property name="config.dir" value="${basedir}/conf"/>	
 	 
 	<fileset id="shared.jars" dir="${shared.lib.dir}">
