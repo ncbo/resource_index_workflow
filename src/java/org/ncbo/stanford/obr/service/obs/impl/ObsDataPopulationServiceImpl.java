@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.dao.obs.master.ObsMasterDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao.OntologyEntry;
+import org.ncbo.stanford.obr.exception.NoOntologyFoundException;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 
 /**
@@ -36,7 +37,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	 * @param withLatestDictionary if true then will populate OBS data with latest dictionary without creating new dictionary
 	 * 							   if false, a new dictionary row in dictionary table is created.
 	 */	
-	public void populateObsSlaveData(boolean withLatestDictionary) {
+	public void populateObsSlaveData(boolean withLatestDictionary) throws NoOntologyFoundException {
 		// initialize obs master dao
 		if(obsMasterDao== null){
 			obsMasterDao = ObsMasterDao.getInstance();
@@ -64,13 +65,17 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			populateSemanticTypeData(localOntologyIDs);
 			populateLSemanticTypeData();
 		}else{
-			logger.info("No new ontology found in master table.");
+			logger.info("No new ontology found in master table.");					
 		}
 		logger.info("Population of slave data from master obs database completed.");
 		timer.end();		
 		logger.info("Population of slave data processed in : " + timer.millisecondsToTimeString(timer.duration()));
 		// Release the master database connection.
 		obsMasterDao.closeConnection();
+		
+		if(localOntologyIDs == null || localOntologyIDs.size()==0){
+			throw new NoOntologyFoundException();
+		}
 	}
  
 	/**

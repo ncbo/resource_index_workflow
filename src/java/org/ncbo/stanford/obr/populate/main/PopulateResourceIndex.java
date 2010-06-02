@@ -28,8 +28,14 @@ public class PopulateResourceIndex {
 		try{
 			// Populate obs tables from master database 
 			if(poluateSlaveTables){	
-				resourceIndexWorkflow.populateObsSlaveTables();
-				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+				try{
+					resourceIndexWorkflow.populateObsSlaveTables();
+					resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+				}catch (Exception e) {
+					processResources=false;
+					removeDuplicateOntologies=false;
+					e.printStackTrace();
+				} 
 			}				
 			
 			// Populate resource index data

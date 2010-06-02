@@ -17,7 +17,7 @@ public interface ResourceIndexWorkflow {
 	 * 
 	 * <p>This method compares slave and master ontology tables and populate newly added data in slave tables.
 	 */
-	public void populateObsSlaveTables();
+	public void populateObsSlaveTables() throws Exception;
 	
 	/**
 	 * This method load obs table and stuff into memory.  

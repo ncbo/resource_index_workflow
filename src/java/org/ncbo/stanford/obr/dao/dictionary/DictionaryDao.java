@@ -41,6 +41,7 @@ public class DictionaryDao extends AbstractObrDao {
 	
 	private static PreparedStatement addEntryStatement;
 	private static PreparedStatement getLastDictionaryBeanStatement;
+	private static PreparedStatement deleteEntryStatement;
 	private PreparedStatement numberOfEntryStatement;
 	
 	private DictionaryDao() {
@@ -60,6 +61,7 @@ public class DictionaryDao extends AbstractObrDao {
 	protected void openPreparedStatements(){
 		super.openPreparedStatements();
 		this.openAddEntryStatement();
+		this.openDeleteEntryStatement();
 		this.openGetLastDictionaryBeanStatement();
 		this.openNumberOfEntryStatement();
 	}
@@ -69,6 +71,7 @@ public class DictionaryDao extends AbstractObrDao {
 		super.closePreparedStatements();
 		addEntryStatement.close();
 		getLastDictionaryBeanStatement.close();
+		deleteEntryStatement.close();
 	}
 	
 	private static class DictionaryDaoHolder {
@@ -91,6 +94,15 @@ public class DictionaryDao extends AbstractObrDao {
 		queryb.append(this.getTableSQLName());
 		queryb.append(" (name, date_created) VALUES (?,NOW());");
 		addEntryStatement = this.prepareSQLStatement(queryb.toString());
+	}
+	
+ 
+	protected void openDeleteEntryStatement(){
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("DELETE DT FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" DT WHERE DT.id= ? ;");
+		deleteEntryStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
 	/**
@@ -116,6 +128,27 @@ public class DictionaryDao extends AbstractObrDao {
 			logger.error(dictionaryName);
 		}
 		return inserted;	
+	}
+	
+	/**
+	 * Add an new entry in corresponding SQL table.
+	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
+	 */
+	public boolean deleteEntry(int dictionaryID){
+		boolean deleted = false;
+		try {
+			deleteEntryStatement.setInt(1, dictionaryID);
+			this.executeSQLUpdate(deleteEntryStatement);
+			deleted = true;
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			this.openDeleteEntryStatement();
+			return this.deleteEntry(dictionaryID);
+		} 
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot delete an entry on table " + this.getTableSQLName(), e);			 
+		}
+		return deleted;	
 	}
 	
 	private void openGetLastDictionaryBeanStatement(){
@@ -233,9 +266,13 @@ public class DictionaryDao extends AbstractObrDao {
 	 */
 	public int writeDictionaryFile(File file, int dictionaryID){
 		StringBuffer queryb = new StringBuffer();		 
-		queryb.append("SELECT id, name FROM ");
-		queryb.append(TermDao.name());
-		queryb.append("TT WHERE TT.");		 
+		queryb.append("SELECT TT.id, TT.name FROM ");
+		queryb.append(termDao.getTableSQLName());
+		queryb.append(" TT, ");
+		queryb.append(conceptDao.getMemoryTableSQLName());
+		queryb.append(" CT, ");
+		queryb.append(ontologyDao.getMemoryTableSQLName());
+		queryb.append(" OT WHERE TT.concept_id=CT.id AND CT.ontology_id=OT.id AND TT.");		 
 		queryb.append(this.blackListFilter());
 		queryb.append(" AND OT.dictionary_id = ");
 		queryb.append(dictionaryID);

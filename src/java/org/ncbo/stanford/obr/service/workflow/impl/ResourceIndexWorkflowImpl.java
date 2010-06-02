@@ -63,7 +63,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * 
 	 * <p>This method compares slave and master ontology tables and populate newly added data in slave tables.
 	 */
-	public void populateObsSlaveTables() {
+	public void populateObsSlaveTables() throws Exception{
 		 logger.info("Populating obs slave tables starts");	
 		 boolean withLatestDictionary = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.dictionary.latest"));
 		 

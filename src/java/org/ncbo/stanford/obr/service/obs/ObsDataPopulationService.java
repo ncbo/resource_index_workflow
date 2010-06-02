@@ -3,6 +3,8 @@ package org.ncbo.stanford.obr.service.obs;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.ncbo.stanford.obr.exception.NoOntologyFoundException;
+
 /**
  * This service interface {@code ObsDataPopulationService} is used for populating obs slave data from master table which is used for
  * populating resource index
@@ -19,7 +21,7 @@ public interface ObsDataPopulationService {
 	 * @param withLatestDictionary if true then will populate OBS data with latest dictionary without creating new dictionary
 	 * 							   if false, a new dictionary row in dictionary table is created.
 	 */	
-	public void populateObsSlaveData(boolean withLatestDictionary);
+	public void populateObsSlaveData(boolean withLatestDictionary) throws NoOntologyFoundException;
 	
 	/**
 	 * This method load obs table and stuff into memory.  
