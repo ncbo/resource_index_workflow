@@ -286,7 +286,10 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	
 	public void createIndexForAnnotationTable() {	
 		if(!directAnnotationTableDao.isIndexExist()){
-			 directAnnotationTableDao.createIndex();		 
-		} 
+			 directAnnotationTableDao.createIndex();
+			 logger.info("\tIndexes created for table " + directAnnotationTableDao.getTableSQLName());
+		} else{
+			logger.info("\tIndexes already present in table " + directAnnotationTableDao.getTableSQLName());
+		}
 	}
 }

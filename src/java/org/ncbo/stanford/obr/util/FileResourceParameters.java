@@ -13,6 +13,9 @@ public class FileResourceParameters implements StringHelper{
 	// OBR schema host name
 	public static final String OBR_SCHEMA_HOST 	= MessageUtils.getMessage("obr.schema.host.name");
 	
+	// OBR version
+	public static final String OBR_VERSION 	= MessageUtils.getMessage("obr.version");
+	
 	// SVN code path
 	public static final String SVN_CODE_PATH = MessageUtils.getMessage("obr.svn.code.path");
 	
@@ -34,7 +37,7 @@ public class FileResourceParameters implements StringHelper{
 	  
 	
 	public static String dictionaryFolder(){
-		return selectRightFolder(DICTIONARY_FOLDER);
+		return selectRightFolder(DICTIONARY_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING);
 	}
 	
 	public static String resourceFolder(){
@@ -87,7 +90,7 @@ public class FileResourceParameters implements StringHelper{
 		try{
 			File ncboDataObrFolder = new File(NCBODATA_OBR_FOLDER);
 		    if (ncboDataObrFolder.exists()){
-		    	folder = NCBODATA_OBR_FOLDER + folderName;
+		    	folder = NCBODATA_OBR_FOLDER + OBR_VERSION + SLASH_STRING+ folderName;
 			}
 		    else{		    	 
 		    	folder = LOCAL_FOLDER + folderName;
@@ -100,5 +103,5 @@ public class FileResourceParameters implements StringHelper{
 			folderFile.mkdirs();
 		}
 		return folder;
-	} 
+	}  
 }

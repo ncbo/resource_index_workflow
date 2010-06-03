@@ -103,7 +103,8 @@
 				<filter token="obrschemahostname" value="${obr.schema.host.name}" />
 				<filter token="obsschemaname" value="${obs.schema.name}" />
 				
-				<filter token="obrsvncodepath" value="${obr.svn.code.path}" />				
+				<filter token="obrsvncodepath" value="${obr.svn.code.path}" />		
+				<filter token="obrversion" value="${obr.version}" />	
 				
 				<filter token="obrresourceids" value="${obr.resource.ids}" />
 				

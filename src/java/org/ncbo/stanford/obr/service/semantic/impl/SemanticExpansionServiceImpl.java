@@ -100,11 +100,17 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	public void createIndexForExpandedAnnotationTables() {
 		if(!isaExpandedAnnotationTableDao.indexesExist()){
 			isaExpandedAnnotationTableDao.createIndexes();	 
-		} 
+			logger.info("\tIndexes created for table " + isaExpandedAnnotationTableDao.getTableSQLName());
+		}else{
+			logger.info("\tIndexes already present in table " + isaExpandedAnnotationTableDao.getTableSQLName());
+		}
 		
 		if(!mapExpandedAnnotationTableDao.indexesExist()){
 			mapExpandedAnnotationTableDao.createIndexes();	 
-		}  
+			logger.info("\tIndexes created for table " + mapExpandedAnnotationTableDao.getTableSQLName());
+		} else{
+			logger.info("\tIndexes already present in table " + mapExpandedAnnotationTableDao.getTableSQLName());
+		}
 		
 	}
 

@@ -1,5 +1,5 @@
-# The current environment dev/stage/prod
-obr.environment=dev
+# The current vesrion : test/v1.0/v1.1/v2.0
+obr.version=test
 
 # SVN repository path  e.g. trunk, branch, tag
 obr.svn.code.path=branch1.0

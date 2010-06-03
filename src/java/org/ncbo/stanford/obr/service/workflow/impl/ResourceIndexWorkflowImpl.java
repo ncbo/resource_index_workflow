@@ -251,12 +251,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");	
 		
 		//Create indexes on Annotation and expanded annotation table.
-		toolLogger.info("** Creating indexes on Annotation and expanded annotation table starts ..");
+		toolLogger.info("*** Creating indexes on Annotation and expanded annotation table starts ..");
 		timer.reset();
 		timer.start();
 		resourceAccessTool.createIndexForAnnotationTables();
 		timer.end();
-		toolLogger.info("## Created indexes on Annotation and expanded annotation table in "
+		toolLogger.info("### Created indexes on Annotation and expanded annotation table in "
 				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
 			 
 		return nbIndexedAnnotation;  

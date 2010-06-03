@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
@@ -292,18 +291,16 @@ public class StatisticsDao extends AbstractObrDao {
 		 	WHERE STAT.ontology_id = OT.id and OT.local_ontology_id IN(?, ?, ?);
 		    */
 			StringBuffer queryb = new StringBuffer();
-			queryb.append("DELETE STAT FROM");
+			queryb.append("DELETE STAT FROM ");
 			queryb.append(this.getTableSQLName());			
 			queryb.append(" STAT, ");
-			queryb.append(OntologyDao.name());
-			queryb.append(" OT, ");
-			queryb.append(" WHERE ");
-			queryb.append(" STAT.ontology_id = OT.id and OT.local_ontology_id IN ( ");			
+			queryb.append(ontologyDao.getMemoryTableSQLName());
+			queryb.append(" OT WHERE STAT.ontology_id = OT.id AND OT.local_ontology_id IN ( ");			
 			for (String localOntologyID : localOntologyIDs) {
 				queryb.append(localOntologyID);
 				queryb.append(", ");
 			}
-			queryb.delete(queryb.length(), queryb.length()-2);
+			queryb.delete(queryb.length()-2, queryb.length());
 			queryb.append(");");
 			
 			executeSQLUpdate(queryb.toString());

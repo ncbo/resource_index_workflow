@@ -25,18 +25,20 @@ public class PopulateResourceIndex {
 		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
 		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
 		
-		try{
+		try{ 
 			// Populate obs tables from master database 
 			if(poluateSlaveTables){	
 				try{
-					resourceIndexWorkflow.populateObsSlaveTables();
-					resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+					resourceIndexWorkflow.populateObsSlaveTables();					
 				}catch (Exception e) {
 					processResources=false;
 					removeDuplicateOntologies=false;
 					e.printStackTrace();
 				} 
-			}				
+			}
+			
+			// Loading obs slave table
+			resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
 			
 			// Populate resource index data
 			if(processResources){
@@ -45,8 +47,7 @@ public class PopulateResourceIndex {
 		   
 			// Remove duplicates.
 			if(removeDuplicateOntologies){
-				resourceIndexWorkflow.removeOntologyDuplicates();
-				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+				resourceIndexWorkflow.removeOntologyDuplicates();				 
 			}
 			
 		}catch (Exception e) {
