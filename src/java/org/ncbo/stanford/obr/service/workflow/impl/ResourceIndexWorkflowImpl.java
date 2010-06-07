@@ -124,7 +124,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		}
 		workflowTimer.end();
-		logger.info("Resources index Workflow completed in : " + timer.millisecondsToTimeString(timer.duration()));	
+		logger.info("Resources index Workflow completed in : " + workflowTimer.millisecondsToTimeString(workflowTimer.duration()));	
 	}
 
 	/**
