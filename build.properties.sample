@@ -43,7 +43,7 @@ obs.schema.name=obs_hibernate
 # Resource Index Schema/Tables properties 
 ####################################################
 # Configuring resource index database 
-obr.jdbc.url=jdbc:mysql://localhost:3306/resource_index
+obr.jdbc.url=jdbc:mysql://localhost:3306/resource_index?noAccessToProcedureBodies=true
 obr.jdbc.driver=com.mysql.jdbc.Driver
 obr.jdbc.username=yourusername
 obr.jdbc.password=yourpassword
