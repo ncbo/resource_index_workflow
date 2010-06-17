@@ -77,7 +77,6 @@ public class OntologyDao extends AbstractObsDao{
 		"virtual_ontology_id VARCHAR(246) NOT NULL, " +
 		"format VARCHAR(32) DEFAULT NULL, "+
 		"dictionary_id SMALLINT UNSIGNED NOT NULL, " +
-		"INDEX X_" + this.getTableSQLName() + "_local_ontology_id (local_ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() + "_virtualOntologyID (virtual_ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() + "_dictionary_id (dictionary_id)" +
 		")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
