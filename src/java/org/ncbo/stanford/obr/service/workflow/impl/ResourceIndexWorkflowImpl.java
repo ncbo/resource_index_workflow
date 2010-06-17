@@ -1,6 +1,7 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import obs.obr.populate.ObrWeight;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
+import org.ncbo.stanford.obr.dao.execution.ExecutionDao.ExecutionEntry;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 import org.ncbo.stanford.obr.service.obs.impl.ObsDataPopulationServiceImpl;
@@ -103,6 +105,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		logger.info("The Resources index Workflow Started.\n");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool resourceAccessTool = null;
+			ExecutionEntry executionEntry= new ExecutionEntry();
+			executionEntry.setResourceId(resourceID);
+			executionEntry.setExecutionBeginning(new Date());
 			try {
 				// Create resource tool object using reflection.
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
@@ -110,16 +115,18 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 								+ resourceID.toLowerCase())).newInstance();				 
 				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "....\n");
 				timer.start();
-				resourceProcessing(resourceAccessTool);
+				resourceProcessing(resourceAccessTool, executionEntry);
 				timer.end();
 				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + " processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
 			} catch (Exception e) {
 				logger.error(
 						"Problem in creating resource tool for resource id : "
 								+ resourceID, e);
-			}finally{				
+			}finally{					
 				resourceAccessTool= null;
 				System.gc();
+				executionEntry.setExecutionEnd(new Date());
+				executionDao.addEntry(executionEntry);				
 			}
 
 		}
@@ -132,8 +139,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * Also it annotate that elements using obs tables and index them. 
 	 * 
 	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
+	 * @param executionEntry 
 	 */
-	public void resourceProcessing(ResourceAccessTool resourceAccessTool) {
+	public void resourceProcessing(ResourceAccessTool resourceAccessTool, ExecutionEntry executionEntry) {
 		ExecutionTimer timer = new ExecutionTimer();
 		ExecutionTimer timer1 = new ExecutionTimer();
 		
@@ -155,7 +163,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		}
 
 		logger.info("\n");
-		
+		if(resourceAccessTool.numberOfElement()==0){
+			executionEntry.setFirstExecution(true);
+		}
 		// Update resource for new elements 
 		if (Boolean
 				.parseBoolean(MessageUtils.getMessage("obr.update.resource"))) {
@@ -173,13 +183,19 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		// Get the latest dictionary from OBS_DVT
  		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
- 		
+ 	    // Adding into execution entry.
+		executionEntry.setDictionaryId(dictionary.getDictionaryID());
+		
     	// value for withCompleteDictionary parameter.
 		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
 				.getMessage("obr.dictionary.complete"));
+		// Adding into execution entry.
+		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
+		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID()));
+		 
 		// Execute the workflow according to resource type. 
-		long nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+	    long nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
 				
 		// Update obr_statistics table.
 		if(nbIndexedAnnotation > 0) {		 
@@ -208,8 +224,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		ExecutionTimer timer = new ExecutionTimer();
 		int nbEntry ;		
-		// Total number of entries found in element table.		 
-		nbEntry = resourceAccessTool.numberOfElement();	 
+		// Total number of entries found in element table for annotation.		 
+		nbEntry = resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
 		
 		// Processing direct annotations
 		long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
@@ -359,8 +375,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		}		
 		
+		// Tracker item #2230
 		// Deleting entries from statistics table.
-		statisticsDao.deleteEntriesFromOntologies(localOntologyIDs);
+		// statisticsDao.deleteEntriesFromOntologies(localOntologyIDs);
 		
 		timer.end();
 		logger.info("\t## The Remove ontology from OBR tables processed in: " + timer.millisecondsToTimeString(timer.duration()));

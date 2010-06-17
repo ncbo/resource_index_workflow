@@ -101,6 +101,7 @@
 				<filter token="obrjdbcusername" value="${obr.jdbc.username}" />
 				<filter token="obrjdbcpassword" value="${obr.jdbc.password}" />
 				<filter token="obrschemahostname" value="${obr.schema.host.name}" />
+				<filter token="obrschemaname" value="${obr.schema.name}" />
 				<filter token="obsschemaname" value="${obs.schema.name}" />
 				
 				<filter token="obrsvncodepath" value="${obr.svn.code.path}" />		

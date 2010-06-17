@@ -89,7 +89,9 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 	public List<String> populateOntologySlaveData(int dictionaryID, List<String> currentSlavLocalOntologyIDs) {
 		List<OntologyEntry>  ontologyEnties= obsMasterDao.getMasterOntologyEntries(dictionaryID, currentSlavLocalOntologyIDs);
 		List<String> localOntologyIDs = new ArrayList<String>();
-		int numberOfOntologiesAdded= ontologyDao.addEntries(ontologyEnties);	
+		int numberOfOntologiesAdded= ontologyDao.addEntries(ontologyEnties);
+		// Populate obr ontology table
+		obrOntologyDao.addEntries(ontologyEnties);	
 		// Adding populated local ontology ids in list.
 		for (OntologyEntry ontologyEntry : ontologyEnties) {
 			localOntologyIDs.add(ontologyEntry.getLocalOntologyID());

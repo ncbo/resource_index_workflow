@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.service.workflow;
 
+import org.ncbo.stanford.obr.dao.execution.ExecutionDao.ExecutionEntry;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -40,7 +41,7 @@ public interface ResourceIndexWorkflow {
 	 * 
 	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
 	 */
-	public void resourceProcessing(ResourceAccessTool resourceAccessTool);
+	public void resourceProcessing(ResourceAccessTool resourceAccessTool, ExecutionEntry executionEntry);
 	
 	/**
 	 * Deletes the ontology duplicates from the OBS slave tables and all the resource index tables.

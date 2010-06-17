@@ -2,6 +2,7 @@ package org.ncbo.stanford.obr.dao;
 
 import org.ncbo.stanford.obr.dao.context.ContexDao;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
+import org.ncbo.stanford.obr.dao.execution.ExecutionDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
 import org.ncbo.stanford.obr.dao.obs.map.MapDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao;
@@ -9,6 +10,7 @@ import org.ncbo.stanford.obr.dao.obs.relation.RelationDao;
 import org.ncbo.stanford.obr.dao.obs.semantic.LSemanticTypeDao;
 import org.ncbo.stanford.obr.dao.obs.semantic.SemanticTypeDao;
 import org.ncbo.stanford.obr.dao.obs.term.TermDao;
+import org.ncbo.stanford.obr.dao.ontology.ObrOntologyDao;
 import org.ncbo.stanford.obr.dao.resource.ResourceDao;
 import org.ncbo.stanford.obr.dao.statistics.StatisticsDao;
 
@@ -56,6 +58,11 @@ public interface DaoFactory {
 	
 	/** Singleton data access object for statistics table. */
 	public static final StatisticsDao statisticsDao = StatisticsDao.getInstance();
-	 
+	
+	/** Singleton data access object for obr ontology table. */
+	public static final ObrOntologyDao obrOntologyDao = ObrOntologyDao.getInstance();
+	
+	/** Singleton data access object for obr execution table. */
+	public static final ExecutionDao executionDao = ExecutionDao.getInstance();
 
 }

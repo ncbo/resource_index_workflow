@@ -48,6 +48,7 @@ obr.jdbc.driver=com.mysql.jdbc.Driver
 obr.jdbc.username=yourusername
 obr.jdbc.password=yourpassword
 obr.schema.host.name=localhost
+obr.schema.name=schema_name
 
 # Configuring RXRD database 
 obr.rxrd.jdbc.url=jdbc:mysql://localhost:3306/rxrd

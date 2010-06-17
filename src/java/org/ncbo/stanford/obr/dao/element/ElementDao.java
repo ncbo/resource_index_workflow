@@ -426,8 +426,8 @@ public class ElementDao extends AbstractObrDao {
 	 * @param dictionaryID
 	 * @return
 	 */
-	public boolean containElementsForMgrepAnnotation(int dictionaryID){
-		boolean result = false;
+	public int numberOfElementsForMgrepAnnotation(int dictionaryID){
+		 
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT count(id) FROM ");
 		queryb.append(this.getTableSQLName());		 
@@ -438,16 +438,14 @@ public class ElementDao extends AbstractObrDao {
 		try{
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			if(rSet.first()){
-				int nonAnnotatedElement = rSet.getInt(1);
-				if(nonAnnotatedElement> 0){
-					result = true;
-				}
+				return rSet.getInt(1);
+				 
 			} 
 		}catch (SQLException e) {
 			 logger.error("Problem in getting non annotated element count", e);
 		}
 		
-		return result;
+		return 0;
 	}
 	
 	/**

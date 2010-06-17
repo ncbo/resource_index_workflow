@@ -49,7 +49,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		logger.info("*** Executing  Direct Annotation process... ");
 		// processes direct mgrep annotations
 		
-		if(elementTableDao.containElementsForMgrepAnnotation(dictionary.getDictionaryID())){
+		if(elementTableDao.numberOfElementsForMgrepAnnotation(dictionary.getDictionaryID())> 0){
 			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
 			 		withCompleteDictionary, stopwords);
 		} else{
@@ -291,5 +291,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		} else{
 			logger.info("\tIndexes already present in table " + directAnnotationTableDao.getTableSQLName());
 		}
+	}
+
+	public int getNumberOfElementsForAnnotation(int dictionaryID) {		 
+		return elementTableDao.numberOfElementsForMgrepAnnotation(dictionaryID);
 	}
 }

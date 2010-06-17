@@ -47,4 +47,6 @@ public interface AnnotationService {
 	 * 
 	 */
 	public void createIndexForAnnotationTable();
+	
+	public int getNumberOfElementsForAnnotation(int dictionaryID);
 }
