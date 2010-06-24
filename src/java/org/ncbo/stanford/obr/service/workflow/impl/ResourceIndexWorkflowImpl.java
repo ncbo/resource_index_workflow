@@ -195,10 +195,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID()));
 		 
 		// Execute the workflow according to resource type. 
-	    long nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+	    long nbAggregatedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
 				
 		// Update obr_statistics table.
-		if(nbIndexedAnnotation > 0) {		 
+		if(nbAggregatedAnnotation > 0) {		 
 			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
 		} 
 		// Update resource table entry for latest dictionary and date for resource workflow completed
@@ -259,23 +259,23 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		 
 		// Aggregation step to annotations.
-		long nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+		long nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
 				obrWeights);
-		toolLogger.info(nbEntry + " elements indexed (with "
-				+ nbIndexedAnnotation
-				+ " new indexed annotations) from resource "
+		toolLogger.info(nbEntry + " elements aggregated (with "
+				+ nbAggregatedAnnotation
+				+ " new aggregated annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");	
 		
 		//Create indexes on Annotation and expanded annotation table.
-		toolLogger.info("*** Creating indexes on Annotation and expanded annotation table starts ..");
+		toolLogger.info("*** Indexing of workflow_status column on annotation and expanded annotation tables starts...");
 		timer.reset();
 		timer.start();
 		resourceAccessTool.createIndexForAnnotationTables();
 		timer.end();
-		toolLogger.info("### Created indexes on Annotation and expanded annotation table in "
+		toolLogger.info("### Indexing of workflow_status column on annotation and expanded annotation tables completed in "
 				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
 			 
-		return nbIndexedAnnotation;  
+		return nbAggregatedAnnotation;  
 		
 	} 
  

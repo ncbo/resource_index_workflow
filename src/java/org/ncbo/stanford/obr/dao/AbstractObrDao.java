@@ -491,12 +491,12 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	/**
 	 * Returns the number of elements in the table (-1 if a problem occurs during the count). 
 	 */
-	public int numberOfEntry(){
-		int nbEntry = -1;
+	public long numberOfEntry(){
+		long nbEntry = -1;
 		try{
 			ResultSet rSet = this.executeSQLQuery(numberOfEntryStatement);
 			rSet.first();
-			nbEntry = rSet.getInt(1);
+			nbEntry = rSet.getLong(1);
 			rSet.close();
 		} 		
 		catch (MySQLNonTransientConnectionException e) {

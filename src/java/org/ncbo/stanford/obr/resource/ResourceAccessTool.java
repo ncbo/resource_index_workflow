@@ -238,7 +238,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	/**
 	 * Returns the number of elements in the _ET table. 
 	 */
-	public int numberOfElement(){
+	public long numberOfElement(){
 		return this.resourceUpdateService.numberOfEntry();
 	}
 	
@@ -292,7 +292,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	}
    
 	/**
-	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * This method calculates number of aggregated annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
 	 * @param withCompleteDictionary 
 	 * @param dictionary 

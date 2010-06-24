@@ -42,7 +42,6 @@ public class DictionaryDao extends AbstractObrDao {
 	private static PreparedStatement addEntryStatement;
 	private static PreparedStatement getLastDictionaryBeanStatement;
 	private static PreparedStatement deleteEntryStatement;
-	private PreparedStatement numberOfEntryStatement;
 	
 	private DictionaryDao() {
 		super(EMPTY_STRING, TABLE_SUFFIX );
@@ -62,8 +61,7 @@ public class DictionaryDao extends AbstractObrDao {
 		super.openPreparedStatements();
 		this.openAddEntryStatement();
 		this.openDeleteEntryStatement();
-		this.openGetLastDictionaryBeanStatement();
-		this.openNumberOfEntryStatement();
+		this.openGetLastDictionaryBeanStatement();		 
 	}
 	
 	@Override
@@ -184,34 +182,7 @@ public class DictionaryDao extends AbstractObrDao {
 			dictionary = null;
 		}
 		return dictionary;
-	}
-	
-	
-	private void openNumberOfEntryStatement() {
-		String query = "SELECT COUNT(*) FROM " + this.getTableSQLName() + ";";
-		this.numberOfEntryStatement= this.prepareSQLStatement(query);
-	}
-	
-	/**
-	 * Returns the number of elements in the table (-1 if a problem occurs during the count). 
-	 */
-	public int numberOfEntry(){
-		int nbEntry = -1;
-		try{
-			ResultSet rSet = this.executeSQLQuery(numberOfEntryStatement);
-			rSet.first();
-			nbEntry = rSet.getInt(1);
-			rSet.close();
-		} 		
-		catch (MySQLNonTransientConnectionException e) {
-			this.openNumberOfEntryStatement();
-			return this.numberOfEntry();
-		}
-		catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot get number of entry on table " + this.getTableSQLName()+". -1 returned.", e);
-		}
-		return nbEntry;
-	}
+	} 
 
 	
 	/*
@@ -264,7 +235,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 * for a given dictionaryID. Used to generate a dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
-	public int writeDictionaryFile(File file, int dictionaryID){
+	public long writeDictionaryFile(File file, int dictionaryID){
 		StringBuffer queryb = new StringBuffer();		 
 		queryb.append("SELECT TT.id, TT.name FROM ");
 		queryb.append(termDao.getTableSQLName());
@@ -278,7 +249,7 @@ public class DictionaryDao extends AbstractObrDao {
 		queryb.append(dictionaryID);
 		queryb.append("; "); 
 		
-		int nbLines = 0;
+		long nbLines = 0;
 		try{
 			ResultSet couplesSet = this.executeSQLQuery(queryb.toString());
 			nbLines = this.writeFile(file, couplesSet);
@@ -296,7 +267,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 * Used to generate a complete dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
-	public int writeDictionaryFile(File file){
+	public long writeDictionaryFile(File file){
 		
 		StringBuffer queryb = new StringBuffer();		 
 		queryb.append("SELECT id, name FROM ");
@@ -305,7 +276,7 @@ public class DictionaryDao extends AbstractObrDao {
 		queryb.append(this.blackListFilter());
 		queryb.append("; "); 
 		
-		int nbLines = 0;
+		long nbLines = 0;
 		try{
 			ResultSet couplesSet = this.executeSQLQuery(queryb.toString());
 			nbLines = this.writeFile(file, couplesSet);
@@ -318,8 +289,8 @@ public class DictionaryDao extends AbstractObrDao {
 		return nbLines;
 	} 
 	
-	private int writeFile(File file, ResultSet couplesSet) throws IOException, SQLException {
-		int nbLines = 0;
+	private long writeFile(File file, ResultSet couplesSet) throws IOException, SQLException {
+		long nbLines = 0;
 		FileWriter fstream = new FileWriter(file);
 		BufferedWriter out = new BufferedWriter(fstream);
 		StringBuffer lineb = new StringBuffer();

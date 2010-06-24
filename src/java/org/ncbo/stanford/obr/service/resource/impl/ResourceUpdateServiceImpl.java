@@ -87,7 +87,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		resourceTableDao.addEntryOrUpdate(resource);
 	}
  
-	public int numberOfEntry() {		 
+	public long numberOfEntry() {		 
 		return elementTableDao.numberOfEntry();
 	} 
 
@@ -249,7 +249,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	
 	
 	/**
-	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * This method calculates number of aggregated annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
 	 * 
 	 */
