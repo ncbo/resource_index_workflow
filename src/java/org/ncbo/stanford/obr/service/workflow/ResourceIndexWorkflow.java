@@ -52,4 +52,11 @@ public interface ResourceIndexWorkflow {
 	 */
 	public void removeOntologyDuplicates();	
 	
+	/**
+	 * This step execute replication mechanism between resource index 
+	 * master/slave database.
+	 * 
+	 */
+	public void executeReplicationMechanism();
+	
 }

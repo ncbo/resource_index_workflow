@@ -1,5 +1,9 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -48,6 +52,11 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			ReportedContextBean.RDA_WEIGHT);
 	
 	private ObsDataPopulationService obsDataPopulationService = new ObsDataPopulationServiceImpl();
+	
+	//attributes 	
+	private static final String SHELL_SCRIPT_PATH = new File(ResourceIndexWorkflowImpl.class.getResource( "ridbsync.sh" ).getFile()).getAbsolutePath();
+	private static final String RPLICATION_COMMAND = "sh "+ SHELL_SCRIPT_PATH;	
+	
 	  
 	public ResourceIndexWorkflowImpl() {
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
@@ -382,6 +391,58 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		timer.end();
 		logger.info("\t## The Remove ontology from OBR tables processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		 
+	}
+
+	/**
+	 * This step execute replication mechanism between resource index 
+	 * master/slave database.
+	 * 
+	 */
+	public void executeReplicationMechanism() {
+		Runtime runtime = Runtime.getRuntime();
+		Process process = null;
+		BufferedReader resultReader = null;
+		BufferedReader errorReader = null;
+		try {					
+			 
+			process = runtime.exec(RPLICATION_COMMAND); 
+			
+			resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			
+			String resultLine = null  ; 			 
+		
+			while((resultLine = resultReader.readLine()) != null) {
+				logger.info(resultLine);
+			}	
+			
+			// parse the file
+			errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			 
+			while((resultLine = errorReader.readLine()) != null) {
+				logger.error(resultLine);
+			}	
+				
+			}catch (Exception e) {
+				logger.error("Problem in executing repication script", e);
+		}finally{
+			if(resultReader!= null){
+				try {
+					resultReader.close();
+				} catch (IOException e) {
+					 e.printStackTrace();
+				}
+			}
+			if(errorReader!= null){
+				try {
+					errorReader.close();
+				} catch (IOException e) {					 
+					e.printStackTrace();
+				}
+			}
+				
+			
+		}
+		
 	}
 
 }
