@@ -10,13 +10,11 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 import obs.obr.populate.Element.BadElementStructureException;
 
-import org.apache.axis.message.MessageElement;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
 
@@ -74,7 +72,13 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 	
 	// Contents name for study tag(study information contains below this tags')
 	private static final String GAP_TAGNAME_STUDY =	"d_study_results";
-	//->
+	
+	// Contents name for study name
+	private static final String GAP_TAGNAME_STUDY_NAME =	"d_study_name";
+	
+	// Contents name for study tag(study information contains below this tags')
+	private static final String GAP_TAGNAME_STUDY_LIST = "d_study_disease_list";
+	 
 	
 	/**
 	 * Construct DbGapAccessTool using database connection property
@@ -125,7 +129,7 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 	 * 
 	 */
 	 
-	@SuppressWarnings("unchecked")
+ 
 	@Override
 	 protected int updateElementTableWithUIDs(HashSet<String> UIDs) throws BadElementStructureException{
 		int nbElement = 0;
@@ -167,53 +171,60 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 					
 					docSumItems = resultDocSums[i].getItem();
 					
-					//Checks parent tag start with "d_study_results"
-					if(docSumItems[0].getName().equals(GAP_TAGNAME_STUDY)){
+					for (ItemType docSumItem : docSumItems) {
+						if(docSumItem.getName().equals(GAP_TAGNAME_STUDY)){
 
-						String localElementID=resultDocSums[i].getId();
-						
-						// 1st element of docSumItems contains study name context
-						eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[0]),docSumItems[0].get_any()[0].getValue());
-						
-						// 2rd elements of docSumItems contains study disease MSH list context
-						Iterator<MessageElement > childElements = docSumItems[0].get_any()[12].getChildElements();
-						String diseaseList=getAllElements(childElements);
-						String concepts_MSH = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[1], COMMA_STRING);
-						// if mapping concepts are null or empty then log message for it.
-						if(concepts_MSH== null || concepts_MSH.trim().length()== 0){
-							logger.error("Cannot map study_disease_list_MSH  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
+							String localElementID=resultDocSums[i].getId();
 							
-						}
-						eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[1]), concepts_MSH);
-					
-						// 3rd elements of docSumItems contains study disease SNOMEDCT list context
-						String concepts_SNOMEDCT = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[2], COMMA_STRING);
-						// if mapping concepts are null or empty then log message for it.
-						if(concepts_SNOMEDCT== null || concepts_SNOMEDCT.trim().length()== 0){
-							logger.error("Cannot map study_disease_list_SNOMEDCT  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
+							for(ItemType itemType : docSumItem.getItem()){
+								if(GAP_TAGNAME_STUDY_NAME.equalsIgnoreCase(itemType.getName())){
+									// 1st element of docSumItems contains study name context
+									eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[0]),getItemTypeContent(itemType));
+								}else if(GAP_TAGNAME_STUDY_LIST.equalsIgnoreCase(itemType.getName())){
+									
+									String diseaseList = getItemTypeContent(itemType, COMMA_STRING);
+									String concepts_MSH = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[1], COMMA_STRING);
+									// if mapping concepts are null or empty then log message for it.
+									if(concepts_MSH== null || concepts_MSH.trim().length()== 0){
+										logger.error("Cannot map study_disease_list_MSH  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
+										
+									}
+									eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[1]), concepts_MSH);
+								
+									// 3rd elements of docSumItems contains study disease SNOMEDCT list context
+									String concepts_SNOMEDCT = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[2], COMMA_STRING);
+									// if mapping concepts are null or empty then log message for it.
+									if(concepts_SNOMEDCT== null || concepts_SNOMEDCT.trim().length()== 0){
+										logger.error("Cannot map study_disease_list_SNOMEDCT  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
+										
+									}
+									eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[2]), concepts_SNOMEDCT);
+									
+									//4th elements of docSumItems contains study disease 13578 list context
+									String concepts_13578 = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[3], COMMA_STRING);
+									// if mapping concepts are null or empty then log message for it.
+									if(concepts_13578== null || concepts_13578.trim().length()== 0){
+										logger.error("Cannot map study_disease_list_13578  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
+										
+									}
+									eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[3]), concepts_13578);
 							
-						}
-						eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[2]), concepts_SNOMEDCT);
-						
-						//4th elements of docSumItems contains study disease 13578 list context
-						String concepts_13578 = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(diseaseList, GAP_ONTOIDS[3], COMMA_STRING);
-						// if mapping concepts are null or empty then log message for it.
-						if(concepts_13578== null || concepts_13578.trim().length()== 0){
-							logger.error("Cannot map study_disease_list_13578  '" + diseaseList + "' to local concept id for element with ID " + localElementID +".");
-							
-						}
-						eltStructure.putContext(Structure.generateContextName(GAP_RESOURCEID, GAP_ITEMKEYS[3]), concepts_13578);
-
-						if(localElementID != null){
-							element = new Element(localElementID, eltStructure);
-							if (this.resourceUpdateService.addElement(element)){
-									nbElement ++;
+								}
+							} 							
+							 
+							if(localElementID != null){
+								element = new Element(localElementID, eltStructure);
+								if (this.resourceUpdateService.addElement(element)){
+										nbElement ++;
+								}
+								
+							}else{
+								logger.error(" In getting Element with null localElementID .");
 							}
-							
-						}else{
-							logger.error(" In getting Element with null localElementID .");
 						}
-					}					
+					}
+					//Checks parent tag start with "d_study_results"
+										
 					
 				}
 			} catch (RemoteException e) {				 
@@ -222,20 +233,7 @@ public class DbGapAccessTool extends AbstractNcbiResourceAccessTool {
 		}
 		return nbElement;
 	} 
-		
-	@SuppressWarnings("unchecked")
-	private String getAllElements(Iterator<MessageElement > childElements){											
-		String values=EMPTY_STRING;
-		while(childElements.hasNext()){
-			MessageElement itemType=childElements.next();
-			Iterator<MessageElement > subChildElements = itemType.getChildElements();
-			while(subChildElements.hasNext()){
-				MessageElement itemType1=subChildElements.next();
-				values+=itemType1.getValue()+COMMA_STRING;				
-			}
-		}		
-		return values.length() > 0 ? values.substring(0,values.length()-1) : values;
-	}
+	
 	@Override
 	public String elementURLString(String elementLocalID) {
 		return GAP_ELT_URL + elementLocalID;

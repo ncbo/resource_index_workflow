@@ -143,8 +143,15 @@
 				 
 				<!--Remove ontology from slave obs tables and all resources tables-->
 				<filter token="obsslaveontologyremove" value="${obs.slave.ontology.remove}" />
+				
+				<!--Enable/disable replication machanism -->
+				<filter token="obrdatabasesync" value="${obr.database.sync}" />
+				 
 			</filterset>
-		</copy>		 
+		</copy>	
+		<copy file="${tmpl.dir}/ridbsync.sh.tmpl" tofile="${config.dir}/org/ncbo/stanford/obr/service/workflow/ridbsync.sh" overwrite="true">
+			 
+		</copy>
 	</target> 
 	
 	<!-- ================================= 

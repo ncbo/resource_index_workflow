@@ -54,7 +54,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	private ObsDataPopulationService obsDataPopulationService = new ObsDataPopulationServiceImpl();
 	
 	//attributes 	
-	private static final String SHELL_SCRIPT_PATH = new File(ResourceIndexWorkflowImpl.class.getResource( "ridbsync.sh" ).getFile()).getAbsolutePath();
+	private static final String SHELL_SCRIPT_PATH = new File(ResourceIndexWorkflow.class.getResource( "ridbsync.sh" ).getFile()).getAbsolutePath();
 	private static final String RPLICATION_COMMAND = "sh "+ SHELL_SCRIPT_PATH;	
 	
 	  

@@ -33,6 +33,7 @@ public class PopulateResourceIndex {
 				}catch (Exception e) {
 					processResources=false;
 					removeDuplicateOntologies=false;
+					excuteReplication = false;
 					e.printStackTrace();
 				} 
 			}
