@@ -199,7 +199,7 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 								logger.error("Cannot map MESH term " + meSHHeadingList + " to local concept id for element with ID " + localElementID +".");
 								
 							}
-							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[0]), concepts);
+							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[1]), concepts);
 							
 						} 
 						// Extract PharmActionList  

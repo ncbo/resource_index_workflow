@@ -105,8 +105,7 @@ public class ExecutionDao extends AbstractObrDao {
 			addEntryStatement.setTimestamp(7,  new java.sql.Timestamp(executionEntry.getExecutionEnd().getTime()));
 			addEntryStatement.setTimestamp(8,  new java.sql.Timestamp(executionEntry.getExecutionEnd().getTime()));
 			addEntryStatement.setTimestamp(9,  new java.sql.Timestamp(executionEntry.getExecutionBeginning().getTime()));
-		   	System.out.println(addEntryStatement);
- 
+		   	 
 			this.executeSQLUpdate(addEntryStatement);
 			inserted = true;
 		}
