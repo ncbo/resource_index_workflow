@@ -149,7 +149,7 @@
 				 
 			</filterset>
 		</copy>	
-		<copy file="${tmpl.dir}/ridbsync.sh.tmpl" tofile="${config.dir}/org/ncbo/stanford/obr/service/workflow/ridbsync.sh" overwrite="true">
+		<copy file="${tmpl.dir}/ridbsync.sh.tmpl" tofile="${src.scripts.dir}/org/ncbo/stanford/obr/service/workflow/ridbsync.sh" overwrite="true">
 			 
 		</copy>
 	</target> 
@@ -226,7 +226,7 @@
 			<!-- Copy all perl scripts and shell scripts requied from src directory -->
 			<mkdir dir="${dist.dir}/script"/>
 			<copy todir="${dist.dir}/script">
-				<fileset dir="${src.perl.dir}">
+				<fileset dir="${src.scripts.dir}">
 					<include name="**/*.pl"/>
 					<include name="**/*.sh"/>
 				</fileset>			 		 

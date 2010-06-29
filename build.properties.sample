@@ -9,7 +9,7 @@ app.name=${ant.project.name}
 
 # Source directory
 src.dir=src/java
-src.perl.dir=src/perl
+src.scripts.dir=src/scripts
 
 # Logging properties
 obr.app.log.deflevel=ERROR
