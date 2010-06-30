@@ -75,8 +75,7 @@ public class ProcessExecutor implements StringHelper {
 		BufferedReader resultReader = null;
 		BufferedReader errorReader = null;
 		
-		StringBuffer command =  new StringBuffer();
-		command.append("./");
+		StringBuffer command =  new StringBuffer();		 
 		command.append(scriptPath);
 		command.append(BLANK_SPACE);
 		for (int i = 0; i < parameters.length; i++) {
