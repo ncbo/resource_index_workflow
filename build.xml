@@ -146,12 +146,10 @@
 				
 				<!--Enable/disable replication machanism -->
 				<filter token="obrdatabasesync" value="${obr.database.sync}" />
+				<filter token="obrdatabasesyncscriptpath" value="${obr.database.sync.script.path}" />
 				 
 			</filterset>
-		</copy>	
-		<copy file="${tmpl.dir}/ridbsync.sh.tmpl" tofile="${src.scripts.dir}/org/ncbo/stanford/obr/service/workflow/ridbsync.sh" overwrite="true">
-			 
-		</copy>
+		</copy>	 
 	</target> 
 	
 	<!-- ================================= 

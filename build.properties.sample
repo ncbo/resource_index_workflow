@@ -98,6 +98,8 @@ obr.expansion.distance=true
 
 # Flag for master-slave replication mechanism
 obr.database.sync=false
+# Full path of syncronization script
+obr.database.sync.script.path=/path/to/script/script_name.sh
 
 # Resources to be included in workflow i.e resource ids separated by comma.
 #obr.resource.ids=GEO,AE,CT,GM,OMIM,CDD,PGDI,PGDR,PGGE,REAC,RXRD,UPKB,WP,BSM,DBK,SMD,CANANO,PC,PCM,GAP,MICAD,PM,AERS,GRANTS

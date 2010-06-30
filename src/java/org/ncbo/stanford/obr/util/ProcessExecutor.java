@@ -1,9 +1,11 @@
 package org.ncbo.stanford.obr.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
@@ -12,7 +14,17 @@ import org.ncbo.stanford.obr.util.helper.StringHelper;
  * @author Kuladip Yadav
  *
  */
-public class ProcessExecutor implements StringHelper {	  
+public class ProcessExecutor implements StringHelper {	
+	
+	private Logger logger;
+	
+	
+	public ProcessExecutor(Logger logger) {
+		super();
+		this.logger = logger;
+	}
+
+
 	/**
 	 * This method execute base command with given parameter. 
 	 * 
@@ -50,5 +62,67 @@ public class ProcessExecutor implements StringHelper {
         return lines;
        
 	}
+	
+	/**
+	 * This method execute master/slave synchronization script
+	 * 
+	 * @param syncScriptPath
+	 * @param resourceIds
+	 */
+	public void executeShellScript(String scriptPath, String... parameters){
+		Runtime runtime = Runtime.getRuntime();
+		Process process = null;
+		BufferedReader resultReader = null;
+		BufferedReader errorReader = null;
+		
+		StringBuffer command =  new StringBuffer();
+		command.append("./");
+		command.append(scriptPath);
+		command.append(BLANK_SPACE);
+		for (int i = 0; i < parameters.length; i++) {
+			command.append(parameters[i]);
+			if(i<parameters.length-1){
+				command.append(BLANK_SPACE);
+			}
+			
+		} 
+		 
+		try {
+			process = runtime.exec(command.toString());
+			 resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			 errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			
+			String resultLine = EMPTY_STRING;
+			 
+			while((resultLine = resultReader.readLine()) != null) {
+				 logger.info(resultLine);
+			}
+			while((resultLine = errorReader.readLine()) != null) {
+				 logger.error(resultLine);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error("Problem in executing shell script ", e);
+		}  finally{
+			if(resultReader!= null){
+				try {
+					resultReader.close();
+				} catch (IOException e) {
+					 e.printStackTrace();
+				}
+			}
+			if(errorReader!= null){
+				try {
+					errorReader.close();
+				} catch (IOException e) {					 
+					e.printStackTrace();
+				}
+			}
+				
+			
+		}
+	}
+	
 
 }

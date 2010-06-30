@@ -57,6 +57,6 @@ public interface ResourceIndexWorkflow {
 	 * master/slave database.
 	 * 
 	 */
-	public void executeReplicationMechanism();
+	public void executeSyncronizationScript()throws Exception;
 	
 }

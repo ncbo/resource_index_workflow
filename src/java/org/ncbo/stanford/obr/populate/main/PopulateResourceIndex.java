@@ -24,22 +24,21 @@ public class PopulateResourceIndex {
 		boolean poluateSlaveTables = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.populate"));
 		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
 		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
-		boolean excuteReplication = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync"));
+		boolean excuteSyncronization = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync"));
 		try{ 
 			// Populate obs tables from master database 
 			if(poluateSlaveTables){	
 				try{
-					resourceIndexWorkflow.populateObsSlaveTables();					
+					resourceIndexWorkflow.populateObsSlaveTables();	
+					// Loading obs slave table
+					resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
 				}catch (Exception e) {
 					processResources=false;
 					removeDuplicateOntologies=false;
-					excuteReplication = false;
+					excuteSyncronization = false;
 					e.printStackTrace();
 				} 
-			}
-			
-			// Loading obs slave table
-			resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+			} 
 			
 			// Populate resource index data
 			if(processResources){
@@ -48,12 +47,14 @@ public class PopulateResourceIndex {
 		   
 			// Remove duplicates.
 			if(removeDuplicateOntologies){
-				resourceIndexWorkflow.removeOntologyDuplicates();				 
+				resourceIndexWorkflow.removeOntologyDuplicates();	
+				// Loading obs slave table
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
 			}
 			
 			// Execute replication mechanism
-			if(excuteReplication){
-				resourceIndexWorkflow.executeReplicationMechanism();
+			if(excuteSyncronization){
+				resourceIndexWorkflow.executeSyncronizationScript();
 			}
 			
 		}catch (Exception e) {

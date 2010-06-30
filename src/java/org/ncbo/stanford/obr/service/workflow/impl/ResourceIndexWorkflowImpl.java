@@ -1,9 +1,6 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -30,7 +27,9 @@ import org.ncbo.stanford.obr.service.workflow.ResourceIndexWorkflow;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.LoggerUtils;
 import org.ncbo.stanford.obr.util.MessageUtils;
+import org.ncbo.stanford.obr.util.ProcessExecutor;
 import org.ncbo.stanford.obr.util.StringUtilities;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * A service  {@code ResourceIndexWorkflowImpl} is main service for workflow execution
@@ -52,12 +51,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			ReportedContextBean.RDA_WEIGHT);
 	
 	private ObsDataPopulationService obsDataPopulationService = new ObsDataPopulationServiceImpl();
-	
-	//attributes 	
-	private static final String SHELL_SCRIPT_PATH = new File(ResourceIndexWorkflow.class.getResource( "ridbsync.sh" ).getFile()).getAbsolutePath();
-	private static final String RPLICATION_COMMAND = "sh "+ SHELL_SCRIPT_PATH;	
-	
-	  
+	 
 	public ResourceIndexWorkflowImpl() {
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
 		// Disable sql logger
@@ -395,54 +389,27 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 	/**
 	 * This step execute replication mechanism between resource index 
-	 * master/slave database.
-	 * 
+	 * master/slave database. 
 	 */
-	public void executeReplicationMechanism() {
-		Runtime runtime = Runtime.getRuntime();
-		Process process = null;
-		BufferedReader resultReader = null;
-		BufferedReader errorReader = null;
-		try {					
-			 
-			process = runtime.exec(RPLICATION_COMMAND); 
-			
-			resultReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			
-			String resultLine = null  ; 			 
+	public void executeSyncronizationScript() throws Exception{
+		ExecutionTimer timer = new ExecutionTimer();
+		ProcessExecutor processExecutor = new ProcessExecutor(logger);
 		
-			while((resultLine = resultReader.readLine()) != null) {
-				logger.info(resultLine);
-			}	
-			
-			// parse the file
-			errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			 
-			while((resultLine = errorReader.readLine()) != null) {
-				logger.error(resultLine);
-			}	
-				
-			}catch (Exception e) {
-				logger.error("Problem in executing repication script", e);
-		}finally{
-			if(resultReader!= null){
-				try {
-					resultReader.close();
-				} catch (IOException e) {
-					 e.printStackTrace();
-				}
-			}
-			if(errorReader!= null){
-				try {
-					errorReader.close();
-				} catch (IOException e) {					 
-					e.printStackTrace();
-				}
-			}
-				
-			
+		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
+				.getMessage("obr.resource.ids"), StringHelper.COMMA_STRING);	
+		String syncScriptPath = MessageUtils.getMessage("obr.database.sync.script.path");
+		 
+		if(!new File(syncScriptPath).exists()){
+			logger.error("Synchronization script not found at location " + syncScriptPath);
+			throw new Exception("Synchronization script not found at location " + syncScriptPath);
 		}
 		
+		timer.start();
+		logger.info("Started executing syncronization script....");
+		processExecutor.executeShellScript(syncScriptPath, resourceIDs);
+		timer.end();
+		logger.info("Syncronization script execution completed in : "
+			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
 	}
 
 }
