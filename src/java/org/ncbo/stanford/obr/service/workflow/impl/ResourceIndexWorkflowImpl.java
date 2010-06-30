@@ -406,7 +406,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		timer.start();
 		logger.info("Started executing syncronization script....");
-		processExecutor.executeShellScript(syncScriptPath, resourceIDs);
+		processExecutor.executeShellScript(syncScriptPath, true, resourceIDs);
 		timer.end();
 		logger.info("Syncronization script execution completed in : "
 			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
