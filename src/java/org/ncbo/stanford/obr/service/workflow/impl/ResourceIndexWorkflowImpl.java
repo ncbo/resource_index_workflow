@@ -122,11 +122,11 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();				 
-				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "....\n");
+				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ")....\n");
 				timer.start();
 				resourceProcessing(resourceAccessTool, executionEntry);
 				timer.end();
-				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + " processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
+				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ") processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
 			} catch (Exception e) {
 				logger.error(
 						"Problem in creating resource tool for resource id : "
