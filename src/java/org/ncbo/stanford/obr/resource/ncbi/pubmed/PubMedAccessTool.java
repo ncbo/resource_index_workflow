@@ -28,6 +28,7 @@ import obs.obr.populate.Element.BadElementStructureException;
 
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -45,6 +46,8 @@ import com.aliasi.util.Files;
  * PubMedAccessTool is responsible for getting data elements for 
  * Pub Med. The latest files available for the particular year 
  * http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
+ * 
+ * FTP location ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/
  *  
  * This tool fetch data using xml files and E-Utilities.
  * <p>
@@ -80,22 +83,16 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	private static String PM_MAIN_ITEMKEY = "title";
 	
 	// Absolute path for folder containing pubmed xml files	
-	private static final String PM_FOLDER = "/ncbodata/OBR/resources/PubMed/";
+	private static final String PM_FOLDER = FileResourceParameters.resourceFolder() +"/pubmed/";
 		
 	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
 		
 	// Start processing xml file number
-    private static final int START_XML_NUMBER = 617; //556 
+    private static final int START_XML_NUMBER = 534;
 	
     // End processing xml file number
-	private static final int END_XML_NUMBER = 617; //617
-	
-	// All the zip files available here. (have to connect to VPN)
-	private String PM_ZIP_URL = "ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/";
-	
-	//following is the url to see the latest files available for the particular year
-	// http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
-	
+	private static final int END_XML_NUMBER = 617;
+	 
 	// lingpipe parser
 	private static MedlineParser medlineParser = new MedlineParser(true);	 
  
@@ -163,11 +160,10 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	@Override
 	public int updateResourceContent() {
 		// Get number of day's since last update.
-		this.numberOfDays = new Integer(this.numberOfDaysSinceLastUpdate());
-		//return super.eutilsUpdateAll(null);
+		this.numberOfDays = new Integer(this.numberOfDaysSinceLastUpdate());		 
+		int nbElements = downloadResourceContent();	
 		
-		int nbElements = downloadResourceContent();		
-		nbElements += super.eutilsUpdateAll(null);		
+		//nbElements += super.eutilsUpdateAll(null);		
 		return nbElements;
 	}
 
