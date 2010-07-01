@@ -69,13 +69,17 @@ public class ProcessExecutor implements StringHelper {
 	 * @param syncScriptPath
 	 * @param resourceIds
 	 */
-	public void executeShellScript(String scriptPath, boolean lowerCaseParameter, String... parameters){
+	public void executeShellScript(String scriptPath, boolean withSudo, boolean lowerCaseParameter, String... parameters){
 		Runtime runtime = Runtime.getRuntime();
 		Process process = null;
 		BufferedReader resultReader = null;
 		BufferedReader errorReader = null;
 		
 		StringBuffer command =  new StringBuffer();		 
+		if(withSudo){
+			command.append("sudo");
+			command.append(BLANK_SPACE);
+		}
 		command.append(scriptPath);
 		command.append(BLANK_SPACE);
 		for (int i = 0; i < parameters.length; i++) {
