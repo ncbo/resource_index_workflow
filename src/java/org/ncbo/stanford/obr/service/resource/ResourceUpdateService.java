@@ -151,4 +151,11 @@ public interface ResourceUpdateService {
 	 * @return boolean {@code true} if updated successfully.
 	 */
 	public boolean updateResourceWorkflowInfo(Resource resource); 
+	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID();
 }

@@ -371,4 +371,13 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		 return resourceTableDao.updateDictionaryAndWorkflowDate(resource, dictionary.getDictionaryID());
 		
 	}
+	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID(){
+		return elementTableDao.getLastElementLocalID();
+	}
 }

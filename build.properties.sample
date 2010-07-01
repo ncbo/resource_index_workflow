@@ -60,6 +60,11 @@ obr.grants.jdbc.url=jdbc:mysql://localhost:3306/rxrd
 obr.grants.jdbc.username=yourusername
 obr.grants.jdbc.password=yourpassword
 
+# Configuring PubMed Resource
+obr.pm.process.xml=true
+obr.pm.xml.from=0
+obr.pm.xml.to=0
+
 # Configuring master OBS database 
 obs.master.schema.name=obsschemaname
 obs.master.schema.host.name=obsschemahost

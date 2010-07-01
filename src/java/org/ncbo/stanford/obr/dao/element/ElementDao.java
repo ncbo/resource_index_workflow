@@ -527,4 +527,31 @@ public class ElementDao extends AbstractObrDao {
 		return reportedAnnotations;
 	}
 	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID(){
+		 
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_element_id FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE id =(SELECT MAX(id) FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(");"); 
+		
+		try{
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			if(rSet.first()){
+				return rSet.getString(1);
+				 
+			} 
+		}catch (SQLException e) {
+			 logger.error("Problem in getting non annotated element count", e);
+		}
+		
+		return null;
+	}
+	
 }

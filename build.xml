@@ -118,7 +118,12 @@
 				<filter token="obrgrantsjdbcurl" value="${obr.grants.jdbc.url}" />
 				<filter token="obrgrantsjdbcusername" value="${obr.grants.jdbc.username}" />
 				<filter token="obrgrantsjdbcpassword" value="${obr.grants.jdbc.password}" />
-				
+	  
+				<!-- For PubMed resource access tool  						-->
+				<filter token="obrpmprocessxml" value="${obr.pm.process.xml}" />
+				<filter token="obrpmxmlfrom" value="${obr.pm.xml.from}" />
+				<filter token="obrpmxmlto" value="${obr.pm.xml.to}" />
+
 				<!-- For obs master database						-->
 				<filter token="obsmasterschemaname" value="${obs.master.schema.name}" />
 				<filter token="obsmasterschemahost" value="${obs.master.schema.host.name}" />
