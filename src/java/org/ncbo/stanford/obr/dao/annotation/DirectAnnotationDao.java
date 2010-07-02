@@ -225,28 +225,17 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
 		int nbInserted = 0;		
-		try {
-			for(DirectAnnotationEntry entry: entries){					 			 	 
-				this.addEntryStatement.setString (1, entry.getLocalElementID());
-				this.addEntryStatement.setString (2, entry.getLocalConceptID());
-				this.addEntryStatement.setString (3, entry.getContextName());
-				this.addEntryStatement.setInt    (4, entry.getDictionaryID());
-				this.addEntryStatement.setInt(5, entry.getWorkflowStatus());
-				this.addEntryStatement.addBatch();
-			}
-			
-			this.executeSQLBatchUpdate(this.addEntryStatement);
-		}catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot add entry on table " + this.getTableSQLName(), e);
-			 
-		}
-		finally{
+		
+		for(DirectAnnotationEntry entry: entries){					 			 	 
 			try {
-				this.addEntryStatement.clearBatch();
-			} catch (SQLException e) {					 
-				e.printStackTrace();
+				addEntry(entry);
+				 nbInserted++;
+			}catch (Exception e) {
+				logger.error("** PROBLEM ** Cannot add " + entry.toString() + "on table " + this.getTableSQLName());
+				 
 			}
-		}
+		}  
+		
 		return nbInserted;
 	}  
 	 

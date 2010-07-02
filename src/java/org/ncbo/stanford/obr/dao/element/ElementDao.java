@@ -529,6 +529,10 @@ public class ElementDao extends AbstractObrDao {
 				
 			}
 			rSet.close();
+			if(reportedAnnotations.size()>0){
+				nbReportedAnnotations+= directAnnotationDao.addEntries(reportedAnnotations);
+				reportedAnnotations.clear();
+			}
 				 
 		}
 		catch(SQLException e){
