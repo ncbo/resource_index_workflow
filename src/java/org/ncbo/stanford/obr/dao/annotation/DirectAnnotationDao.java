@@ -135,7 +135,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Add an new entry in corresponding SQL table.
 	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
 	 */
-	private boolean addEntry(DirectAnnotationEntry entry ){
+	public boolean addEntry(DirectAnnotationEntry entry ){
 		boolean inserted = false;
 		try {		 
 			this.addEntryStatement.setString (1, entry.getLocalElementID());
@@ -199,7 +199,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addMgrepEntryStatement.setInt    (5, entry.getFrom());
 			this.addMgrepEntryStatement.setInt    (6, entry.getTo());
 			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryID());
-			this.addMgrepEntryStatement.setInt(8, entry.getWorkflowStatus());
+			this.addMgrepEntryStatement.setInt	  (8, entry.getWorkflowStatus());
 		 
 			this.executeSQLUpdate(this.addMgrepEntryStatement);
 			inserted = true;
@@ -224,10 +224,27 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * @return the number of added entries
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
-		int nbInserted = 0;		 
-		for(DirectAnnotationEntry entry: entries){
-			if (this.addEntry(entry)){
-				nbInserted++; 
+		int nbInserted = 0;		
+		try {
+			for(DirectAnnotationEntry entry: entries){					 			 	 
+				this.addEntryStatement.setString (1, entry.getLocalElementID());
+				this.addEntryStatement.setString (2, entry.getLocalConceptID());
+				this.addEntryStatement.setString (3, entry.getContextName());
+				this.addEntryStatement.setInt    (4, entry.getDictionaryID());
+				this.addEntryStatement.setInt(5, entry.getWorkflowStatus());
+				this.addEntryStatement.addBatch();
+			}
+			
+			this.executeSQLBatchUpdate(this.addEntryStatement);
+		}catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot add entry on table " + this.getTableSQLName(), e);
+			 
+		}
+		finally{
+			try {
+				this.addEntryStatement.clearBatch();
+			} catch (SQLException e) {					 
+				e.printStackTrace();
 			}
 		}
 		return nbInserted;

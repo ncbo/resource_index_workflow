@@ -16,6 +16,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
@@ -475,14 +476,17 @@ public class ElementDao extends AbstractObrDao {
 	}
 	
 	/**
-	 * Returns the reported annotations that pre-exist in the resource, as DirectAnnotationEntry in order
-	 * to insert them in the corresponding _DAT table.
+	 * Add the reported annotations that pre-exist in the resource.
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
+	 * 
+	 * @param directAnnotationDao 
 	 * @param useTemporaryElementTable 
+	 * 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion){		
+	public long addExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, DirectAnnotationDao directAnnotationDao){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
+		long nbReportedAnnotations =0 ;
 		try{				
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("SELECT local_element_id, ");
@@ -517,6 +521,12 @@ public class ElementDao extends AbstractObrDao {
 						logger.error("** PROBLEM ** Problem with existing annotations of element: "+ localElementID +" on table " + this.getTableSQLName() +".", e);
 					}
 				}
+				
+				if(reportedAnnotations.size()>1000){
+					nbReportedAnnotations+= directAnnotationDao.addEntries(reportedAnnotations);
+					reportedAnnotations.clear();
+				}
+				
 			}
 			rSet.close();
 				 
@@ -524,7 +534,8 @@ public class ElementDao extends AbstractObrDao {
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot report annotation from the table "+this.getTableSQLName()+". Empty set returned.", e);
 		}
-		return reportedAnnotations;
+		
+		return nbReportedAnnotations;
 	}
 	
 	/**

@@ -349,6 +349,41 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		return nbRow;
 	}
 	
+	protected long executeSQLBatchUpdate(PreparedStatement stmt) throws SQLException {
+		int[] nbRow;
+		try{ 
+		    nbRow = stmt.executeBatch(); 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(stmt.toString());
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (CommunicationsException e) {
+			reOpenConnectionIfClosed();
+			// Re-calling the execution will generate a MySQLNonTransientConnectionException
+			// Those exceptions are catched in each functions to re-execute the query correctly.
+			nbRow = stmt.executeBatch();
+		} 
+		
+		if(nbRow== null || nbRow.length ==0){
+			return 0;
+			
+		}
+		long updatedRows =0;
+		for (int i : nbRow) {
+			updatedRows+= i;
+		}
+		
+		return updatedRows;
+		
+	}
+	
 	/**
 	 * Executes a given SQL query as String using a generic statement. As it returns a ResultSet,
 	 * this statement needs to be explicitly closed after the processing of the ResultSet with function

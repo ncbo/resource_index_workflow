@@ -10,7 +10,6 @@ import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
@@ -213,15 +212,16 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * workflow (semantic expansion). It use the dictionaryID of the given
 	 * dictionary. Returns the number of reported annotations added to _DAT.
 	 */
-	private int reportExistingAnnotations(DictionaryBean dictionary) {
-		int nbReported;
+	private long reportExistingAnnotations(DictionaryBean dictionary) {
+		long nbReported;
 		ExecutionTimer timer = new ExecutionTimer();
 
 		logger.info("\t** Processing of existing reported annotations...");
 		timer.start();
-		nbReported = directAnnotationTableDao.addEntries(getExistingAnnotations(dictionary.getDictionaryID(),
-						resourceAccessTool.getToolResource()
-								.getResourceStructure()));
+ 
+		nbReported = addExistingAnnotations(dictionary.getDictionaryID(),
+				resourceAccessTool.getToolResource()
+						.getResourceStructure());
 
 		timer.end();
 		logger.info("\t## " +nbReported + " reported annotations processed in: "
@@ -236,21 +236,19 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param structure
 	 * @return
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
-		
-		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		 
+	public long addExistingAnnotations(int dictionaryID, Structure structure){
+		long nbAnnotations =0; 
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
+				nbAnnotations += elementTableDao.addExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, directAnnotationTableDao);				
 			}
 			
 		}
-		return reportedAnnotations;
+		return nbAnnotations;
 	}
 
 	/**
