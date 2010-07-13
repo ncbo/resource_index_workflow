@@ -3,6 +3,7 @@ package org.ncbo.stanford.obr.service;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.dao.aggregation.AggregationDao;
+import org.ncbo.stanford.obr.dao.aggregation.ConceptFrequencyDao;
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
@@ -22,6 +23,7 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 	protected static IsaExpandedAnnotationDao isaExpandedAnnotationTableDao;
 	protected static MapExpandedAnnotationDao mapExpandedAnnotationTableDao;
 	protected static AggregationDao aggregationTableDao;
+	protected static ConceptFrequencyDao conceptFrequencyDao;
 	  
 	public AbstractResourceService(ResourceAccessTool resourceAccessTool) {
 		super();
@@ -42,6 +44,7 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 			
 			 aggregationTableDao = new AggregationDao(resourceAccessTool.getToolResource().getResourceID());
 			
+			 conceptFrequencyDao = new ConceptFrequencyDao(resourceAccessTool.getToolResource().getResourceID());
 		}
 		
 		

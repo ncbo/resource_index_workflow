@@ -30,5 +30,20 @@ public interface AggregationService {
 	 * @param {@code List} of localOntologyID String containing ontology version.
 	 */
 	public void removeAggregation(List<String> localOntologyID);
+	
+	/**
+	 * Method calculates concept frequency from aggregation table 
+	 *  
+	 * @return The number of annotations created in the index. 
+	 * 
+	 */
+	public long calulateConceptFrequncy();
+	
+	/**
+	 * Method removes concept frequency calculation done for given ontology versions.
+	 * 
+	 * @param {@code List} of localOntologyID String containing ontology version.
+	 */
+	public void removeConceptFrequncy(List<String> localOntologyID);
 
 }
