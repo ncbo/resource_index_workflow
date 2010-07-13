@@ -255,11 +255,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
-		int aggregated;
-		int mgrep;
-		int reported;
-		int isA ;
-		int mapping;
+		long aggregated;
+		long mgrep;
+		long reported;
+		long isA ;
+		long mapping;
 		
 		logger.info("*** Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
@@ -290,31 +290,31 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
 			 
 			if(aggregatedAnnotations.get(ontologyID)!= null){
-				aggregated = aggregatedAnnotations.get(ontologyID).intValue();
+				aggregated = aggregatedAnnotations.get(ontologyID);
 			}else{
 				aggregated = 0;
 			}
 			
 			if(mgrepAnnotations.get(ontologyID)!= null){
-				mgrep = mgrepAnnotations.get(ontologyID).intValue();
+				mgrep = mgrepAnnotations.get(ontologyID);
 			}else{
 				mgrep = 0;
 			}
 			
 			if(reportedAnnotations.get(ontologyID)!= null){
-				reported = reportedAnnotations.get(ontologyID).intValue();
+				reported = reportedAnnotations.get(ontologyID);
 			}else{
 				reported = 0;
 			}
 			
 			if(isaAnnotations.get(ontologyID)!= null){
-				isA = isaAnnotations.get(ontologyID).intValue();
+				isA = isaAnnotations.get(ontologyID);
 			}else{
 				isA = 0;
 			}
 			
 			if(mappingAnnotations.get(ontologyID)!= null){
-				mapping = mappingAnnotations.get(ontologyID).intValue();
+				mapping = mappingAnnotations.get(ontologyID);
 			}else{
 				mapping = 0;
 			} 
