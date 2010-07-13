@@ -243,8 +243,8 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	 *  
 	 *  @return HashMap<Integer, Integer>
 	 */
-	public HashMap<Integer, Integer> getISAAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getISAAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
@@ -268,7 +268,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}

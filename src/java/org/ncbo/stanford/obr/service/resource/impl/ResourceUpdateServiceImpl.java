@@ -266,19 +266,19 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		timer.start();
 		
 		// Getting Aggregated annotations
-		HashMap<Integer, Integer> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
-		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting REPORTED annotations
-		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting ISA annotations
-		HashMap<Integer, Integer> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting Mapping annotations
-		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		 
@@ -325,7 +325,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
-		int noOfEntiesUpdated=statisticsDao.addEntries(entries); 
+		long noOfEntiesUpdated=statisticsDao.addEntries(entries); 
 		
 		logger.info("\tNumber of entries added/updated in statistics table are :" + noOfEntiesUpdated);
 		timer.end();

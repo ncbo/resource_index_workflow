@@ -490,8 +490,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  @return Map containing number of mgerp annotations for each ontology as key. 
 	 *   
 	 */
-	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -515,7 +515,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}
@@ -536,8 +536,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  
 	 *  @return Map containing number of reported annotations for each ontology as key. 
 	 */
-	public HashMap<Integer, Integer> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -560,7 +560,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}

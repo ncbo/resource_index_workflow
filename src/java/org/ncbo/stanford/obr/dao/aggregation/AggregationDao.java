@@ -412,8 +412,8 @@ public class AggregationDao extends AbstractObrDao {
 	 *  
 	 * @return map containing number of aggregated annotations for each ontologyID as key.
 	 */
-	public HashMap<Integer, Integer> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();
 		if(withCompleteDictionary){
@@ -437,7 +437,7 @@ public class AggregationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}
