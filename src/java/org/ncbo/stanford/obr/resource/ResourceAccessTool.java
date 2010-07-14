@@ -327,6 +327,8 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void removeOntologies(List<String> localOntologyIDs){
 		// Remove entries from indexing table  
 		aggregationService.removeAggregation(localOntologyIDs);
+		// Remove entries from concept frequency table  
+		aggregationService.removeConceptFrequncy(localOntologyIDs);
 		// Remove entries from expanded annotation table  
 		semanticExpansionService.removeExpandedAnnotations(localOntologyIDs);
 		// Remove entries from annotation table.
@@ -366,5 +368,12 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void createIndexForAnnotationTables() {
 		annotationService.createIndexForAnnotationTable();
 		semanticExpansionService.createIndexForExpandedAnnotationTables(); 
-	}	 
+	}	
+	
+	/**
+	 * Calculate concept frequency
+	 */
+	public void calulateConceptFrequncy() {
+		 aggregationService.calulateConceptFrequncy(); 
+	}
 }

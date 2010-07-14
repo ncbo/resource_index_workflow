@@ -51,4 +51,29 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 			 
 		 }		 	
 	} 
+	
+	/**
+	 * Method calculates concept frequency from aggregation table 
+	 *  
+	 * @return The number of annotations created in the index. 	
+	 */
+	public long calulateConceptFrequncy() {
+		long nbAnnotation;
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		logger.info("*** Executing concept frequency process.... ");
+		nbAnnotation = conceptFrequencyDao.calulateConceptFrequncy();
+		timer.end();
+		logger.info("### Concept frequency  processed in: " + timer.millisecondsToTimeString(timer.duration()));
+		return nbAnnotation;
+	}
+
+	/**
+	 * Method removes concept frequency calculation done for given ontology versions.
+	 * 
+	 * @param {@code List} of localOntologyID String containing ontology version.
+	 */
+	public void removeConceptFrequncy(List<String> localOntologyIDs) {		 
+		conceptFrequencyDao.deleteEntriesFromOntologies(localOntologyIDs);	
+	} 
 }
