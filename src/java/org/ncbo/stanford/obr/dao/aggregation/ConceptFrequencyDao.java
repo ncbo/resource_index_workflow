@@ -50,7 +50,7 @@ public class ConceptFrequencyDao extends AbstractObrDao {
 	@Override
 	protected String creationQuery(){
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id INT(11) UNSIGNED NOT NULL PRIMARY KEY, " +
+					"id INT(11) UNSIGNED NOT NULL, " +
 					"counts BIGINT UNSIGNED NOT NULL, " +
 					"score FLOAT " +					 
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
