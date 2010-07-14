@@ -74,7 +74,7 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 	 * @param {@code List} of localOntologyID String containing ontology version.
 	 */
 	public void removeConceptFrequncy(List<String> localOntologyIDs) {		 
-		 aggregationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	
+		conceptFrequencyDao.deleteEntriesFromOntologies(localOntologyIDs);	
 	} 
 	
 	
