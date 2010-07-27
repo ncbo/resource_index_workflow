@@ -70,8 +70,8 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
 					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
 					"INDEX X_" + this.getTableSQLName() +"_child_concept_id(child_concept_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_dictionary_id(dictionary_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_parent_level(parent_level) USING BTREE " +	
+					"INDEX X_" + this.getTableSQLName() +"_parent_level(parent_level) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 	

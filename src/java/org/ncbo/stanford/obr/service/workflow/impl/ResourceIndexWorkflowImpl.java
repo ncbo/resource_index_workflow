@@ -221,9 +221,16 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		ExecutionTimer timer = new ExecutionTimer();
 		int nbEntry ;
 	    boolean disableIndexes = Boolean.parseBoolean(MessageUtils.getMessage("obr.table.index.disabled"));
+	    long nbAggregatedAnnotation = 0;
 	    
 		if(disableIndexes || withCompleteDictionary){
+			toolLogger.info("*** Disabling indexes on annotation tables starts...");
+ 			timer.reset();
+ 			timer.start();
 			resourceAccessTool.getAnnotationService().disableIndexes();
+			timer.end();
+			toolLogger.info("### Disabling indexes on annotation tables completed in "
+					+ timer.millisecondsToTimeString(timer.duration()) +".\n");			 
 		} 
 		
 		try{
@@ -260,6 +267,22 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 					+ nbExpandedAnnotation
 					+ " new expanded annotations) from resource "
 					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+			
+			// Aggregation step to annotations.
+			nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+					obrWeights);
+			toolLogger.info(nbEntry + " elements aggregated (with "
+					+ nbAggregatedAnnotation
+					+ " new aggregated annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+			
+			// Update obr_statistics and concept_frequency table.
+			if(nbAggregatedAnnotation > 0) {
+				resourceAccessTool.calulateConceptFrequncy();
+				resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
+				
+			}  
+			
 		}finally{
 			if(disableIndexes || withCompleteDictionary){
 				toolLogger.info("*** Enabling indexes on annotation tables starts...");
@@ -270,30 +293,6 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				toolLogger.info("### Enabling indexes on annotation tables completed in "
 						+ timer.millisecondsToTimeString(timer.duration()) +".\n");
 			}  
-		} 
-		 
-		// Aggregation step to annotations.
-		long nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
-				obrWeights);
-		toolLogger.info(nbEntry + " elements aggregated (with "
-				+ nbAggregatedAnnotation
-				+ " new aggregated annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");	
-		
-//		//Create indexes on Annotation and expanded annotation table.
-//		toolLogger.info("*** Indexing of workflow_status column on annotation and expanded annotation tables starts...");
-//		timer.reset();
-//		timer.start();
-//   	resourceAccessTool.createIndexForAnnotationTables();
-//		timer.end();
-//		toolLogger.info("### Indexing of workflow_status column on annotation and expanded annotation tables completed in "
-//				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
-		
-		// Update obr_statistics and concept_frequency table.
-		if(nbAggregatedAnnotation > 0) {
-			resourceAccessTool.calulateConceptFrequncy();
-			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
-			
 		}  
 		
 	    // Update resource table entry for latest dictionary and date for resource workflow completed
