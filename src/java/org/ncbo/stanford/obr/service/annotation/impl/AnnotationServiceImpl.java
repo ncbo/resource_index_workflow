@@ -294,4 +294,26 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	public int getNumberOfElementsForAnnotation(int dictionaryID) {		 
 		return elementTableDao.numberOfElementsForMgrepAnnotation(dictionaryID);
 	}
+
+	/**
+	 * Disable indexes for all annotation tables
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes() {	 
+		return directAnnotationTableDao.disableIndexes()
+				&& isaExpandedAnnotationTableDao.disableIndexes()
+				&& mapExpandedAnnotationTableDao.disableIndexes();
+	}
+
+	/**
+	 *  Enable indexes for all annotation table
+	 *   
+	 * @return
+	 */
+	public boolean enableIndexes() {
+		return directAnnotationTableDao.enableIndexes()
+				&& isaExpandedAnnotationTableDao.enableIndexes()
+				&& mapExpandedAnnotationTableDao.enableIndexes();
+	}
 }

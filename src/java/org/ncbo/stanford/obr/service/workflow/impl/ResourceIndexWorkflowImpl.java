@@ -198,16 +198,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID()));
 		 
 		// Execute the workflow according to resource type. 
-	    long nbAggregatedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
-				
-		// Update obr_statistics table.
-		if(nbAggregatedAnnotation > 0) {		 
-			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
-			resourceAccessTool.calulateConceptFrequncy();
-		} 
-		// Update resource table entry for latest dictionary and date for resource workflow completed
-		resourceAccessTool.updateResourceWorkflowInfo();
-		
+	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+		 
 		timer1.end();
 		toolLogger.info("#### Resource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " processed in: "
@@ -227,40 +219,58 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	private long executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
 		
 		ExecutionTimer timer = new ExecutionTimer();
-		int nbEntry ;		
-		// Total number of entries found in element table for annotation.		 
-		nbEntry = resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
+		int nbEntry ;
+	    boolean disableIndexes = Boolean.parseBoolean(MessageUtils.getMessage("obr.table.index.disabled"));
+	    
+		if(disableIndexes || withCompleteDictionary){
+			resourceAccessTool.getAnnotationService().disableIndexes();
+		} 
 		
-		// Processing direct annotations
-		long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
-				.resourceAnnotation(withCompleteDictionary, dictionary, 
-						Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
-		
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbDirectAnnotation
-				+ " new direct annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+		try{
+			// Total number of entries found in element table for annotation.		 
+			nbEntry = resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
+			 
+			// Processing direct annotations
+			long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
+					.resourceAnnotation(withCompleteDictionary, dictionary, 
+							Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
+			
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbDirectAnnotation
+					+ " new direct annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 
-		// Flag for mapping expansion.  
-		boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.relational"));
-		
-		// Flag for mapping expansion.
-		boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.mapping"));
-		
-		// Flag for distance expansion.
-		boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.distance"));
+			// Flag for mapping expansion.  
+			boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.relational"));
+			
+			// Flag for mapping expansion.
+			boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.mapping"));
+			
+			// Flag for distance expansion.
+			boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.distance"));
 
-		// Creating semantic expansion annotation.
-		long nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
-				.semanticExpansion(isaClosureExpansion, mappingExpansion,
-						distanceExpansion);
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbExpandedAnnotation
-				+ " new expanded annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+			// Creating semantic expansion annotation.
+			long nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
+					.semanticExpansion(isaClosureExpansion, mappingExpansion,
+							distanceExpansion);
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbExpandedAnnotation
+					+ " new expanded annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+		}finally{
+			if(disableIndexes || withCompleteDictionary){
+				toolLogger.info("*** Enabling indexes on annotation tables starts...");
+	 			timer.reset();
+	 			timer.start();
+				resourceAccessTool.getAnnotationService().enableIndexes();
+				timer.end();
+				toolLogger.info("### Enabling indexes on annotation tables completed in "
+						+ timer.millisecondsToTimeString(timer.duration()) +".\n");
+			}  
+		} 
 		 
 		// Aggregation step to annotations.
 		long nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
@@ -270,17 +280,26 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ " new aggregated annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");	
 		
-		//Create indexes on Annotation and expanded annotation table.
-		toolLogger.info("*** Indexing of workflow_status column on annotation and expanded annotation tables starts...");
-		timer.reset();
-		timer.start();
-		resourceAccessTool.createIndexForAnnotationTables();
-		timer.end();
-		toolLogger.info("### Indexing of workflow_status column on annotation and expanded annotation tables completed in "
-				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
-			 
-		return nbAggregatedAnnotation;  
+//		//Create indexes on Annotation and expanded annotation table.
+//		toolLogger.info("*** Indexing of workflow_status column on annotation and expanded annotation tables starts...");
+//		timer.reset();
+//		timer.start();
+//   	resourceAccessTool.createIndexForAnnotationTables();
+//		timer.end();
+//		toolLogger.info("### Indexing of workflow_status column on annotation and expanded annotation tables completed in "
+//				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
 		
+		// Update obr_statistics and concept_frequency table.
+		if(nbAggregatedAnnotation > 0) {
+			resourceAccessTool.calulateConceptFrequncy();
+			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
+			
+		}  
+		
+	    // Update resource table entry for latest dictionary and date for resource workflow completed
+		resourceAccessTool.updateResourceWorkflowInfo();
+		
+		return nbAggregatedAnnotation;   
 	} 
  
 	/**

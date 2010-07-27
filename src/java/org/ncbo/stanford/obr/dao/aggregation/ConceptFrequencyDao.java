@@ -52,8 +52,10 @@ public class ConceptFrequencyDao extends AbstractObrDao {
 		return "CREATE TABLE " + getTableSQLName() +" (" +
 					"id INT(11) UNSIGNED NOT NULL, " +
 					"counts BIGINT UNSIGNED NOT NULL, " +
-					"score FLOAT " +					 
-				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
+					"score FLOAT, " +	
+					"INDEX X_" + this.getTableSQLName() +"_counts(counts) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_score(score) USING BTREE " +	
+				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	} 
 	
 	@Override

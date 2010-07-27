@@ -65,7 +65,13 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"position_to INT(11) UNSIGNED, " +
 					"child_concept_id INT(11) UNSIGNED, " +
 					"parent_level SMALLINT(5) UNSIGNED NOT NULL, " +					
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +
+					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_child_concept_id(child_concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id(dictionary_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_parent_level(parent_level) USING BTREE " +	
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 	
@@ -138,7 +144,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(" WHERE workflow_status = ");
 		updatingQueryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), false);
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){

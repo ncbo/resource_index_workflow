@@ -48,5 +48,25 @@ public interface AnnotationService {
 	 */
 	public void createIndexForAnnotationTable();
 	
+	/**
+	 * This method gives number of elements present for annotation with given dictionary id
+	 * 
+	 * @param dictionaryID
+	 * @return int - number of elements
+	 */
 	public int getNumberOfElementsForAnnotation(int dictionaryID);
+	
+	/**
+	 *  Enable indexes for all annotation table
+	 *   
+	 * @return
+	 */
+	public boolean enableIndexes();
+	
+	/**
+	 * Disable indexes for all annotation tables
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes();
 }

@@ -150,9 +150,11 @@
 				<filter token="obsslaveontologyremove" value="${obs.slave.ontology.remove}" />
 				
 				<!--Enable/disable replication machanism -->
+				<filter token="obrtableindexdisabled" value="${obr.table.index.disabled}" />
+ 
+				<!--Enable/disable replication machanism -->
 				<filter token="obrdatabasesync" value="${obr.database.sync}" />
 				<filter token="obrdatabasesyncscriptpath" value="${obr.database.sync.script.path}" />
-				 
 			</filterset>
 		</copy>	 
 	</target> 

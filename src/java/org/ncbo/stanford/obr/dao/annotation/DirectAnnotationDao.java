@@ -75,7 +75,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"position_to INT(11), " +
 					"term_id INT(11) UNSIGNED, " +					
 					"dictionary_id SMALLINT(5) UNSIGNED NOT NULL, " +
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +					
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +	
+					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_term_id(term_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id(dictionary_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
@@ -329,7 +335,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		timer.reset();
 		timer.start();
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), false);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot join the temporary table and OBS_TT to load the file " + mgrepFile.getName()+". 0 returned", e);

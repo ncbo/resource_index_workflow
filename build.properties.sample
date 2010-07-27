@@ -101,8 +101,12 @@ obr.expansion.relational=true
 obr.expansion.mapping=true
 obr.expansion.distance=true
 
+# Disable/Enabled indexes for workflow
+obr.table.index.disabled=false
+
 # Flag for master-slave replication mechanism
 obr.database.sync=false
+
 # Full path of syncronization script
 obr.database.sync.script.path=/path/to/script/script_name.sh
 

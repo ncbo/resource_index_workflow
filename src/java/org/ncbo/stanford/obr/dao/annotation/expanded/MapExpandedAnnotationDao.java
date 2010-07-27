@@ -65,7 +65,13 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"position_to INT(11) UNSIGNED, " +
 					"mapped_concept_id INT(11) UNSIGNED, " +
 					"mapping_type TINYINT(1) UNSIGNED NOT NULL, " +					
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +
+					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id(mapped_concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_mapping_type(mapping_type) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 	
@@ -139,7 +145,7 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());
 		
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), false);
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
