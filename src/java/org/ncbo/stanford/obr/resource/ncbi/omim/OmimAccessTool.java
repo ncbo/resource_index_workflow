@@ -36,7 +36,7 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 			"The full-text, referenced overviews in OMIM contain information on all known mendelian disorders and over 12,000 genes. " +
 			"OMIM focuses on the relationship between phenotype and genotype.";
 	private static final String OMIM_LOGO 		= "http://www.ncbi.nlm.nih.gov/entrez/query/static/gifs/entrez_omim.gif";
-	private static final String OMIM_ELT_URL 	= "http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=";
+	private static final String OMIM_ELT_URL 	= "http://www.ncbi.nlm.nih.gov/omim/";
 		
 	private static final String OMIM_EUTILS_DB 	= "omim";
 	private static final String OMIM_EUTILS_TERM =  "all[filter]";
