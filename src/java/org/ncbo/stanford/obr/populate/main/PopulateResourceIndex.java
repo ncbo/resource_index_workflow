@@ -29,9 +29,7 @@ public class PopulateResourceIndex {
 			// Populate obs tables from master database 
 			if(poluateSlaveTables){	
 				try{
-					resourceIndexWorkflow.populateObsSlaveTables();	
-					// Loading obs slave table
-					resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+					resourceIndexWorkflow.populateObsSlaveTables();					
 				}catch (Exception e) {
 					processResources=false;
 					removeDuplicateOntologies=false;
@@ -42,7 +40,9 @@ public class PopulateResourceIndex {
 			
 			// Populate resource index data
 			if(processResources){
-				 resourceIndexWorkflow.startResourceIndexWorkflow();
+				// Loading obs slave table
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+				resourceIndexWorkflow.startResourceIndexWorkflow();
 			}
 		   
 			// Remove duplicates.
