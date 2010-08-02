@@ -223,7 +223,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	    boolean disableIndexes = Boolean.parseBoolean(MessageUtils.getMessage("obr.table.index.disabled"));
 	    long nbAggregatedAnnotation = 0;
 	    
-		if(disableIndexes || withCompleteDictionary){
+		if(disableIndexes){
 			toolLogger.info("*** Disabling indexes on annotation tables starts...");
  			timer.reset();
  			timer.start();
@@ -268,7 +268,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 					+ " new expanded annotations) from resource "
 					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		}finally{
-			if(disableIndexes || withCompleteDictionary){
+			if(disableIndexes){
 				toolLogger.info("*** Enabling indexes on annotation tables starts...");
 	 			timer.reset();
 	 			timer.start();
