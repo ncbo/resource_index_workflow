@@ -263,8 +263,13 @@ public class ClinicalTrialsAccessTool extends AbstractXmlResourceAccessTool {
 
 			//Optra: Get brief_summary from domRoot
 			NodeList briefSummaryList = domRoot.getElementsByTagName(CT_ITEMKEYS[2]);
-			org.w3c.dom.Element briefSummaryElt = (org.w3c.dom.Element)briefSummaryList.item(0);
-			this.eltInfo.put(ELT_BRIEF_SUMMARY, cleanString(briefSummaryElt.getElementsByTagName(CT_TXT_BLOCK_STRING).item(0).getTextContent()));
+			if(briefSummaryList != null && briefSummaryList.getLength() > 0){
+				org.w3c.dom.Element briefSummaryElt = (org.w3c.dom.Element)briefSummaryList.item(0);				 
+				this.eltInfo.put(ELT_BRIEF_SUMMARY, cleanString(briefSummaryElt.getElementsByTagName(CT_TXT_BLOCK_STRING).item(0).getTextContent()));
+			}else{
+				this.eltInfo.put(ELT_BRIEF_SUMMARY, EMPTY_STRING);
+			}
+			
 			//->
 			
 			//NodeList detailedDescriptionList = domRoot.getElementsByTagName(ELT_DETAILED_DESCRIPTION);
