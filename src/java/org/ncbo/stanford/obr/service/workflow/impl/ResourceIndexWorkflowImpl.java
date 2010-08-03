@@ -209,6 +209,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Execute the workflow according to resource type. 
 	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
 		 
+	    // Update resource table entry for latest dictionary and date for resource workflow completed
+		resourceAccessTool.updateResourceWorkflowInfo();
+	    
 		timer1.end();
 		toolLogger.info("#### Resource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " processed in: "
@@ -228,7 +231,16 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	private long executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
 		
 		ExecutionTimer timer = new ExecutionTimer();
-		int nbEntry ;
+		
+		// Total number of entries found in element table for annotation.	
+		int nbEntry  = resourceAccessTool.getAnnotationService()
+							.getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
+		
+		if(nbEntry == 0){
+			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceID());
+			return 0;
+		}
+
 	    boolean disableIndexes = Boolean.parseBoolean(MessageUtils.getMessage("obr.table.index.disabled"));
 	    long nbAggregatedAnnotation = 0;
 	    
@@ -243,9 +255,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		} 
 		
 		try{
-			// Total number of entries found in element table for annotation.		 
-			nbEntry = resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
-			 
+						 
 			// Processing direct annotations
 			long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
 					.resourceAnnotation(withCompleteDictionary, dictionary, 
@@ -301,10 +311,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
 			
 		}  
-		
-	    // Update resource table entry for latest dictionary and date for resource workflow completed
-		resourceAccessTool.updateResourceWorkflowInfo();
-		
+		 
 		return nbAggregatedAnnotation;   
 	} 
  
