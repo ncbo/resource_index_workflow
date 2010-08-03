@@ -61,6 +61,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public ResourceAccessTool(String resource, String resourceID, Structure structure){
 		super(); 
 		initializeLogger(resourceID); 
+		logger.info("*****************************************************");
 		logger.info("ResourceAccessTool creation...");
 		this.toolName = RESOURCE_NAME_PREFIX + resourceID + Utilities.getRandomString(3);
 		String mainContext = Structure.generateContextName(resourceID, this.mainContextDescriptor());

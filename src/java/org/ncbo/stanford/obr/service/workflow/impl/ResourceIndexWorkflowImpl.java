@@ -104,7 +104,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.resource.ids"), ",");		
 		
 		//Initialize the Execution timer 		
-		ExecutionTimer timer = new ExecutionTimer();		
+		ExecutionTimer timer = new ExecutionTimer();	
+		logger.info("***********************************************\n");
 		logger.info("The Resources index Workflow Started.\n");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool resourceAccessTool = null;
@@ -134,7 +135,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		}
 		workflowTimer.end();
-		logger.info("Resources index Workflow completed in : " + workflowTimer.millisecondsToTimeString(workflowTimer.duration()));	
+		logger.info("Resources index Workflow completed in : " + workflowTimer.millisecondsToTimeString(workflowTimer.duration()));
+		logger.info("***********************************************\n");
 	}
 
 	/**
@@ -148,20 +150,31 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		ExecutionTimer timer = new ExecutionTimer();
 		ExecutionTimer timer1 = new ExecutionTimer();
 		
+		boolean reInitializeAllTables =Boolean.parseBoolean(MessageUtils.getMessage("obr.reinitialize.all")) ;
+		boolean reInitializeAllTablesExceptElement = Boolean.parseBoolean(MessageUtils
+				.getMessage("obr.reinitialize.only.annotation")) ;
+		boolean updateResource= Boolean.parseBoolean(MessageUtils.getMessage("obr.update.resource"));
+		// value for withCompleteDictionary parameter.
+		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
+				.getMessage("obr.dictionary.complete"));
+		
 		// Creating logger for resourceAcessTool
 		Logger toolLogger = ResourceAccessTool.getLogger();
 		timer1.start();
 		toolLogger.info("**** Resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + " processing");
+		toolLogger.info("Workflow Parameters[withCompleteDictionary= " 	+ withCompleteDictionary 
+									+ ", updateResource= " + updateResource 
+									+ ", reInitializeAllTables= " + reInitializeAllTables
+									+ ", reInitializeAllTablesExceptElement= " + reInitializeAllTablesExceptElement
+									+ " ]");
 		// Adds resource entry into Resource Table(OBR_RT)
 		resourceAccessTool.addResourceTableEntry();
 
 		// Re-initialized tables
-		if (Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.reinitialize.all"))) {
+		if (reInitializeAllTables) {
 			resourceAccessTool.reInitializeAllTables();
-		} else if (Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.reinitialize.only.annotation"))) {
+		} else if (reInitializeAllTablesExceptElement) {
 			resourceAccessTool.reInitializeAllTablesExcept_ET();
 		}
 
@@ -170,8 +183,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			executionEntry.setFirstExecution(true);
 		}
 		// Update resource for new elements 
-		if (Boolean
-				.parseBoolean(MessageUtils.getMessage("obr.update.resource"))) {
+		if (updateResource) {
 			timer.start();
 			toolLogger.info("*** Resource "
 					+ resourceAccessTool.getToolResource().getResourceName() + " update processing");
@@ -187,11 +199,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Get the latest dictionary from OBS_DVT
  		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
  	    // Adding into execution entry.
-		executionEntry.setDictionaryId(dictionary.getDictionaryID());
-		
-    	// value for withCompleteDictionary parameter.
-		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.dictionary.complete"));
+		executionEntry.setDictionaryId(dictionary.getDictionaryID());		
+    	
 		// Adding into execution entry.
 		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
