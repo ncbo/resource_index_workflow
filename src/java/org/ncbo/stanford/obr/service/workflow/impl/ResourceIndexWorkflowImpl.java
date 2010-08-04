@@ -423,8 +423,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	/**
 	 * This step execute replication mechanism between resource index 
 	 * master/slave database. 
+	 * 
+	 *  @param replicateObsTables a {@code boolean} decide to copy obs tables or not .
 	 */
-	public void executeSyncronizationScript() throws Exception{
+	public void executeSyncronizationScript(boolean replicateObsTables) throws Exception{
 		ExecutionTimer timer = new ExecutionTimer();
 		ProcessExecutor processExecutor = new ProcessExecutor(logger);
 		
@@ -439,7 +441,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		timer.start();
 		logger.info("Started executing syncronization script....");
-		processExecutor.executeShellScript(syncScriptPath, true, true, resourceIDs);
+		processExecutor.executeShellScript(syncScriptPath, true, true, replicateObsTables, resourceIDs);
 		timer.end();
 		logger.info("Syncronization script execution completed in : "
 			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");

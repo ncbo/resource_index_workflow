@@ -69,7 +69,7 @@ public class ProcessExecutor implements StringHelper {
 	 * @param syncScriptPath
 	 * @param resourceIds
 	 */
-	public void executeShellScript(String scriptPath, boolean withSudo, boolean lowerCaseParameter, String... parameters){
+	public void executeShellScript(String scriptPath, boolean withSudo, boolean lowerCaseParameter, boolean replicateObsTables, String... parameters){
 		Runtime runtime = Runtime.getRuntime();
 		Process process = null;
 		BufferedReader resultReader = null;
@@ -81,7 +81,13 @@ public class ProcessExecutor implements StringHelper {
 			command.append(BLANK_SPACE);
 		}
 		command.append(scriptPath);
-		command.append(BLANK_SPACE);
+		command.append(BLANK_SPACE);		
+		
+		if(replicateObsTables){
+			command.append("replicateObstables");
+			command.append(BLANK_SPACE);
+		}
+		
 		for (int i = 0; i < parameters.length; i++) {
 			if(lowerCaseParameter){
 				command.append(parameters[i].toLowerCase());

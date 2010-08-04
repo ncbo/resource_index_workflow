@@ -56,7 +56,8 @@ public interface ResourceIndexWorkflow {
 	 * This step execute replication mechanism between resource index 
 	 * master/slave database.
 	 * 
+	 * @param replicateObsTables a {@code boolean} decide to copy obs tables or not . 
 	 */
-	public void executeSyncronizationScript()throws Exception;
+	public void executeSyncronizationScript(boolean replicateObsTables)throws Exception;
 	
 }

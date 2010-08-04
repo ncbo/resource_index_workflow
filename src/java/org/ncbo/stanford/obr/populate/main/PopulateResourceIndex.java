@@ -25,6 +25,7 @@ public class PopulateResourceIndex {
 		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
 		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
 		boolean excuteSyncronization = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync"));
+		boolean replicateObsTables = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync.obs.tables"));
 		try{ 
 			// Populate obs tables from master database 
 			if(poluateSlaveTables){	
@@ -53,8 +54,9 @@ public class PopulateResourceIndex {
 			}
 			
 			// Execute replication mechanism
-			if(excuteSyncronization){
-				resourceIndexWorkflow.executeSyncronizationScript();
+			if(excuteSyncronization){	
+				// Replicate obs tables if one of replicateObsTables, poluateSlaveTables, removeDuplicateOntologies
+				resourceIndexWorkflow.executeSyncronizationScript(replicateObsTables || poluateSlaveTables || removeDuplicateOntologies);
 			}
 			
 		}catch (Exception e) {

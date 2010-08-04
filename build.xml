@@ -155,6 +155,7 @@
 				<!--Enable/disable replication machanism -->
 				<filter token="obrdatabasesync" value="${obr.database.sync}" />
 				<filter token="obrdatabasesyncscriptpath" value="${obr.database.sync.script.path}" />
+				<filter token="obrdatabasesyncobstables" value="${obr.database.sync.obs.tables}" />
 			</filterset>
 		</copy>	 
 	</target> 
