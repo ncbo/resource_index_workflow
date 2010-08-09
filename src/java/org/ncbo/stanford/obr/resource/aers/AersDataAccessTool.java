@@ -121,7 +121,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	 
 	@Override
 	public ResourceType  getResourceType() {		 
-		return ResourceType.BIG;
+		return ResourceType.MEDIUM;
 	}
 
 	@Override

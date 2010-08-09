@@ -47,10 +47,12 @@ public class PopulateResourceIndex {
 			}
 		   
 			// Remove duplicates.
-			if(removeDuplicateOntologies){
-				resourceIndexWorkflow.removeOntologyDuplicates();	
-				// Loading obs slave table
-				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+			if(removeDuplicateOntologies){ 
+				if(!processResources){
+					// Loading obs slave table
+					resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+				} 
+				resourceIndexWorkflow.removeOntologyDuplicates();	 
 			}
 			
 			// Execute replication mechanism

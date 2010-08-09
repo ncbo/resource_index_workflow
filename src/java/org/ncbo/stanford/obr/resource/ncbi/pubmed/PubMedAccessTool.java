@@ -124,7 +124,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	
 	@Override
 	public ResourceType  getResourceType() {		 
-		return ResourceType.BIG;
+		return ResourceType.MEDIUM;
 	}
 
 	@Override

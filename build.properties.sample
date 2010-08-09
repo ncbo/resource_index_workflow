@@ -79,6 +79,10 @@ obs.slave.dictionary.latest=false
 
 # Remove ontology from slave obs tables and all resources tables
 obs.slave.ontology.remove=false
+# If want to remove specific ontology
+obs.slave.ontology.remove.from.list=false
+obs.slave.ontology.remove.list=list_of_local_ontology_ids
+
 
 # Resource Index Workflow flags
 

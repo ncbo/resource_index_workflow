@@ -2,6 +2,7 @@ package org.ncbo.stanford.obr.service.workflow.impl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -323,10 +324,21 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * <p>This method ensures to keep only the latest version of ontologies.	  
 	 */
 	public void removeOntologyDuplicates() {
+		
+		boolean removeOntologiesFromList = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove.from.list"));
+		
+		if(removeOntologiesFromList){
+			String[] ontologyIDs = StringUtilities.splitSecure(MessageUtils
+					.getMessage("obs.slave.ontology.remove.list"), ",");
+			 removeSpecificOntologies(ontologyIDs);
+			 return;
+		}
+		
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
 		logger.info("*** Remove ontology duplicates started....");
+			
 		Set<String> ontologiesToRemove = new HashSet<String>();		 
 		String virtualOntologyID1;
 		String localOntologyID1;
@@ -357,25 +369,46 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		} 
 		 
 		if(ontologiesToRemove.size() == 0){
-			logger.info("\tNo dupicate ontology found");					 
-		}else {
-			// remove from obr tables.
-			 removeOntologiesFromOBRTables(new ArrayList<String>(ontologiesToRemove));
-			 
-			 // Iterating each duplicate ontology version and remove from obr and obs tables.
-			
-			logger.info("\t**Removing dulicate ontology version from obs slave tables started");	
-			for (String localOntologyID : ontologiesToRemove) {
-				logger.info("\t\tRemoving ontology version :" + localOntologyID);			 
-				// remove ontology from obs slave database.
-				obsDataPopulationService.removeOntology(localOntologyID);
-			} 
-			logger.info("\t##Removing dulicate ontology version from obs slave tables completed.");	
-			 
+			logger.info("\tNo No ontology found to remove");					 
+		}else {			
+			removeOntologies(new ArrayList<String>(ontologiesToRemove)); 
 		} 		
 		timer.end();		
 		logger.info("### Remove dupicate ontologies completed in: "
 			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
+	}
+	
+	private void removeSpecificOntologies(String[] localOntologyIds) {
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();		
+		logger.info("*** Remove ontologies started....");
+		
+		if(localOntologyIds == null || localOntologyIds.length == 0){
+			logger.info("\tNo No ontology found to remove");					 
+		}else {	
+			logger.info("\t Ontologies to remove : "+ Arrays.asList(localOntologyIds));
+			removeOntologies(Arrays.asList(localOntologyIds)); 
+		} 	
+		
+		timer.end();		
+		logger.info("### Remove ontologies completed in: "
+			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
+		
+	}
+	
+	private void removeOntologies(List<String> ontologiesToRemove){
+		// remove from obr tables.
+		 removeOntologiesFromOBRTables(ontologiesToRemove);
+		 
+		 // Iterating each duplicate ontology version and remove from obr and obs tables.
+		
+		logger.info("\t**Removing ontology version from obs slave tables started");	
+		for (String localOntologyID : ontologiesToRemove) {
+			logger.info("\t\tRemoving ontology version :" + localOntologyID);			 
+			// remove ontology from obs slave database.
+			obsDataPopulationService.removeOntology(localOntologyID);
+		} 
+		logger.info("\t##Removing ontology version from obs slave tables completed.");	
 	}
 	
 	/**
@@ -446,5 +479,5 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		logger.info("Syncronization script execution completed in : "
 			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
 	}
-
+ 
 }
