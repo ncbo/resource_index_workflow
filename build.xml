@@ -148,7 +148,9 @@
 				 
 				<!--Remove ontology from slave obs tables and all resources tables-->
 				<filter token="obsslaveontologyremove" value="${obs.slave.ontology.remove}" />
-				
+				<filter token="obsslaveontologyremovefromlist" value="${obs.slave.ontology.remove.from.list}" />
+				<filter token="obsslaveontologyremovelist" value="${obs.slave.ontology.remove.list}" />
+			 
 				<!--Enable/disable replication machanism -->
 				<filter token="obrtableindexdisabled" value="${obr.table.index.disabled}" />
  

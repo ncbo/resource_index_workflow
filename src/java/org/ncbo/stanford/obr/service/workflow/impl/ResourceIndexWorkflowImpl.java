@@ -369,7 +369,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		} 
 		 
 		if(ontologiesToRemove.size() == 0){
-			logger.info("\tNo No ontology found to remove");					 
+			logger.info("\tNo ontology found to remove");					 
 		}else {			
 			removeOntologies(new ArrayList<String>(ontologiesToRemove)); 
 		} 		
