@@ -384,7 +384,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		logger.info("*** Remove ontologies started....");
 		
 		if(localOntologyIds == null || localOntologyIds.length == 0){
-			logger.info("\tNo No ontology found to remove");					 
+			logger.info("\tNo ontology found to remove");					 
 		}else {	
 			logger.info("\t Ontologies to remove : "+ Arrays.asList(localOntologyIds));
 			removeOntologies(Arrays.asList(localOntologyIds)); 
