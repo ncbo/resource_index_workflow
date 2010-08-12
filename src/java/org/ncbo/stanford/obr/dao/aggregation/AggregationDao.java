@@ -64,7 +64,7 @@ public class AggregationDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE, " +	
+					"UNIQUE INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE, " +	
 					"INDEX X_" + getTableSQLName() +"_concept_id(concept_id) USING BTREE " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
