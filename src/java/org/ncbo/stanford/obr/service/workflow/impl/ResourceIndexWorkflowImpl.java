@@ -422,16 +422,21 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.resource.ids"), ",");
 		//Initialize the Execution timer 
 		ExecutionTimer timer = new ExecutionTimer();	
+		ExecutionTimer resourceTimer = new ExecutionTimer();	
 		timer.start();
-		logger.info("\t **The Remove ontology from OBR tables Started.");	
+		logger.info("\t**The Remove ontologies from OBR tables Started.");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool resourceAccessTool = null;
 			try {
 				// Create resource tool object using reflection.
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
-								+ resourceID.toLowerCase())).newInstance();	 
+								+ resourceID.toLowerCase())).newInstance();	
+				resourceTimer.reset();
+				resourceTimer.start();
 				resourceAccessTool.removeOntologies(localOntologyIDs); 
+				resourceTimer.end();
+				logger.info("\t\tRemove ontologies from resource " + resourceID +" completed in : " + resourceTimer.millisecondsToTimeString(resourceTimer.duration()));
 				
 			} catch (Exception e) {
 				logger.error(
