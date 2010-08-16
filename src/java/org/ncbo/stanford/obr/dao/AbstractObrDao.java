@@ -577,4 +577,21 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		
 		return false;
 	}
+	
+	/**
+	 * Set session variable myisam_repair_threads
+	 * 
+	 * @return true if successful
+	 */
+	public boolean setMyisamRepairThreads(int numberOfThreads){
+		try{
+			this.executeSQLUpdate("SET SESSION myisam_repair_threads = "+ numberOfThreads + ";");
+			return true;
+		}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot set session variable 'myisam_repair_threads'." , e);
+		}
+		
+		return false;
+	}
 }

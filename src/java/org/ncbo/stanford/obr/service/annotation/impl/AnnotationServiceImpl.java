@@ -11,7 +11,6 @@ import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
-import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
@@ -261,14 +260,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */
 	public void removeAnnotations(List<String> localOntologyIDs) {
 		
-		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+//		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			 directAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	 
-		 }else{
-			 for (String localOntologyID : localOntologyIDs) {
-				 directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);	 
-			}
-			 
-		 }
+//		 }else{
+//			 for (String localOntologyID : localOntologyIDs) {
+//				 directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);	 
+//			}
+//			 
+//		 }
 	}
 
 	/**
@@ -300,7 +299,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * 
 	 * @return
 	 */
-	public boolean disableIndexes() {	 
+	public boolean disableIndexes() {		
 		return directAnnotationTableDao.disableIndexes()
 				&& isaExpandedAnnotationTableDao.disableIndexes()
 				&& mapExpandedAnnotationTableDao.disableIndexes();
@@ -311,9 +310,21 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 *   
 	 * @return
 	 */
-	public boolean enableIndexes() {
-		return directAnnotationTableDao.enableIndexes()
-				&& isaExpandedAnnotationTableDao.enableIndexes()
-				&& mapExpandedAnnotationTableDao.enableIndexes();
+	public boolean enableIndexes(boolean bigResource) {	
+		// SET session variable  myisam_repair_threads  to 1
+		if(bigResource){
+			directAnnotationTableDao.setMyisamRepairThreads(MYISAM_REPAIR_THREADS_FOR_BIG_RESOURCE);
+		} 
+		try{
+			return directAnnotationTableDao.enableIndexes()
+			&& isaExpandedAnnotationTableDao.enableIndexes()
+			&& mapExpandedAnnotationTableDao.enableIndexes();
+		}finally{
+			// SET session variable  myisam_repair_threads  to 1
+			if(bigResource){
+				directAnnotationTableDao.setMyisamRepairThreads(MYISAM_REPAIR_THREADS_FOR_SMALL_RESOURCE);
+			} 
+		}
+		
 	}
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.ObrWeight;
 
-import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.aggregation.AggregationService;
@@ -42,14 +41,14 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 	 * @param {@code List} of localOntologyID containing ontology versions.
 	 */
 	public void removeAggregation(List<String> localOntologyIDs) {
-		 if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+//		 if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			 aggregationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	
-		 }else{
-			 for (String localOntologyID : localOntologyIDs) {
-				 aggregationTableDao.deleteEntriesFromOntology(localOntologyID);
-			}
-			 
-		 }		 	
+//		 }else{
+//			 for (String localOntologyID : localOntologyIDs) {
+//				 aggregationTableDao.deleteEntriesFromOntology(localOntologyID);
+//			}
+//			 
+//		 }		 	
 	} 
 	
 	/**

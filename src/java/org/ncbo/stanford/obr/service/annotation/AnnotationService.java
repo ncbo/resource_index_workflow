@@ -12,6 +12,9 @@ import obs.common.beans.DictionaryBean;
  *
  */
 public interface AnnotationService {
+	
+	public static int MYISAM_REPAIR_THREADS_FOR_BIG_RESOURCE =1;
+	public static int MYISAM_REPAIR_THREADS_FOR_SMALL_RESOURCE =8;
    
 	/**
 	 * 
@@ -59,9 +62,10 @@ public interface AnnotationService {
 	/**
 	 *  Enable indexes for all annotation table
 	 *   
+	 * @param bigResource
 	 * @return
 	 */
-	public boolean enableIndexes();
+	public boolean enableIndexes(boolean bigResource);
 	
 	/**
 	 * Disable indexes for all annotation tables

@@ -21,6 +21,7 @@ import obs.obr.populate.ObrWeight;
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
 import org.ncbo.stanford.obr.dao.execution.ExecutionDao.ExecutionEntry;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 import org.ncbo.stanford.obr.service.obs.impl.ObsDataPopulationServiceImpl;
@@ -292,7 +293,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				toolLogger.info("*** Enabling indexes on annotation tables starts...");
 	 			timer.reset();
 	 			timer.start();
-				resourceAccessTool.getAnnotationService().enableIndexes();
+				resourceAccessTool.getAnnotationService().enableIndexes(ResourceType.BIG==resourceAccessTool.getResourceType());
 				timer.end();
 				toolLogger.info("### Enabling indexes on annotation tables completed in "
 						+ timer.millisecondsToTimeString(timer.duration()) +".\n");
