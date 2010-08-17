@@ -311,20 +311,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @return
 	 */
 	public boolean enableIndexes(boolean bigResource) {	
-		// SET session variable  myisam_repair_threads  to 1
+		 
 		if(bigResource){
-			directAnnotationTableDao.setMyisamRepairThreads(MYISAM_REPAIR_THREADS_FOR_BIG_RESOURCE);
-		} 
-		try{
+			directAnnotationTableDao.callStoredProcedure("enable_indexes", resourceAccessTool.getToolResource().getResourceID().toLowerCase());
+			return true;
+		}else{
 			return directAnnotationTableDao.enableIndexes()
 			&& isaExpandedAnnotationTableDao.enableIndexes()
 			&& mapExpandedAnnotationTableDao.enableIndexes();
-		}finally{
-			// SET session variable  myisam_repair_threads  to 1
-			if(bigResource){
-				directAnnotationTableDao.setMyisamRepairThreads(MYISAM_REPAIR_THREADS_FOR_SMALL_RESOURCE);
-			} 
-		}
-		
+		} 
 	}
 }
