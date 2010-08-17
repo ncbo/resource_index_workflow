@@ -15,6 +15,7 @@ import org.ncbo.stanford.obr.dao.obs.master.ObsMasterDao;
 import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao.OntologyEntry;
 import org.ncbo.stanford.obr.exception.NoOntologyFoundException;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
+import org.ncbo.stanford.obr.util.LoggerUtils;
 
 /**
  * This service class {@code ObsDataPopulationServiceImpl} is provides implementation for populating obs slave data from master table which is used for
@@ -25,10 +26,17 @@ import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, DaoFactory{
 	 
 	/** Default logger for {@code ObsDataPopulationServiceImpl} class. */
-	private static Logger logger = Logger.getLogger(ObsDataPopulationServiceImpl.class);
+	private static Logger logger;
 	
 	/** The obsMasterDao used for querying OBS master database. */
 	private ObsMasterDao obsMasterDao;
+	
+	/**
+	 * 
+	 */
+	public ObsDataPopulationServiceImpl() {
+		logger = LoggerUtils.createOBRLogger(ObsDataPopulationServiceImpl.class);
+	} 
 	 
 	/**
 	 * Populates all the OBS master tables in the right sequence in order to traverse ontologies only once and reuse
