@@ -300,8 +300,17 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			}  
 		}
 		// Aggregation step to annotations.
-		nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
-				obrWeights);
+		try{
+			if(disableIndexes){
+				resourceAccessTool.getAggregationService().disableIndexes();
+			} 
+			nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+					obrWeights);
+		}finally{
+			if(disableIndexes){
+				resourceAccessTool.getAggregationService().enableIndexes(ResourceType.BIG==resourceAccessTool.getResourceType());
+			} 
+		} 
 		toolLogger.info(nbEntry + " elements aggregated (with "
 				+ nbAggregatedAnnotation
 				+ " new aggregated annotations) from resource "

@@ -75,4 +75,22 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 	public void removeConceptFrequncy(List<String> localOntologyIDs) {		 
 		conceptFrequencyDao.deleteEntriesFromOntologies(localOntologyIDs);	
 	} 
+	
+	/**
+	 * Disable indexes for aggregation tables
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes() {		
+		return aggregationTableDao.disableIndexes();				 
+	}
+
+	/**
+	 * Enable indexes for aggregation table
+	 *   
+	 * @return
+	 */
+	public boolean enableIndexes(boolean bigResource) {	
+		return aggregationTableDao.enableIndexes(bigResource);	 
+	}
 }

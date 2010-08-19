@@ -566,15 +566,18 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	 * 
 	 * @return true if successful
 	 */
-	public boolean enableIndexes(){
+	public boolean enableIndexes(boolean bigTable){
 		try{
-			this.executeSQLUpdate("ALTER TABLE "+ this.getTableSQLName()+" ENABLE KEYS;");
+			if(bigTable){
+				this.callStoredProcedure("enable_indexes", this.getTableSQLName(), "1");
+			}else{
+				this.callStoredProcedure("enable_indexes", this.getTableSQLName(), "0");
+			}			
 			return true;
 		}
-		catch(SQLException e){
+		catch(Exception e){
 			logger.error("** PROBLEM ** Cannot enable indexes for table " + this.getTableSQLName(), e);
-		}
-		
+		}		
 		return false;
 	}
 	

@@ -46,4 +46,18 @@ public interface AggregationService {
 	 */
 	public void removeConceptFrequncy(List<String> localOntologyID);
 
+	/**
+	 *  Enable indexes for aggregation table
+	 *   
+	 * @param bigResource
+	 * @return
+	 */
+	public boolean enableIndexes(boolean bigResource);
+	
+	/**
+	 * Disable indexes for aggregation table
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes();
 }

@@ -311,14 +311,9 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @return
 	 */
 	public boolean enableIndexes(boolean bigResource) {	
+		return directAnnotationTableDao.enableIndexes(bigResource)
+			&& isaExpandedAnnotationTableDao.enableIndexes(bigResource)
+			&& mapExpandedAnnotationTableDao.enableIndexes(bigResource);
 		 
-		if(bigResource){
-			directAnnotationTableDao.callStoredProcedure("enable_indexes", resourceAccessTool.getToolResource().getResourceID().toLowerCase());
-			return true;
-		}else{
-			return directAnnotationTableDao.enableIndexes()
-			&& isaExpandedAnnotationTableDao.enableIndexes()
-			&& mapExpandedAnnotationTableDao.enableIndexes();
-		} 
 	}
 }
