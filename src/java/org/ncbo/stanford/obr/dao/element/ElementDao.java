@@ -130,9 +130,17 @@ public class ElementDao extends AbstractObrDao {
 	
 	private String contextsForCreateQuery(){
 		StringBuffer queryb = new StringBuffer();
+		String context = null;
 		for(Iterator<String> it = this.contextNames.iterator(); it.hasNext();){
-			queryb.append(it.next().toLowerCase());
-			queryb.append(" TEXT");
+			context= it.next().toLowerCase();			
+			queryb.append(context);
+			
+			if(context.contains("_biological_characterization")){
+				queryb.append(" LONGTEXT");
+			}else{
+				queryb.append(" TEXT");
+			} 
+			
 			if (it.hasNext()){
 				queryb.append(", ");
 			}
