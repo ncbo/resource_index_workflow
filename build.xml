@@ -34,13 +34,7 @@
 	</fileset>
 	
 	<fileset id="cananolab.jars" dir="${cananolab.lib.dir}">
-		<include name="*.jar"/>
-		<exclude name="commons-lang-2.0.jar"/>
-		<exclude name="edtftpj-1.5.2.jar"/>
-		<exclude name="ekitspell.jar"/>
-		<exclude name="icu4j-3.4.4.jar"/>
-		<exclude name="jena-2.3.jar"/>
-		<exclude name="lucene-core-2.0.0.jar"/>		 
+		<include name="*.jar"/>		 	 
 	</fileset>
 	<path id="master-classpath">
 		<fileset refid="shared.jars" /> 	
@@ -217,10 +211,8 @@
 					<include name="**/*.jar"/>
 				</fileset> 
 				<fileset refid="shared.jars" /> 	
-				<fileset refid="protege.jars" /> 	
-				<!--TODO : comment for test
-				<fileset refid="cananolab.jars" /> 
-				-->
+				<fileset refid="protege.jars" />				 
+				<fileset refid="cananolab.jars" /> 			 
 			</copy>
 			
 			<!-- Copy properties folder containg all properties files to dist directory -->

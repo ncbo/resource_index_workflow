@@ -83,14 +83,20 @@ public class GetCananoLabData {
     	for (CaNanoLabThread caNanoLabThread : caNanoLabThreads) {
     		caNanoLabThread.start();
     		try {
-				Thread.sleep(2000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {				 
 				e.printStackTrace();
 			}
 		}
     	// wait for all thead complete
     	for (CaNanoLabThread caNanoLabThread : caNanoLabThreads) {
-			while(caNanoLabThread.isAlive());			
+			while(caNanoLabThread.isAlive()){
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {				 
+					e.printStackTrace();
+				}			
+			}
 		}
     	
     }
