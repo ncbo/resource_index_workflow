@@ -57,7 +57,7 @@ public class CaNanoLabAccessTool extends ResourceAccessTool {
     private static Structure CANANO_STRUCTURE = new Structure(CANANO_ITEMKEYS, CANANOLAB_RESOURCE_ID,
             CANANO_WEIGHTS, CANANO_ONTOIDS);
 
-    private static String CANANO_MAIN_ITEMKEY = CANANO_ITEMKEYS[0];
+    private static String CANANO_MAIN_ITEMKEY = CANANO_ITEMKEYS[4];
 
     public CaNanoLabAccessTool() {
 
@@ -69,7 +69,7 @@ public class CaNanoLabAccessTool extends ResourceAccessTool {
             logger.error("Malformed URL Exception Occured", e);
         }
         this.getToolResource().setResourceDescription(CANANO_DESCRIPTION);        
-        //this.getToolResource().setResourceElementURL(CANANO_ELT_URL); 
+        this.getToolResource().setResourceElementURL(EMPTY_STRING); 
         
     } 
     
