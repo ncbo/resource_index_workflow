@@ -69,7 +69,7 @@ public class CaNanoLabAccessTool extends ResourceAccessTool {
             logger.error("Malformed URL Exception Occured", e);
         }
         this.getToolResource().setResourceDescription(CANANO_DESCRIPTION);        
-        this.getToolResource().setResourceElementURL(EMPTY_STRING); 
+        this.getToolResource().setResourceElementURL(NOT_APPLICABLE); 
         
     } 
     
