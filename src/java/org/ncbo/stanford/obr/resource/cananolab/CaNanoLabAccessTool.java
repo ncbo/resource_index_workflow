@@ -57,7 +57,7 @@ public class CaNanoLabAccessTool extends ResourceAccessTool {
     private static Structure CANANO_STRUCTURE = new Structure(CANANO_ITEMKEYS, CANANOLAB_RESOURCE_ID,
             CANANO_WEIGHTS, CANANO_ONTOIDS);
 
-    private static String CANANO_MAIN_ITEMKEY = CANANO_ITEMKEYS[4];
+    private static String CANANO_MAIN_ITEMKEY = CANANO_ITEMKEYS[0];
 
     public CaNanoLabAccessTool() {
 
