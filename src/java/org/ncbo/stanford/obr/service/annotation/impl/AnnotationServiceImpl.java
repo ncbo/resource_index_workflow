@@ -10,9 +10,7 @@ import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
-import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
-import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.annotation.AnnotationService;
@@ -49,7 +47,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		logger.info("*** Executing  Direct Annotation process... ");
 		// processes direct mgrep annotations
 		
-		if(elementTableDao.containElementsForMgrepAnnotation(dictionary.getDictionaryID())){
+		if(elementTableDao.numberOfElementsForMgrepAnnotation(dictionary.getDictionaryID())> 0){
 			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
 			 		withCompleteDictionary, stopwords);
 		} else{
@@ -213,15 +211,16 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * workflow (semantic expansion). It use the dictionaryID of the given
 	 * dictionary. Returns the number of reported annotations added to _DAT.
 	 */
-	private int reportExistingAnnotations(DictionaryBean dictionary) {
-		int nbReported;
+	private long reportExistingAnnotations(DictionaryBean dictionary) {
+		long nbReported;
 		ExecutionTimer timer = new ExecutionTimer();
 
 		logger.info("\t** Processing of existing reported annotations...");
 		timer.start();
-		nbReported = directAnnotationTableDao.addEntries(getExistingAnnotations(dictionary.getDictionaryID(),
-						resourceAccessTool.getToolResource()
-								.getResourceStructure()));
+ 
+		nbReported = addExistingAnnotations(dictionary.getDictionaryID(),
+				resourceAccessTool.getToolResource()
+						.getResourceStructure());
 
 		timer.end();
 		logger.info("\t## " +nbReported + " reported annotations processed in: "
@@ -236,21 +235,19 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param structure
 	 * @return
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
-		
-		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		 
+	public long addExistingAnnotations(int dictionaryID, Structure structure){
+		long nbAnnotations =0; 
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
+				nbAnnotations += elementTableDao.addExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, directAnnotationTableDao);				
 			}
 			
 		}
-		return reportedAnnotations;
+		return nbAnnotations;
 	}
 
 	/**
@@ -263,14 +260,14 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 */
 	public void removeAnnotations(List<String> localOntologyIDs) {
 		
-		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+//		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			 directAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	 
-		 }else{
-			 for (String localOntologyID : localOntologyIDs) {
-				 directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);	 
-			}
-			 
-		 }
+//		 }else{
+//			 for (String localOntologyID : localOntologyIDs) {
+//				 directAnnotationTableDao.deleteEntriesFromOntology(localOntologyID);	 
+//			}
+//			 
+//		 }
 	}
 
 	/**
@@ -291,5 +288,32 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		} else{
 			logger.info("\tIndexes already present in table " + directAnnotationTableDao.getTableSQLName());
 		}
+	}
+
+	public int getNumberOfElementsForAnnotation(int dictionaryID) {		 
+		return elementTableDao.numberOfElementsForMgrepAnnotation(dictionaryID);
+	}
+
+	/**
+	 * Disable indexes for all annotation tables
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes() {		
+		return directAnnotationTableDao.disableIndexes()
+				&& isaExpandedAnnotationTableDao.disableIndexes()
+				&& mapExpandedAnnotationTableDao.disableIndexes();
+	}
+
+	/**
+	 *  Enable indexes for all annotation table
+	 *   
+	 * @return
+	 */
+	public boolean enableIndexes(boolean bigResource) {	
+		return directAnnotationTableDao.enableIndexes(bigResource)
+			&& isaExpandedAnnotationTableDao.enableIndexes(bigResource)
+			&& mapExpandedAnnotationTableDao.enableIndexes(bigResource);
+		 
 	}
 }

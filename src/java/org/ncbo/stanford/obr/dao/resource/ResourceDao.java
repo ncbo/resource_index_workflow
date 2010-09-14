@@ -86,10 +86,9 @@ public class ResourceDao extends AbstractObrDao {
 					"logo VARCHAR(255), " +	
 					"dictionary_id SMALLINT UNSIGNED, "+ 
 					"total_element BIGINT, " +
-					"last_update_date TIMESTAMP, " +
-					"workflow_completed_date TIMESTAMP, " +
-					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id), " +
-					"INDEX X_" + this.getTableSQLName() +"_resource_id (resource_id) " +				 
+					"last_update_date TIMESTAMP NULL DEFAULT NULL, " +
+					"workflow_completed_date TIMESTAMP NULL DEFAULT NULL, " +
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id (dictionary_id) " +					 
 				    ") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 

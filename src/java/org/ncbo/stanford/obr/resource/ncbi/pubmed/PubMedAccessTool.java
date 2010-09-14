@@ -1,6 +1,7 @@
 package org.ncbo.stanford.obr.resource.ncbi.pubmed;
 
 import gov.nih.nlm.ncbi.www.soap.eutils.efetch_pubmed.AbstractType;
+import gov.nih.nlm.ncbi.www.soap.eutils.efetch_pubmed.DateCreatedType;
 import gov.nih.nlm.ncbi.www.soap.eutils.efetch_pubmed.EFetchPubmedServiceLocator;
 import gov.nih.nlm.ncbi.www.soap.eutils.efetch_pubmed.EFetchRequest;
 import gov.nih.nlm.ncbi.www.soap.eutils.efetch_pubmed.EFetchResult;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +30,8 @@ import obs.obr.populate.Element.BadElementStructureException;
 
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ncbi.AbstractNcbiResourceAccessTool;
+import org.ncbo.stanford.obr.util.FileResourceParameters;
+import org.ncbo.stanford.obr.util.MessageUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -45,13 +49,15 @@ import com.aliasi.util.Files;
  * PubMedAccessTool is responsible for getting data elements for 
  * Pub Med. The latest files available for the particular year 
  * http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
+ * 
+ * FTP location ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/
  *  
  * This tool fetch data using xml files and E-Utilities.
  * <p>
  * To fetch data using E-utilities  use method <code>updateResourceContent</code>  
  * and to fetch data using xml files use method <code>downloadResourceContent</code>
  * 
- * @author  kyadav(Optra)
+ * @author  Kuladip Yadav
  * @version $$
  */
 public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
@@ -70,8 +76,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	private static final String PM_EUTILS_DB = "pubmed";
 
 	// Query terms for E-Utils
-	//private static final String PM_EUTILS_TERM = "all[filter]";
-	private static final String PM_EUTILS_TERM = "all[filter] melanoma";
+	private static final String PM_EUTILS_TERM = "all[filter]"; 
 
 	private static final String[] PM_ITEMKEYS 	= {"title", "abstract", "keywords", "meshheadings" };
 	private static final Double[] PM_WEIGHTS 	= {1.0, 0.8, 0.7, 0.7 };
@@ -80,22 +85,19 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	private static String PM_MAIN_ITEMKEY = "title";
 	
 	// Absolute path for folder containing pubmed xml files	
-	private static final String PM_FOLDER = "/ncbodata/OBR/resources/PubMed/";
+	private static final String PM_FOLDER = FileResourceParameters.resourceFolder() +"/pubmed/";
 		
 	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
 		
 	// Start processing xml file number
-    private static final int START_XML_NUMBER = 617; //556 
+    private static int START_XML_NUMBER = Integer.parseInt(MessageUtils.getMessage("obr.pm.xml.from"));
 	
     // End processing xml file number
-	private static final int END_XML_NUMBER = 617; //617
+	private static int END_XML_NUMBER =  Integer.parseInt(MessageUtils.getMessage("obr.pm.xml.to"));
 	
-	// All the zip files available here. (have to connect to VPN)
-	private String PM_ZIP_URL = "ftp://ftp.nlm.nih.gov/nlmdata/.medleasebaseline/zip/";
-	
-	//following is the url to see the latest files available for the particular year
-	// http://www.nlm.nih.gov/bsd/licensee/2010_stats/baseline_med_filecount.html
-	
+	 // End processing xml file number
+	private static boolean PROCESS_XML_FILES = Boolean.parseBoolean(MessageUtils.getMessage("obr.pm.process.xml"));
+	 
 	// lingpipe parser
 	private static MedlineParser medlineParser = new MedlineParser(true);	 
  
@@ -162,12 +164,16 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	 */
 	@Override
 	public int updateResourceContent() {
-		// Get number of day's since last update.
-		this.numberOfDays = new Integer(this.numberOfDaysSinceLastUpdate());
-		//return super.eutilsUpdateAll(null);
 		
-		int nbElements = downloadResourceContent();		
-		nbElements += super.eutilsUpdateAll(null);		
+		int nbElements = 0;
+		if(PROCESS_XML_FILES){
+			 nbElements = downloadResourceContent();	
+		}else{
+			// Get number of day's since last update.
+			 this.numberOfDays = new Integer(EMPTY_STRING + this.numberOfDaysSinceLastUpdate());
+			 nbElements += super.eutilsUpdateAll(null);	
+		} 
+			
 		return nbElements;
 	}
 
@@ -347,39 +353,51 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	 *  
 	 * @return int
 	 */
-	public int numberOfDaysSinceLastUpdate() {
-		/*
-		 * int nbOfDays = 0; //get the last entry in the corresponding _ET
-		 * String lastLocalID =
-		 * this.getToolElementTab().getLastElementLocalID(); if (lastLocalID !=
-		 * null){ //use efetch to get the date of the creation of this element
-		 * in NCBI DB EFetchRequest efetchRequest = new EFetchRequest();
-		 * efetchRequest.setEmail(EUTILS_EMAIL);
-		 * efetchRequest.setTool(EUTILS_TOOL);
-		 * efetchRequest.setDb(this.getEutilsDB());
-		 * efetchRequest.setId(lastLocalID);
-		 * 
-		 * EFetchResult efetchResult; Calendar articleCal =
-		 * Calendar.getInstance(); try { efetchResult =
-		 * this.getToolEutils().run_eFetch(efetchRequest); PubmedArticleType[]
-		 * resultArticles = efetchResult.getPubmedArticleSet();
-		 * PubmedArticleType article = resultArticles[0]; DateCreatedType
-		 * articleDate = article.getMedlineCitation().getDateCreated();
-		 * articleCal.set(Integer.parseInt(articleDate.getYear()),
-		 * Integer.parseInt(articleDate.getMonth()),
-		 * Integer.parseInt(articleDate.getDay()),
-		 * Integer.parseInt(articleDate.getHour()),
-		 * Integer.parseInt(articleDate.getMinute()),
-		 * Integer.parseInt(articleDate.getSecond())); } catch (RemoteException
-		 * e) { logger.error("** PROBLEM ** Cannot
-		 * get the date of the last record for " +
-		 * this.getToolResource().getResourceName() +" using Efetch.", e); }
-		 * //compute the number of days between today and this date Calendar
-		 * rightNow = Calendar.getInstance(); nbOfDays = (int)
-		 * NcbiResourceAccessTool.deltaDays(rightNow, articleCal); } return
-		 * nbOfDays;
-		 */
-		return 2;
+	public long numberOfDaysSinceLastUpdate() {
+		 
+		long nbOfDays = 0; // get the last entry in the corresponding _ET
+		String lastLocalID = getResourceUpdateService().getLastElementLocalID();
+		if (lastLocalID != null) {
+			// use efetch to get the date of the creation of this element in
+			// NCBI DB
+
+			EFetchRequest efetchRequest = new EFetchRequest();
+			efetchRequest.setEmail(EUTILS_EMAIL);
+			efetchRequest.setTool(EUTILS_TOOL);		 
+			efetchRequest.setId(lastLocalID);
+
+			EFetchResult efetchResult;
+			Calendar articleCal = Calendar.getInstance();
+
+			try {
+
+				EFetchPubmedServiceLocator toolService = new EFetchPubmedServiceLocator();
+				EUtilsServiceSoap toolEutils = toolService
+						.geteUtilsServiceSoap();
+
+				efetchResult = toolEutils.run_eFetch(efetchRequest);
+				PubmedArticleType[] resultArticles = efetchResult
+						.getPubmedArticleSet();
+				PubmedArticleType article = resultArticles[0];
+				DateCreatedType articleDate = article.getMedlineCitation()
+						.getDateCreated();
+				articleCal.set(Integer.parseInt(articleDate.getYear()), Integer
+						.parseInt(articleDate.getMonth()), Integer
+						.parseInt(articleDate.getDay()));
+			} catch ( Exception e) {
+				logger.error(
+						"** PROBLEM ** Cannot    get the date of the last record for "
+								+ this.getToolResource().getResourceName()
+								+ " using Efetch.", e);
+			}
+			// compute the number of days between today and this date Calendar
+			Calendar rightNow = Calendar.getInstance();
+			nbOfDays =   (rightNow.getTimeInMillis() - articleCal.getTimeInMillis())/(1000 * 60 *60 *24);
+			 
+		}
+		return nbOfDays;
+		 
+		 
 	}
 
 	@Override

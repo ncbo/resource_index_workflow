@@ -64,7 +64,8 @@ public class AggregationDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"UNIQUE element_id(element_id, concept_id) " +	
+					"UNIQUE INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE, " +	
+					"INDEX X_" + getTableSQLName() +"_concept_id(concept_id) USING BTREE " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
 	
@@ -195,7 +196,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index isa expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info("\t" +nbAnnotation + " annotations indexed with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
+		logger.info("\t" +nbAnnotation + " annotations aggregated with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
 
 		// Switches the indexingDone flags on EAT
 		StringBuffer updatingQueryb2 = new StringBuffer();
@@ -230,7 +231,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info("\t" + nbAnnotation + " annotations indexed with mapping expanded annotations in : " 
+		logger.info("\t" + nbAnnotation + " annotations aggregated with mapping expanded annotations in : " 
 				+ timer.millisecondsToTimeString(timer.duration()));
 		
 		// Switches the workflow_status flags on mapping annotation
@@ -406,14 +407,14 @@ public class AggregationDao extends AbstractObrDao {
 	//**********************************Statistics Method****************
 	 
 	/**
-	 * This method gives number of indexed annotations for each ontologyID 
+	 * This method gives number of aggregated annotations for each ontologyID 
 	 * @param dictionary 
 	 * @param withCompleteDictionary 
 	 *  
-	 * @return map containing number of indexed annotations for each ontologyID as key.
+	 * @return map containing number of aggregated annotations for each ontologyID as key.
 	 */
-	public HashMap<Integer, Integer> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();
 		if(withCompleteDictionary){
@@ -437,7 +438,7 @@ public class AggregationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}
@@ -445,7 +446,7 @@ public class AggregationDao extends AbstractObrDao {
 			return this.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot get indexed annotations statistics from "+this.getTableSQLName()+" .", e);
+			logger.error("** PROBLEM ** Cannot get aggregated annotations statistics from "+this.getTableSQLName()+" .", e);
 		}
 		return annotationStats;
 		 

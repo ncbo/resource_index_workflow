@@ -83,6 +83,16 @@ obs.slave.dictionary.latest=@obsslavedictionarylatest@
 
 # Remove ontology from slave obs tables and all resources tables
 obs.slave.ontology.remove=@obsslaveontologyremove@
+# If want to remove specific ontology
+obs.slave.ontology.remove.from.list=@obsslaveontologyremovefromlist@
+obs.slave.ontology.remove.list=@obsslaveontologyremovelist@
+
+# Flag for master-slave replication mechanism
+obr.database.sync=@obrdatabasesync@
+# Full path of syncronization script
+obr.database.sync.script.path=@obrdatabasesyncscriptpath@
+# Flag for replicating obs tables
+obr.database.sync.obs.tables=@obrdatabasesyncobstables@
 
 ####################################################
 # Resource Index Schema/Tables properties 
@@ -104,6 +114,7 @@ obr.dictionary.table.suffix=dictionary
 obr.resource.table.suffix=resource
 obr.context.table.suffix=context
 obr.statistics.table.suffix=statistics
+obr.execution.table.suffix=execution
 
 # Maximum number of element to process
 obr.elements.process.max=15000
@@ -114,6 +125,9 @@ obr.jdbc.driver=@obrjdbcdriver@
 obr.jdbc.username=@obrjdbcusername@
 obr.jdbc.password=@obrjdbcpassword@
 
+# Disable/Enabled indexes for workflow
+obr.table.index.disabled=@obrtableindexdisabled@
+
 # Configuring RXRD database 
 obr.rxrd.jdbc.url=@obrrxrdjdbcurl@
 obr.rxrd.jdbc.username=@obrrxrdjdbcusername@
@@ -123,6 +137,11 @@ obr.rxrd.jdbc.password=@obrrxrdjdbcpassword@
 obr.grants.jdbc.url=@obrgrantsjdbcurl@
 obr.grants.jdbc.username=@obrgrantsjdbcusername@
 obr.grants.jdbc.password=@obrgrantsjdbcpassword@
+
+# Configuring PubMed Resource
+obr.pm.process.xml=@obrpmprocessxml@
+obr.pm.xml.from=@obrpmxmlfrom@
+obr.pm.xml.to=@obrpmxmlto@
 
 # File parameters
 obr.local.path=files/
@@ -140,4 +159,5 @@ obr.version=@obrversion@
 
 obr.svn.code.path=@obrsvncodepath@
 obr.schema.host.name=@obrschemahostname@
+obr.schema.name=@obrschemaname@
 obr.common.log.file=@obrlogfilename@

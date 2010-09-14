@@ -1,5 +1,6 @@
 package org.ncbo.stanford.obr.service.workflow;
 
+import org.ncbo.stanford.obr.dao.execution.ExecutionDao.ExecutionEntry;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 
 /**
@@ -40,7 +41,7 @@ public interface ResourceIndexWorkflow {
 	 * 
 	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
 	 */
-	public void resourceProcessing(ResourceAccessTool resourceAccessTool);
+	public void resourceProcessing(ResourceAccessTool resourceAccessTool, ExecutionEntry executionEntry);
 	
 	/**
 	 * Deletes the ontology duplicates from the OBS slave tables and all the resource index tables.
@@ -50,5 +51,13 @@ public interface ResourceIndexWorkflow {
 	 * <p>This method ensures to keep only the latest version of ontologies.	  
 	 */
 	public void removeOntologyDuplicates();	
+	
+	/**
+	 * This step execute replication mechanism between resource index 
+	 * master/slave database.
+	 * 
+	 * @param replicateObsTables a {@code boolean} decide to copy obs tables or not . 
+	 */
+	public void executeSyncronizationScript(boolean replicateObsTables)throws Exception;
 	
 }

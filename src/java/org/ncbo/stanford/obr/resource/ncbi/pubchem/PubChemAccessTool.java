@@ -11,9 +11,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
@@ -142,9 +140,10 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 		String[] UIDsTab = new String[UIDs.size()];
 		UIDsTab = UIDs.toArray(UIDsTab);
 		int max;
-		HashSet<String> fieldValues= new HashSet<String>();
+		 
 		String concepts;
 		List<String> itemKeys= Arrays.asList(PCM_ITEMKEYS);
+		String meSHHeadingList;
 		
 		// Process UIDs 
 		for(int step=0; step<UIDsTab.length; step+=EUTILS_MAX){
@@ -171,54 +170,46 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 					for (int j = 0; j < docSumItems.length; j++) {
 						if(!itemKeys.contains(docSumItems[j].getName())){
 							continue;
-						}
-						
-						fieldValues.clear();
-						// Get field and add it into fieldVlaues collection
-						if(docSumItems[j].get_any()!= null && docSumItems[j].get_any().length >0){							 
-							for (int k = 0; k < docSumItems[j].get_any().length; k++) {								
-								fieldValues.add(docSumItems[j].get_any()[k].getValue());
-							}
 						} 
 						
 						// Extract MeSHHeadingList and map to as MESH ontology concepts
 						if(PCM_ITEMKEYS[0].equals(docSumItems[j].getName())){
-							
-							if(docSumItems[j].getItem()!= null && docSumItems[j].getItem().get_any().length >0){							 
-								fieldValues.add(docSumItems[j].getItem().get_any()[0].getValue());								 
-							} 
-							
+							 
+							meSHHeadingList= getItemTypeContent(docSumItems[j], GT_SEPARATOR_STRING);
 							// Map terms to MESH concepts.
-							concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(fieldValues, PCM_ONTOIDS[0]);		
+							concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(meSHHeadingList, PCM_ONTOIDS[0], GT_SEPARATOR_STRING);		
 							
-							if(!fieldValues.isEmpty()
+							if(!EMPTY_STRING.equals(meSHHeadingList)
 									&& (concepts== null || concepts.trim().length()== 0)){
-								logger.error("Cannot map MESH term " + fieldValues + " to local concept id for element with ID " + localElementID +".");
+								logger.error("Cannot map MESH term " + meSHHeadingList + " to local concept id for element with ID " + localElementID +".");
 								
 							}
 							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[0]), concepts);
 							
 						}
 						// Extract MeSHTermList and map to as MESH ontology concepts
-						else if(PCM_ITEMKEYS[1].equals(docSumItems[j].getName())){							
+						else if(PCM_ITEMKEYS[1].equals(docSumItems[j].getName())){
+							 
+							meSHHeadingList= getItemTypeContent(docSumItems[j], GT_SEPARATOR_STRING);
 							// Map terms to MESH concepts.
-							concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(fieldValues , PCM_ONTOIDS[1]);
-							if(!fieldValues.isEmpty()
+							concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(meSHHeadingList, PCM_ONTOIDS[1], GT_SEPARATOR_STRING);		
+							
+							if(!EMPTY_STRING.equals(meSHHeadingList)
 									&& (concepts== null || concepts.trim().length()== 0)){
-								logger.error("Cannot map MESH term " + fieldValues + " to local concept id for element with ID " + localElementID +".");
+								logger.error("Cannot map MESH term " + meSHHeadingList + " to local concept id for element with ID " + localElementID +".");
 								
 							}
 							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[1]), concepts);
 							
-						}
+						} 
 						// Extract PharmActionList  
 						else if(PCM_ITEMKEYS[2].equals(docSumItems[j].getName())){
-							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[2]), createStringFromSet(fieldValues, COMMA_SEPARATOR));
+							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[2]), getItemTypeContent(docSumItems[j], COMMA_SEPARATOR));
 							
 						}
 						// Extract SynonymList 
 						else if(PCM_ITEMKEYS[3].equals(docSumItems[j].getName())){
-							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[3]), createStringFromSet(fieldValues, COMMA_SEPARATOR));
+							eltStructure.putContext(Structure.generateContextName(PCM_RESOURCEID, PCM_ITEMKEYS[3]), getItemTypeContent(docSumItems[j], COMMA_SEPARATOR));
 							
 						} 
 					}			
@@ -239,32 +230,7 @@ public class PubChemAccessTool extends AbstractNcbiResourceAccessTool {
 			}
 		}
 		return nbElement;
-	} 
-	
-	 /**
-	  * This method create string for given collection separated by given separator
-	  * 
-	  * @param values
-	  * @param separator
-	  * @return String separated by separator string
-	  */
-	private String createStringFromSet(Set<String> values, String separator){
-		if(values==null ||values.isEmpty()  )
-			return EMPTY_STRING;
-		StringBuffer result= new StringBuffer();
-		
-		for (Iterator<String> iterator = values.iterator(); iterator.hasNext();) {
-			String name = iterator.next();
-			result.append(name);
-			result.append(separator);			
-		}
-		// Delete last GT_SEPARATOR_STRING		
-		if(result.length()> 0){
-			result.delete(result.length()-separator.length(), result.length());
-		} 
-		
-		return result.toString();
-	}
+	}   
 	 
 	@Override
 	public String elementURLString(String elementLocalID) {

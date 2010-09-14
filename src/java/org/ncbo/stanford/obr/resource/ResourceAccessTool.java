@@ -61,6 +61,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public ResourceAccessTool(String resource, String resourceID, Structure structure){
 		super(); 
 		initializeLogger(resourceID); 
+		logger.info("*****************************************************");
 		logger.info("ResourceAccessTool creation...");
 		this.toolName = RESOURCE_NAME_PREFIX + resourceID + Utilities.getRandomString(3);
 		String mainContext = Structure.generateContextName(resourceID, this.mainContextDescriptor());
@@ -238,7 +239,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	/**
 	 * Returns the number of elements in the _ET table. 
 	 */
-	public int numberOfElement(){
+	public long numberOfElement(){
 		return this.resourceUpdateService.numberOfEntry();
 	}
 	
@@ -292,7 +293,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	}
    
 	/**
-	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * This method calculates number of aggregated annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
 	 * @param withCompleteDictionary 
 	 * @param dictionary 
@@ -325,7 +326,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * @param {@code List} of localOntologyID containing version of given ontology.
 	 */
 	public void removeOntologies(List<String> localOntologyIDs){
-		// Remove entries from aggrgation table  
+		// Remove entries from aggregation table  
 		aggregationService.removeAggregation(localOntologyIDs);
 		// Remove entries from concept frequency table  
 		aggregationService.removeConceptFrequncy(localOntologyIDs);
@@ -368,12 +369,12 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void createIndexForAnnotationTables() {
 		annotationService.createIndexForAnnotationTable();
 		semanticExpansionService.createIndexForExpandedAnnotationTables(); 
-	}
-
+	}	
+	
 	/**
 	 * Calculate concept frequency
 	 */
 	public void calulateConceptFrequncy() {
 		 aggregationService.calulateConceptFrequncy(); 
-	}	 
+	}
 }

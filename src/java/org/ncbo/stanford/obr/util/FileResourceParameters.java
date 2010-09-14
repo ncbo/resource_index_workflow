@@ -13,6 +13,9 @@ public class FileResourceParameters implements StringHelper{
 	// OBR schema host name
 	public static final String OBR_SCHEMA_HOST 	= MessageUtils.getMessage("obr.schema.host.name");
 	
+	// OBR schema name
+	public static final String OBR_SCHEMA = MessageUtils.getMessage("obr.schema.name");
+	
 	// OBR version
 	public static final String OBR_VERSION 	= MessageUtils.getMessage("obr.version");
 	
@@ -57,7 +60,7 @@ public class FileResourceParameters implements StringHelper{
 	}
 	
 	public static String resourceLogFolder(){
-		return selectRightFolder(RESOURCE_LOG_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING );
+		return selectRightFolder(RESOURCE_LOG_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING + OBR_SCHEMA + SLASH_STRING);
 	}
 	 
 	public static String blackListFolder(){

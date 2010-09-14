@@ -43,8 +43,8 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 			 mapExpandedAnnotationTableDao= new MapExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
 			
 			 aggregationTableDao = new AggregationDao(resourceAccessTool.getToolResource().getResourceID());
-			
-			 conceptFrequencyDao = new ConceptFrequencyDao(resourceAccessTool.getToolResource().getResourceID());
+			 
+			 conceptFrequencyDao = new ConceptFrequencyDao(resourceAccessTool.getToolResource().getResourceID());			
 		}
 		
 		

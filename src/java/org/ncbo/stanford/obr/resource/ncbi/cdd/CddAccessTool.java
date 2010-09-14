@@ -107,6 +107,7 @@ public class CddAccessTool extends AbstractNcbiResourceAccessTool{
 		String[] UIDsTab = new String[UIDs.size()];
 		UIDsTab = UIDs.toArray(UIDsTab);
 		int max;
+		String localElementId= null;
 		
 		for(int step=0; step<UIDsTab.length; step+=EUTILS_MAX){
 			max = step+EUTILS_MAX; 
@@ -125,42 +126,31 @@ public class CddAccessTool extends AbstractNcbiResourceAccessTool{
 					
 					// resultDocSums[i].getID contains the UID
 					eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[0]), resultDocSums[i].getId());
-					//logger.info("result UID: " + resultDocSums[i].getId());
-					// localElementID
-					//logger.info("get data of "+docSumItems[0].get_any()[0].toString()+"...");	
-					
-					// get "title"
-					String titleString=EMPTY_STRING;
-					org.apache.axis.message.MessageElement[] title = docSumItems[1].get_any();
-					if(title != null){
-						for (int k=0; k<title.length; k++){
-							titleString+=title[k].toString();
-							if (k!=(title.length-1)){
-								titleString+=GT_SEPARATOR_STRING;
+					 
+					for (ItemType docSumItem : docSumItems) {
+						if(CDD_ITEMKEYS[1].equalsIgnoreCase(docSumItem.getName())){
+							String title = getItemTypeContent(docSumItem);
+							if(title != null){
+								eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[1]), title);
+							}else{
+								eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[1]), EMPTY_STRING);
+							}	
+						} else if(CDD_ITEMKEYS[2].equalsIgnoreCase(docSumItem.getName())){
+							// get "abstract"
+							String abstractString=getItemTypeContent(docSumItem);
+							 
+							if(abstractString != null){					 
+								 eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[2]), abstractString);
+							}else{
+								eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[2]), EMPTY_STRING);
 							}
-						 }
-						 eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[1]), titleString);
-					}else{
-						eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[1]), EMPTY_STRING);
-					}	
-					
-					// get "abstract"
-					String abstractString=EMPTY_STRING;
-					org.apache.axis.message.MessageElement[] abstractMsg = docSumItems[2].get_any();
-					if(abstractMsg != null){
-						for (int k=0; k<abstractMsg.length; k++){
-							abstractString+=abstractMsg[k].toString();
-							if (k!=(abstractMsg.length-1)){
-								abstractString+=EMPTY_STRING;
-							}
-						 }
-						 eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[2]), abstractString);
-					}else{
-						eltStructure.putContext(Structure.generateContextName(CDD_RESOURCEID, CDD_ITEMKEYS[2]), EMPTY_STRING);
-					}
-				
+						}else if(ACCESSION_STRING.equals(docSumItem.getName())){
+							localElementId =docSumItem.getItemContent();
+						}
+						
+					} 
 					// localElementID and structure into a new element
-					element = new Element(docSumItems[0].get_any()[0].toString(), eltStructure);
+					element = new Element(localElementId, eltStructure);
 					
 					if (resourceUpdateService.addElement(element)){
 							nbElement ++;

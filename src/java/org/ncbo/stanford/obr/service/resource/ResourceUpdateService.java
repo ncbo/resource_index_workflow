@@ -103,9 +103,9 @@ public interface ResourceUpdateService {
 	/**
 	 * Gets the number of entries present in element table.
 	 * 
-	 * @return int
+	 * @return long
 	 */
-	public int numberOfEntry();
+	public long numberOfEntry();
 
 	/**
 	 * Remove all the entries from element table, annotation table, index table for
@@ -119,7 +119,7 @@ public interface ResourceUpdateService {
 	public void reInitializeAllTablesExcept_ET();
 
 	/**
-	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * This method calculates number of aggregated annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for a resource.
 	 * @param withCompleteDictionary 
 	 * @param dictionary 
@@ -151,4 +151,11 @@ public interface ResourceUpdateService {
 	 * @return boolean {@code true} if updated successfully.
 	 */
 	public boolean updateResourceWorkflowInfo(Resource resource); 
+	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID();
 }

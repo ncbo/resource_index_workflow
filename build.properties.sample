@@ -9,7 +9,7 @@ app.name=${ant.project.name}
 
 # Source directory
 src.dir=src/java
-src.perl.dir=src/perl
+src.scripts.dir=src/scripts
 
 # Logging properties
 obr.app.log.deflevel=ERROR
@@ -43,11 +43,12 @@ obs.schema.name=obs_hibernate
 # Resource Index Schema/Tables properties 
 ####################################################
 # Configuring resource index database 
-obr.jdbc.url=jdbc:mysql://localhost:3306/resource_index
+obr.jdbc.url=jdbc:mysql://localhost:3306/resource_index?noAccessToProcedureBodies=true
 obr.jdbc.driver=com.mysql.jdbc.Driver
 obr.jdbc.username=yourusername
 obr.jdbc.password=yourpassword
 obr.schema.host.name=localhost
+obr.schema.name=schema_name
 
 # Configuring RXRD database 
 obr.rxrd.jdbc.url=jdbc:mysql://localhost:3306/rxrd
@@ -58,6 +59,11 @@ obr.rxrd.jdbc.password=yourpassword
 obr.grants.jdbc.url=jdbc:mysql://localhost:3306/rxrd
 obr.grants.jdbc.username=yourusername
 obr.grants.jdbc.password=yourpassword
+
+# Configuring PubMed Resource
+obr.pm.process.xml=true
+obr.pm.xml.from=0
+obr.pm.xml.to=0
 
 # Configuring master OBS database 
 obs.master.schema.name=obsschemaname
@@ -73,6 +79,10 @@ obs.slave.dictionary.latest=false
 
 # Remove ontology from slave obs tables and all resources tables
 obs.slave.ontology.remove=false
+# If want to remove specific ontology
+obs.slave.ontology.remove.from.list=false
+obs.slave.ontology.remove.list=list_of_local_ontology_ids
+
 
 # Resource Index Workflow flags
 
@@ -94,6 +104,18 @@ obr.dictionary.complete=false
 obr.expansion.relational=true
 obr.expansion.mapping=true
 obr.expansion.distance=true
+
+# Disable/Enabled indexes for workflow
+obr.table.index.disabled=false
+
+# Flag for master-slave replication mechanism
+obr.database.sync=false
+
+# Full path of syncronization script
+obr.database.sync.script.path=/path/to/script/script_name.sh
+
+# Flag for replicating obs tables
+obr.database.sync.obs.tables=false
 
 # Resources to be included in workflow i.e resource ids separated by comma.
 #obr.resource.ids=GEO,AE,CT,GM,OMIM,CDD,PGDI,PGDR,PGGE,REAC,RXRD,UPKB,WP,BSM,DBK,SMD,CANANO,PC,PCM,GAP,MICAD,PM,AERS,GRANTS

@@ -75,7 +75,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"position_to INT(11), " +
 					"term_id INT(11) UNSIGNED, " +					
 					"dictionary_id SMALLINT(5) UNSIGNED NOT NULL, " +
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +					
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +	
+					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_term_id(term_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id(dictionary_id) USING BTREE, " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
@@ -135,7 +141,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Add an new entry in corresponding SQL table.
 	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
 	 */
-	private boolean addEntry(DirectAnnotationEntry entry ){
+	public boolean addEntry(DirectAnnotationEntry entry ){
 		boolean inserted = false;
 		try {		 
 			this.addEntryStatement.setString (1, entry.getLocalElementID());
@@ -199,7 +205,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addMgrepEntryStatement.setInt    (5, entry.getFrom());
 			this.addMgrepEntryStatement.setInt    (6, entry.getTo());
 			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryID());
-			this.addMgrepEntryStatement.setInt(8, entry.getWorkflowStatus());
+			this.addMgrepEntryStatement.setInt	  (8, entry.getWorkflowStatus());
 		 
 			this.executeSQLUpdate(this.addMgrepEntryStatement);
 			inserted = true;
@@ -224,12 +230,18 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * @return the number of added entries
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
-		int nbInserted = 0;		 
-		for(DirectAnnotationEntry entry: entries){
-			if (this.addEntry(entry)){
-				nbInserted++; 
+		int nbInserted = 0;		
+		
+		for(DirectAnnotationEntry entry: entries){					 			 	 
+			try {
+				addEntry(entry);
+				 nbInserted++;
+			}catch (Exception e) {
+				logger.error("** PROBLEM ** Cannot add " + entry.toString() + "on table " + this.getTableSQLName());
+				 
 			}
-		}
+		}  
+		
 		return nbInserted;
 	}  
 	 
@@ -323,7 +335,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		timer.reset();
 		timer.start();
 		try{
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), false);
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot join the temporary table and OBS_TT to load the file " + mgrepFile.getName()+". 0 returned", e);
@@ -484,8 +496,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  @return Map containing number of mgerp annotations for each ontology as key. 
 	 *   
 	 */
-	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -509,7 +521,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}
@@ -530,8 +542,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  
 	 *  @return Map containing number of reported annotations for each ontology as key. 
 	 */
-	public HashMap<Integer, Integer> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+	public HashMap<Integer, Long> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -554,7 +566,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
 			}			
 			rSet.close();
 		}

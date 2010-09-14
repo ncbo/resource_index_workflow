@@ -87,7 +87,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		resourceTableDao.addEntryOrUpdate(resource);
 	}
  
-	public int numberOfEntry() {		 
+	public long numberOfEntry() {		 
 		return elementTableDao.numberOfEntry();
 	} 
 
@@ -249,36 +249,36 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	
 	
 	/**
-	 * This method calculates number of indexed annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
+	 * This method calculates number of aggregated annotations, mgrep annotations, reported annotations, isa annotations, mapping annotations
 	 * for current resource.
 	 * 
 	 */
 	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
 		
-		int aggregated;
-		int mgrep;
-		int reported;
-		int isA ;
-		int mapping;
+		long aggregated;
+		long mgrep;
+		long reported;
+		long isA ;
+		long mapping;
 		
 		logger.info("*** Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
 		// Getting Aggregated annotations
-		HashMap<Integer, Integer> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
-		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting REPORTED annotations
-		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting ISA annotations
-		HashMap<Integer, Integer> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		// Getting Mapping annotations
-		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+		HashMap<Integer, Long> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		 
@@ -290,31 +290,31 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
 			 
 			if(aggregatedAnnotations.get(ontologyID)!= null){
-				aggregated = aggregatedAnnotations.get(ontologyID).intValue();
+				aggregated = aggregatedAnnotations.get(ontologyID);
 			}else{
 				aggregated = 0;
 			}
 			
 			if(mgrepAnnotations.get(ontologyID)!= null){
-				mgrep = mgrepAnnotations.get(ontologyID).intValue();
+				mgrep = mgrepAnnotations.get(ontologyID);
 			}else{
 				mgrep = 0;
 			}
 			
 			if(reportedAnnotations.get(ontologyID)!= null){
-				reported = reportedAnnotations.get(ontologyID).intValue();
+				reported = reportedAnnotations.get(ontologyID);
 			}else{
 				reported = 0;
 			}
 			
 			if(isaAnnotations.get(ontologyID)!= null){
-				isA = isaAnnotations.get(ontologyID).intValue();
+				isA = isaAnnotations.get(ontologyID);
 			}else{
 				isA = 0;
 			}
 			
 			if(mappingAnnotations.get(ontologyID)!= null){
-				mapping = mappingAnnotations.get(ontologyID).intValue();
+				mapping = mappingAnnotations.get(ontologyID);
 			}else{
 				mapping = 0;
 			} 
@@ -325,7 +325,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
-		int noOfEntiesUpdated=statisticsDao.addEntries(entries); 
+		long noOfEntiesUpdated=statisticsDao.addEntries(entries); 
 		
 		logger.info("\tNumber of entries added/updated in statistics table are :" + noOfEntiesUpdated);
 		timer.end();
@@ -370,5 +370,14 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		 DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
 		 return resourceTableDao.updateDictionaryAndWorkflowDate(resource, dictionary.getDictionaryID());
 		
+	}
+	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID(){
+		return elementTableDao.getLastElementLocalID();
 	}
 }

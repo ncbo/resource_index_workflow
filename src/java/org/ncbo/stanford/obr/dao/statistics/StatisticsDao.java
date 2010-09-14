@@ -58,11 +58,11 @@ public class StatisticsDao extends AbstractObrDao {
 					"id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"resource_id INT UNSIGNED NOT NULL, " +
 					"ontology_id INT UNSIGNED NOT NULL, " +
-					"aggregated_annotations INT UNSIGNED," +
-					"mgrep_annotations INT UNSIGNED," +
-					"reported_annotations INT UNSIGNED," +
-					"isa_annotations INT UNSIGNED," +
-					"mapping_annotations INT UNSIGNED," +
+					"aggregated_annotations BIGINT UNSIGNED," +
+					"mgrep_annotations BIGINT UNSIGNED," +
+					"reported_annotations BIGINT UNSIGNED," +
+					"isa_annotations BIGINT UNSIGNED," +
+					"mapping_annotations BIGINT UNSIGNED," +
 					"UNIQUE (resource_id, ontology_id), " +					
 					"INDEX X_" + this.getTableSQLName() +"_resource_id (resource_id), " +
 					"INDEX X_" + this.getTableSQLName() +"_ontology_id (ontology_id)" +
@@ -119,17 +119,17 @@ public class StatisticsDao extends AbstractObrDao {
 		try {
 			addEntryStatement.setInt(1, entry.getResourceID());
 			addEntryStatement.setInt(2, entry.getOntologyID());
-			addEntryStatement.setInt(3, entry.getAggregatedAnnotations());
-			addEntryStatement.setInt(4, entry.getMgrepAnnotations());
-			addEntryStatement.setInt(5, entry.getReportedAnnotations());
-			addEntryStatement.setInt(6, entry.getIsaAnnotations());
-			addEntryStatement.setInt(7, entry.getMappingAnnotations());
+			addEntryStatement.setLong(3, entry.getAggregatedAnnotations());
+			addEntryStatement.setLong(4, entry.getMgrepAnnotations());
+			addEntryStatement.setLong(5, entry.getReportedAnnotations());
+			addEntryStatement.setLong(6, entry.getIsaAnnotations());
+			addEntryStatement.setLong(7, entry.getMappingAnnotations());
 			
-			addEntryStatement.setInt(8, entry.getAggregatedAnnotations());
-			addEntryStatement.setInt(9, entry.getMgrepAnnotations());
-			addEntryStatement.setInt(10, entry.getReportedAnnotations());
-			addEntryStatement.setInt(11, entry.getIsaAnnotations());
-			addEntryStatement.setInt(12, entry.getMappingAnnotations());
+			addEntryStatement.setLong(8, entry.getAggregatedAnnotations());
+			addEntryStatement.setLong(9, entry.getMgrepAnnotations());
+			addEntryStatement.setLong(10, entry.getReportedAnnotations());
+			addEntryStatement.setLong(11, entry.getIsaAnnotations());
+			addEntryStatement.setLong(12, entry.getMappingAnnotations());
 			 
 			this.executeSQLUpdate(addEntryStatement);
 			inserted = true;
@@ -153,8 +153,8 @@ public class StatisticsDao extends AbstractObrDao {
 	 * @param HashSet<StatisticsEntry> entries
 	 * @return the number of added entries
 	 */
-	public int addEntries(HashSet<StatisticsEntry> entries){
-		int nbInserted = 0;
+	public long addEntries(HashSet<StatisticsEntry> entries){
+		long nbInserted = 0;
 		for(StatisticsEntry entry: entries){
 			if (this.addEntry(entry)){
 				nbInserted++;
@@ -329,17 +329,17 @@ public class StatisticsDao extends AbstractObrDao {
 
 		private int resourceID;
 		private int ontologyID;
-		private int aggregatedAnnotations;
-		private int mgrepAnnotations;
-		private int reportedAnnotations;
-		private int isaAnnotations;
-		private int mappingAnnotations;
+		private long aggregatedAnnotations;
+		private long mgrepAnnotations;
+		private long reportedAnnotations;
+		private long isaAnnotations;
+		private long mappingAnnotations;
 	 
 				
 		public StatisticsEntry(int resourceID, int ontologyID,
-				int aggregatedAnnotations, int mgrepAnnotations,
-				int reportedAnnotations, int isaAnnotations,
-				int mappingAnnotations) {
+				long aggregatedAnnotations, long mgrepAnnotations,
+				long reportedAnnotations, long isaAnnotations,
+				long mappingAnnotations) {
 			super();
 			this.resourceID = resourceID;
 			this.ontologyID = ontologyID;
@@ -372,7 +372,7 @@ public class StatisticsDao extends AbstractObrDao {
 		 * 
 		 * @return aggregatedAnnotations
 		 */
-		public int getAggregatedAnnotations() {
+		public long getAggregatedAnnotations() {
 			return aggregatedAnnotations;
 		}
 
@@ -381,7 +381,7 @@ public class StatisticsDao extends AbstractObrDao {
 		/**
 		 * @return the mgrepAnnotations
 		 */
-		public int getMgrepAnnotations() {
+		public long getMgrepAnnotations() {
 			return mgrepAnnotations;
 		}
 
@@ -390,7 +390,7 @@ public class StatisticsDao extends AbstractObrDao {
 		/**
 		 * @return the reportedAnnotations
 		 */
-		public int getReportedAnnotations() {
+		public long getReportedAnnotations() {
 			return reportedAnnotations;
 		}
 
@@ -399,7 +399,7 @@ public class StatisticsDao extends AbstractObrDao {
 		/**
 		 * @return the isaAnnotations
 		 */
-		public int getIsaAnnotations() {
+		public long getIsaAnnotations() {
 			return isaAnnotations;
 		}
 
@@ -408,7 +408,7 @@ public class StatisticsDao extends AbstractObrDao {
 		/**
 		 * @return the mappingAnnotations
 		 */
-		public int getMappingAnnotations() {
+		public long getMappingAnnotations() {
 			return mappingAnnotations;
 		}
 

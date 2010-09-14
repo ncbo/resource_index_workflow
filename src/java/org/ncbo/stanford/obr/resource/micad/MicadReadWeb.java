@@ -17,7 +17,7 @@ public class MicadReadWeb implements StringHelper {
 	
 	protected static Logger logger = Logger.getLogger(MicadReadWeb.class);
 	// Constant used to specify max number of reconnect
-	private static final int MAX_RECONNECT = 5; 	
+	private static final int MAX_RECONNECT = 3; 	
 
 //Main method for testing MicadReadWeb independently
 /*	public static void main(String[] args){

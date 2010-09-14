@@ -69,14 +69,21 @@ public class GeoAccessTool extends AbstractNcbiResourceAccessTool {
 	// A context name used to describe the associated element
 	private static final String GEO_MAIN_ITEMKEY = "title";
 	
-	//Optra: 	
+	 
 	// Prefix used to element id for GSE data element 
 	private static final String GEO_GSE_STRING = "GSE";
 	
 	// Prefix used to element id for GDS data element 
 	private static final String GEO_GDS_STRING = "GDS";
+	
+	// Taxon context
+	private static final String GEO_TAXON_STRING = "taxon";
+	
+	// Entry Type
+	private static final String GEO_ENTRY_TYPE_STRING = "entryType";
 	  
-	//->
+	  
+	 
 	
 	/**
 	 * Construct GeoAccessTool using database connection property
@@ -169,45 +176,52 @@ public class GeoAccessTool extends AbstractNcbiResourceAccessTool {
 					// resultDocSums[i].getID contains the UID
 					eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[0]), resultDocSums[i].getId());
 					//	logger.info("result UID: " + resultDocSums[i].getId());
-
-					// 1st element of docSumItems contains name context
-					eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[1]), docSumItems[1].get_any()[0].toString());
 					
-					// 2nd element of docSumItems contains summary context
-					eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[2]), docSumItems[2].get_any()[0].toString());
-					 
 					String localElementID =null; 
 					String entryType= null;
 					
-					// 8th element contains entryType					
-					if(docSumItems[8].get_any()!= null && docSumItems[8].get_any().length >0){
-						entryType = docSumItems[8].get_any()[0].toString();
+					for (ItemType docSumItem : docSumItems) {
+						 
 						
-						// if the entryType is GDS then append 'GDS' before element id
-						if(GEO_GDS_STRING.equals(entryType)){
-							
-							// 0th element contains local element id for GDS 
-							localElementID=GEO_GDS_STRING +docSumItems[0].get_any()[0].toString();
+						if(GEO_ITEMKEYS[1].equals(docSumItem.getName())){
+							//  docSumItems contains title context
+							eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[1]), getItemTypeContent(docSumItem));
 						}
-						
-						// if the entryType is GSE then append  'GSE' before element id
-						else if(GEO_GSE_STRING.equals(entryType)){ 
+						else if(GEO_ITEMKEYS[2].equals(docSumItem.getName())){
+							//  docSumItems contains summary context
+							eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[2]), getItemTypeContent(docSumItem));
+						}else if(GEO_TAXON_STRING.equals(docSumItem.getName())){
+							//  element of docSumItems contains organism context
+							String organism = getItemTypeContent(docSumItem) ;
+							String concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(organism, GEO_ONTOIDS[3], SEMICOLON_STRING);
+							// if mapping concepts are null or empty then log message for it.
+							if(concepts== null || concepts.trim().length()== 0){
+								logger.error("Cannot map Organism  '" + organism + "' to local concept id for element with ID " + localElementID +".");
+								
+							}
+							eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[3]), concepts);
+
+						}else if(GEO_ENTRY_TYPE_STRING.equals(docSumItem.getName())){
+							entryType = getItemTypeContent(docSumItem);
 							
-							// 4th element contains local element id for GSE
-							localElementID=GEO_GSE_STRING +docSumItems[4].get_any()[0].toString();
-						}
-					} 					
-					
-					//Optra : 5th element of docSumItems contains organism context
-					String organism = docSumItems[5].get_any()[0].toString();
-					String concepts = resourceUpdateService.mapTermsToVirtualLocalConceptIDs(organism, GEO_ONTOIDS[3], SEMICOLON_STRING);
-					// if mapping concepts are null or empty then log message for it.
-					if(concepts== null || concepts.trim().length()== 0){
-						logger.error("Cannot map Organism  '" + organism + "' to local concept id for element with ID " + localElementID +".");
+							// if the entryType is GDS then append 'GDS' before element id
+							if(GEO_GDS_STRING.equals(entryType)){
+								
+								// 0th element contains local element id for GDS 
+								localElementID=GEO_GDS_STRING + getItemTypeContent(docSumItems[0]);
+							}
+							
+							// if the entryType is GSE then append  'GSE' before element id
+							else if(GEO_GSE_STRING.equals(entryType)){ 								
+								// 4th element contains local element id for GSE
+								localElementID=GEO_GSE_STRING +getItemTypeContent(docSumItems[4]);
+							}
+							 
+						} 
 						
 					}
-					eltStructure.putContext(Structure.generateContextName(GEO_RESOURCEID, GEO_ITEMKEYS[3]), concepts);
-					
+					// 1st element of docSumItems contains name context
+									
 					if(localElementID != null){
 						element = new Element(localElementID, eltStructure);
 						if (resourceUpdateService.addElement(element)){

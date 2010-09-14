@@ -1,6 +1,9 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +20,8 @@ import obs.obr.populate.ObrWeight;
 
 import org.apache.log4j.Logger;
 import org.ncbo.stanford.obr.dao.DaoFactory;
+import org.ncbo.stanford.obr.dao.execution.ExecutionDao.ExecutionEntry;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.obs.ObsDataPopulationService;
 import org.ncbo.stanford.obr.service.obs.impl.ObsDataPopulationServiceImpl;
@@ -24,7 +29,9 @@ import org.ncbo.stanford.obr.service.workflow.ResourceIndexWorkflow;
 import org.ncbo.stanford.obr.util.FileResourceParameters;
 import org.ncbo.stanford.obr.util.LoggerUtils;
 import org.ncbo.stanford.obr.util.MessageUtils;
+import org.ncbo.stanford.obr.util.ProcessExecutor;
 import org.ncbo.stanford.obr.util.StringUtilities;
+import org.ncbo.stanford.obr.util.helper.StringHelper;
 
 /**
  * A service  {@code ResourceIndexWorkflowImpl} is main service for workflow execution
@@ -46,7 +53,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			ReportedContextBean.RDA_WEIGHT);
 	
 	private ObsDataPopulationService obsDataPopulationService = new ObsDataPopulationServiceImpl();
-	  
+	 
 	public ResourceIndexWorkflowImpl() {
 		logger = LoggerUtils.createOBRLogger(ResourceIndexWorkflowImpl.class);
 		// Disable sql logger
@@ -99,32 +106,39 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.resource.ids"), ",");		
 		
 		//Initialize the Execution timer 		
-		ExecutionTimer timer = new ExecutionTimer();		
+		ExecutionTimer timer = new ExecutionTimer();	
+		logger.info("***********************************************\n");
 		logger.info("The Resources index Workflow Started.\n");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool resourceAccessTool = null;
+			ExecutionEntry executionEntry= new ExecutionEntry();
+			executionEntry.setResourceId(resourceID);
+			executionEntry.setExecutionBeginning(new Date());
 			try {
 				// Create resource tool object using reflection.
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();				 
-				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "....\n");
+				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ")....\n");
 				timer.start();
-				resourceProcessing(resourceAccessTool);
+				resourceProcessing(resourceAccessTool, executionEntry);
 				timer.end();
-				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + " processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
+				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ") processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
 			} catch (Exception e) {
 				logger.error(
 						"Problem in creating resource tool for resource id : "
 								+ resourceID, e);
-			}finally{				
+			}finally{					
 				resourceAccessTool= null;
 				System.gc();
+				executionEntry.setExecutionEnd(new Date());
+				executionDao.addEntry(executionEntry);				
 			}
 
 		}
 		workflowTimer.end();
-		logger.info("Resources index Workflow completed in : " + timer.millisecondsToTimeString(timer.duration()));	
+		logger.info("Resources index Workflow completed in : " + workflowTimer.millisecondsToTimeString(workflowTimer.duration()));
+		logger.info("***********************************************\n");
 	}
 
 	/**
@@ -132,33 +146,46 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * Also it annotate that elements using obs tables and index them. 
 	 * 
 	 * @param resourceAccessTool a {@code ResourceAccessTool} to be processed. 
+	 * @param executionEntry 
 	 */
-	public void resourceProcessing(ResourceAccessTool resourceAccessTool) {
+	public void resourceProcessing(ResourceAccessTool resourceAccessTool, ExecutionEntry executionEntry) {
 		ExecutionTimer timer = new ExecutionTimer();
 		ExecutionTimer timer1 = new ExecutionTimer();
+		
+		boolean reInitializeAllTables =Boolean.parseBoolean(MessageUtils.getMessage("obr.reinitialize.all")) ;
+		boolean reInitializeAllTablesExceptElement = Boolean.parseBoolean(MessageUtils
+				.getMessage("obr.reinitialize.only.annotation")) ;
+		boolean updateResource= Boolean.parseBoolean(MessageUtils.getMessage("obr.update.resource"));
+		// value for withCompleteDictionary parameter.
+		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
+				.getMessage("obr.dictionary.complete"));
 		
 		// Creating logger for resourceAcessTool
 		Logger toolLogger = ResourceAccessTool.getLogger();
 		timer1.start();
 		toolLogger.info("**** Resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + " processing");
+		toolLogger.info("Workflow Parameters[withCompleteDictionary= " 	+ withCompleteDictionary 
+									+ ", updateResource= " + updateResource 
+									+ ", reInitializeAllTables= " + reInitializeAllTables
+									+ ", reInitializeAllTablesExceptElement= " + reInitializeAllTablesExceptElement
+									+ " ]");
 		// Adds resource entry into Resource Table(OBR_RT)
 		resourceAccessTool.addResourceTableEntry();
 
 		// Re-initialized tables
-		if (Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.reinitialize.all"))) {
+		if (reInitializeAllTables) {
 			resourceAccessTool.reInitializeAllTables();
-		} else if (Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.reinitialize.only.annotation"))) {
+		} else if (reInitializeAllTablesExceptElement) {
 			resourceAccessTool.reInitializeAllTablesExcept_ET();
 		}
 
 		logger.info("\n");
-		
+		if(resourceAccessTool.numberOfElement()==0){
+			executionEntry.setFirstExecution(true);
+		}
 		// Update resource for new elements 
-		if (Boolean
-				.parseBoolean(MessageUtils.getMessage("obr.update.resource"))) {
+		if (updateResource) {
 			timer.start();
 			toolLogger.info("*** Resource "
 					+ resourceAccessTool.getToolResource().getResourceName() + " update processing");
@@ -173,22 +200,20 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		// Get the latest dictionary from OBS_DVT
  		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
- 		
-    	// value for withCompleteDictionary parameter.
-		boolean withCompleteDictionary = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.dictionary.complete"));
+ 	    // Adding into execution entry.
+		executionEntry.setDictionaryId(dictionary.getDictionaryID());		
+    	
+		// Adding into execution entry.
+		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
+		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID()));
+		 
 		// Execute the workflow according to resource type. 
-		long nbIndexedAnnotation= executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
-				
-		// Update obr_statistics table.
-		if(nbIndexedAnnotation > 0) {		 
-			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
-			resourceAccessTool.calulateConceptFrequncy();
-		} 
-		// Update resource table entry for latest dictionary and date for resource workflow completed
+	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+		 
+	    // Update resource table entry for latest dictionary and date for resource workflow completed
 		resourceAccessTool.updateResourceWorkflowInfo();
-		
+	    
 		timer1.end();
 		toolLogger.info("#### Resource " + resourceAccessTool.getToolResource().getResourceName()
 				+ " processed in: "
@@ -208,60 +233,97 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	private long executeWorkflow(ResourceAccessTool resourceAccessTool, DictionaryBean dictionary, boolean withCompleteDictionary, Logger toolLogger){
 		
 		ExecutionTimer timer = new ExecutionTimer();
-		int nbEntry ;		
-		// Total number of entries found in element table.		 
-		nbEntry = resourceAccessTool.numberOfElement();	 
 		
-		// Processing direct annotations
-		long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
-				.resourceAnnotation(withCompleteDictionary, dictionary, 
-						Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
+		// Total number of entries found in element table for annotation.	
+		int nbEntry  = resourceAccessTool.getAnnotationService()
+							.getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
 		
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbDirectAnnotation
-				+ " new direct annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+		if(nbEntry == 0){
+			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceID());
+			return 0;
+		}
 
-		// Flag for mapping expansion.  
-		boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.relational"));
+	    boolean disableIndexes = Boolean.parseBoolean(MessageUtils.getMessage("obr.table.index.disabled"));
+	    long nbAggregatedAnnotation = 0;
+	    
+		if(disableIndexes){
+			toolLogger.info("*** Disabling indexes on annotation tables starts...");
+ 			timer.reset();
+ 			timer.start();
+			resourceAccessTool.getAnnotationService().disableIndexes();
+			timer.end();
+			toolLogger.info("### Disabling indexes on annotation tables completed in "
+					+ timer.millisecondsToTimeString(timer.duration()) +".\n");			 
+		} 
 		
-		// Flag for mapping expansion.
-		boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.mapping"));
-		
-		// Flag for distance expansion.
-		boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
-				.getMessage("obr.expansion.distance"));
+		try{
+						 
+			// Processing direct annotations
+			long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
+					.resourceAnnotation(withCompleteDictionary, dictionary, 
+							Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
+			
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbDirectAnnotation
+					+ " new direct annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 
-		// Creating semantic expansion annotation.
-		long nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
-				.semanticExpansion(isaClosureExpansion, mappingExpansion,
-						distanceExpansion);
-		toolLogger.info(nbEntry + " elements annotated (with "
-				+ nbExpandedAnnotation
-				+ " new expanded annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
-		 
+			// Flag for mapping expansion.  
+			boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.relational"));
+			
+			// Flag for mapping expansion.
+			boolean mappingExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.mapping"));
+			
+			// Flag for distance expansion.
+			boolean distanceExpansion = Boolean.parseBoolean(MessageUtils
+					.getMessage("obr.expansion.distance"));
+
+			// Creating semantic expansion annotation.
+			long nbExpandedAnnotation = resourceAccessTool.getSemanticExpansionService()
+					.semanticExpansion(isaClosureExpansion, mappingExpansion,
+							distanceExpansion);
+			toolLogger.info(nbEntry + " elements annotated (with "
+					+ nbExpandedAnnotation
+					+ " new expanded annotations) from resource "
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
+		}finally{
+			if(disableIndexes){
+				toolLogger.info("*** Enabling indexes on annotation tables starts...");
+	 			timer.reset();
+	 			timer.start();
+				resourceAccessTool.getAnnotationService().enableIndexes(ResourceType.BIG==resourceAccessTool.getResourceType());
+				timer.end();
+				toolLogger.info("### Enabling indexes on annotation tables completed in "
+						+ timer.millisecondsToTimeString(timer.duration()) +".\n");
+			}  
+		}
 		// Aggregation step to annotations.
-		long nbIndexedAnnotation = resourceAccessTool.getAggregationService().aggregation(
-				obrWeights);
-		toolLogger.info(nbEntry + " elements indexed (with "
-				+ nbIndexedAnnotation
-				+ " new indexed annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");	
+		try{
+			if(disableIndexes){
+				resourceAccessTool.getAggregationService().disableIndexes();
+			} 
+			nbAggregatedAnnotation = resourceAccessTool.getAggregationService().aggregation(
+					obrWeights);
+		}finally{
+			if(disableIndexes){
+				resourceAccessTool.getAggregationService().enableIndexes(ResourceType.BIG==resourceAccessTool.getResourceType());
+			} 
+		} 
+		toolLogger.info(nbEntry + " elements aggregated (with "
+				+ nbAggregatedAnnotation
+				+ " new aggregated annotations) from resource "
+				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		
-		//Create indexes on Annotation and expanded annotation table.
-		toolLogger.info("*** Creating indexes on Annotation and expanded annotation table starts ..");
-		timer.reset();
-		timer.start();
-		resourceAccessTool.createIndexForAnnotationTables();
-		timer.end();
-		toolLogger.info("### Created indexes on Annotation and expanded annotation table in "
-				+ timer.millisecondsToTimeString(timer.duration()) +".\n");
-			 
-		return nbIndexedAnnotation;  
-		
+		// Update obr_statistics and concept_frequency table.
+		if(nbAggregatedAnnotation > 0) {
+			resourceAccessTool.calulateConceptFrequncy();
+			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
+			
+		}  
+		 
+		return nbAggregatedAnnotation;   
 	} 
  
 	/**
@@ -272,10 +334,21 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 	 * <p>This method ensures to keep only the latest version of ontologies.	  
 	 */
 	public void removeOntologyDuplicates() {
+		
+		boolean removeOntologiesFromList = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove.from.list"));
+		
+		if(removeOntologiesFromList){
+			String[] ontologyIDs = StringUtilities.splitSecure(MessageUtils
+					.getMessage("obs.slave.ontology.remove.list"), ",");
+			 removeSpecificOntologies(ontologyIDs);
+			 return;
+		}
+		
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
 		logger.info("*** Remove ontology duplicates started....");
+			
 		Set<String> ontologiesToRemove = new HashSet<String>();		 
 		String virtualOntologyID1;
 		String localOntologyID1;
@@ -306,25 +379,46 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		} 
 		 
 		if(ontologiesToRemove.size() == 0){
-			logger.info("\tNo dupicate ontology found");					 
-		}else {
-			// remove from obr tables.
-			 removeOntologiesFromOBRTables(new ArrayList<String>(ontologiesToRemove));
-			 
-			 // Iterating each duplicate ontology version and remove from obr and obs tables.
-			
-			logger.info("\t**Removing dulicate ontology version from obs slave tables started");	
-			for (String localOntologyID : ontologiesToRemove) {
-				logger.info("\t\tRemoving ontology version :" + localOntologyID);			 
-				// remove ontology from obs slave database.
-				obsDataPopulationService.removeOntology(localOntologyID);
-			} 
-			logger.info("\t##Removing dulicate ontology version from obs slave tables completed.");	
-			 
+			logger.info("\tNo ontology found to remove");					 
+		}else {			
+			removeOntologies(new ArrayList<String>(ontologiesToRemove)); 
 		} 		
 		timer.end();		
 		logger.info("### Remove dupicate ontologies completed in: "
 			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
+	}
+	
+	private void removeSpecificOntologies(String[] localOntologyIds) {
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();		
+		logger.info("*** Remove ontologies started....");
+		
+		if(localOntologyIds == null || localOntologyIds.length == 0){
+			logger.info("\tNo ontology found to remove");					 
+		}else {	
+			logger.info("\t Ontologies to remove : "+ Arrays.asList(localOntologyIds));
+			removeOntologies(Arrays.asList(localOntologyIds)); 
+		} 	
+		
+		timer.end();		
+		logger.info("### Remove ontologies completed in: "
+			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
+		
+	}
+	
+	private void removeOntologies(List<String> ontologiesToRemove){
+		// remove from obr tables.
+		 removeOntologiesFromOBRTables(ontologiesToRemove);
+		 
+		 // Iterating each duplicate ontology version and remove from obr and obs tables.
+		
+		logger.info("\t**Removing ontology version from obs slave tables started");	
+		for (String localOntologyID : ontologiesToRemove) {
+			logger.info("\t\tRemoving ontology version :" + localOntologyID);			 
+			// remove ontology from obs slave database.
+			obsDataPopulationService.removeOntology(localOntologyID);
+		} 
+		logger.info("\t##Removing ontology version from obs slave tables completed.");	
 	}
 	
 	/**
@@ -338,16 +432,21 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				.getMessage("obr.resource.ids"), ",");
 		//Initialize the Execution timer 
 		ExecutionTimer timer = new ExecutionTimer();	
+		ExecutionTimer resourceTimer = new ExecutionTimer();	
 		timer.start();
-		logger.info("\t **The Remove ontology from OBR tables Started.");	
+		logger.info("\t**The Remove ontologies from OBR tables Started.");	
 		for (String resourceID : resourceIDs) {
 			ResourceAccessTool resourceAccessTool = null;
 			try {
 				// Create resource tool object using reflection.
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
-								+ resourceID.toLowerCase())).newInstance();	 
+								+ resourceID.toLowerCase())).newInstance();	
+				resourceTimer.reset();
+				resourceTimer.start();
 				resourceAccessTool.removeOntologies(localOntologyIDs); 
+				resourceTimer.end();
+				logger.info("\t\tRemove ontologies from resource " + resourceID +" completed in : " + resourceTimer.millisecondsToTimeString(resourceTimer.duration()));
 				
 			} catch (Exception e) {
 				logger.error(
@@ -360,12 +459,40 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 
 		}		
 		
+		// Tracker item #2230
 		// Deleting entries from statistics table.
-		statisticsDao.deleteEntriesFromOntologies(localOntologyIDs);
+		// statisticsDao.deleteEntriesFromOntologies(localOntologyIDs);
 		
 		timer.end();
 		logger.info("\t## The Remove ontology from OBR tables processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		 
 	}
 
+	/**
+	 * This step execute replication mechanism between resource index 
+	 * master/slave database. 
+	 * 
+	 *  @param replicateObsTables a {@code boolean} decide to copy obs tables or not .
+	 */
+	public void executeSyncronizationScript(boolean replicateObsTables) throws Exception{
+		ExecutionTimer timer = new ExecutionTimer();
+		ProcessExecutor processExecutor = new ProcessExecutor(logger);
+		
+		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
+				.getMessage("obr.resource.ids"), StringHelper.COMMA_STRING);	
+		String syncScriptPath = MessageUtils.getMessage("obr.database.sync.script.path");
+		 
+		if(!new File(syncScriptPath).exists()){
+			logger.error("Synchronization script not found at location " + syncScriptPath);
+			throw new Exception("Synchronization script not found at location " + syncScriptPath);
+		}
+		
+		timer.start();
+		logger.info("Started executing syncronization script....");
+		processExecutor.executeShellScript(syncScriptPath, true, true, replicateObsTables, resourceIDs);
+		timer.end();
+		logger.info("Syncronization script execution completed in : "
+			+ timer.millisecondsToTimeString(timer.duration()) + ".\n");
+	}
+ 
 }

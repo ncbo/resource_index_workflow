@@ -349,6 +349,41 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 		return nbRow;
 	}
 	
+	protected long executeSQLBatchUpdate(PreparedStatement stmt) throws SQLException {
+		int[] nbRow;
+		try{ 
+		    nbRow = stmt.executeBatch(); 
+			try{
+				if(AbstractObrDao.sqlLogFile != null){
+					AbstractObrDao.sqlLogBuffer.write(stmt.toString());
+					AbstractObrDao.sqlLogBuffer.newLine();
+					AbstractObrDao.sqlLogBuffer.flush();
+				}
+			}
+			catch (IOException e){
+				logger.error("** PROBLEM ** Cannot write SQL log file BufferedWritter. ");
+			}
+		}
+		catch (CommunicationsException e) {
+			reOpenConnectionIfClosed();
+			// Re-calling the execution will generate a MySQLNonTransientConnectionException
+			// Those exceptions are catched in each functions to re-execute the query correctly.
+			nbRow = stmt.executeBatch();
+		} 
+		
+		if(nbRow== null || nbRow.length ==0){
+			return 0;
+			
+		}
+		long updatedRows =0;
+		for (int i : nbRow) {
+			updatedRows+= i;
+		}
+		
+		return updatedRows;
+		
+	}
+	
 	/**
 	 * Executes a given SQL query as String using a generic statement. As it returns a ResultSet,
 	 * this statement needs to be explicitly closed after the processing of the ResultSet with function
@@ -491,12 +526,12 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 	/**
 	 * Returns the number of elements in the table (-1 if a problem occurs during the count). 
 	 */
-	public int numberOfEntry(){
-		int nbEntry = -1;
+	public long numberOfEntry(){
+		long nbEntry = -1;
 		try{
 			ResultSet rSet = this.executeSQLQuery(numberOfEntryStatement);
 			rSet.first();
-			nbEntry = rSet.getInt(1);
+			nbEntry = rSet.getLong(1);
 			rSet.close();
 		} 		
 		catch (MySQLNonTransientConnectionException e) {
@@ -507,5 +542,59 @@ public abstract class AbstractObrDao implements DaoFactory, StringHelper{
 			logger.error("** PROBLEM ** Cannot get number of entry on table " + this.getTableSQLName()+". -1 returned.", e);
 		}
 		return nbEntry;
+	}
+	
+	/**
+	 * Disabled All indexes for given table. 
+	 * 
+	 * @return true if successful
+	 */
+	public boolean disableIndexes(){
+		try{
+			this.executeSQLUpdate("ALTER TABLE "+ this.getTableSQLName()+" DISABLE KEYS;");
+			return true;
+		}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot disables indexes for table " + this.getTableSQLName(), e);
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Enabled All indexes for given table. 
+	 * 
+	 * @return true if successful
+	 */
+	public boolean enableIndexes(boolean bigTable){
+		try{
+			if(bigTable){
+				this.callStoredProcedure("enable_indexes", this.getTableSQLName(), "1");
+			}else{
+				this.callStoredProcedure("enable_indexes", this.getTableSQLName(), "0");
+			}			
+			return true;
+		}
+		catch(Exception e){
+			logger.error("** PROBLEM ** Cannot enable indexes for table " + this.getTableSQLName(), e);
+		}		
+		return false;
+	}
+	
+	/**
+	 * Set session variable myisam_repair_threads
+	 * 
+	 * @return true if successful
+	 */
+	public boolean setMyisamRepairThreads(int numberOfThreads){
+		try{
+			this.executeSQLUpdate("SET SESSION myisam_repair_threads = "+ numberOfThreads + ";");
+			return true;
+		}
+		catch(SQLException e){
+			logger.error("** PROBLEM ** Cannot set session variable 'myisam_repair_threads'." , e);
+		}
+		
+		return false;
 	}
 }

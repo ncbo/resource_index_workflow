@@ -4,7 +4,6 @@ import java.util.List;
 
 import obs.common.utils.ExecutionTimer;
 
-import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.semantic.SemanticExpansionService;
@@ -81,16 +80,16 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	 */
 	public void removeExpandedAnnotations(List<String> localOntologyIDs) {
 		
-		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+//		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			isaExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
 			mapExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
-		 }else{
-			 for (String localOntologyID : localOntologyIDs) {
-				 isaExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
-				 mapExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
-			}
-			 
-		 }	
+//		 }else{
+//			 for (String localOntologyID : localOntologyIDs) {
+//				 isaExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+//				 mapExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+//			}
+//			 
+//		 }	
 	}
 
 	/*

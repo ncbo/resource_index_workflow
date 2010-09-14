@@ -16,6 +16,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
+import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
@@ -129,9 +130,17 @@ public class ElementDao extends AbstractObrDao {
 	
 	private String contextsForCreateQuery(){
 		StringBuffer queryb = new StringBuffer();
+		String context = null;
 		for(Iterator<String> it = this.contextNames.iterator(); it.hasNext();){
-			queryb.append(it.next().toLowerCase());
-			queryb.append(" TEXT");
+			context= it.next().toLowerCase();			
+			queryb.append(context);
+			
+			if(context.contains("_biological_characterization")){
+				queryb.append(" LONGTEXT");
+			}else{
+				queryb.append(" TEXT");
+			} 
+			
 			if (it.hasNext()){
 				queryb.append(", ");
 			}
@@ -426,8 +435,8 @@ public class ElementDao extends AbstractObrDao {
 	 * @param dictionaryID
 	 * @return
 	 */
-	public boolean containElementsForMgrepAnnotation(int dictionaryID){
-		boolean result = false;
+	public int numberOfElementsForMgrepAnnotation(int dictionaryID){
+		 
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT count(id) FROM ");
 		queryb.append(this.getTableSQLName());		 
@@ -438,16 +447,14 @@ public class ElementDao extends AbstractObrDao {
 		try{
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			if(rSet.first()){
-				int nonAnnotatedElement = rSet.getInt(1);
-				if(nonAnnotatedElement> 0){
-					result = true;
-				}
+				return rSet.getInt(1);
+				 
 			} 
 		}catch (SQLException e) {
 			 logger.error("Problem in getting non annotated element count", e);
 		}
 		
-		return result;
+		return 0;
 	}
 	
 	/**
@@ -477,14 +484,17 @@ public class ElementDao extends AbstractObrDao {
 	}
 	
 	/**
-	 * Returns the reported annotations that pre-exist in the resource, as DirectAnnotationEntry in order
-	 * to insert them in the corresponding _DAT table.
+	 * Add the reported annotations that pre-exist in the resource.
 	 * Reported annotations come from context with staticOntologyID in _CXT that is not null or -1. 
+	 * 
+	 * @param directAnnotationDao 
 	 * @param useTemporaryElementTable 
+	 * 
 	 */
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion){		
+	public long addExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, DirectAnnotationDao directAnnotationDao){		
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
+		long nbReportedAnnotations =0 ;
 		try{				
 			StringBuffer queryb = new StringBuffer();
 			queryb.append("SELECT local_element_id, ");
@@ -519,14 +529,52 @@ public class ElementDao extends AbstractObrDao {
 						logger.error("** PROBLEM ** Problem with existing annotations of element: "+ localElementID +" on table " + this.getTableSQLName() +".", e);
 					}
 				}
+				
+				if(reportedAnnotations.size()>1000){
+					nbReportedAnnotations+= directAnnotationDao.addEntries(reportedAnnotations);
+					reportedAnnotations.clear();
+				}
+				
 			}
 			rSet.close();
+			if(reportedAnnotations.size()>0){
+				nbReportedAnnotations+= directAnnotationDao.addEntries(reportedAnnotations);
+				reportedAnnotations.clear();
+			}
 				 
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot report annotation from the table "+this.getTableSQLName()+". Empty set returned.", e);
 		}
-		return reportedAnnotations;
+		
+		return nbReportedAnnotations;
+	}
+	
+	/**
+	 * This method get local element id for last element.
+	 *    
+	 * @return localElementID
+	 */
+	public String getLastElementLocalID(){
+		 
+		StringBuffer queryb = new StringBuffer();
+		queryb.append("SELECT local_element_id FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(" WHERE id =(SELECT MAX(id) FROM ");
+		queryb.append(this.getTableSQLName());		 
+		queryb.append(");"); 
+		
+		try{
+			ResultSet rSet = this.executeSQLQuery(queryb.toString());
+			if(rSet.first()){
+				return rSet.getString(1);
+				 
+			} 
+		}catch (SQLException e) {
+			 logger.error("Problem in getting non annotated element count", e);
+		}
+		
+		return null;
 	}
 	
 }

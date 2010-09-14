@@ -34,13 +34,7 @@
 	</fileset>
 	
 	<fileset id="cananolab.jars" dir="${cananolab.lib.dir}">
-		<include name="*.jar"/>
-		<exclude name="commons-lang-2.0.jar"/>
-		<exclude name="edtftpj-1.5.2.jar"/>
-		<exclude name="ekitspell.jar"/>
-		<exclude name="icu4j-3.4.4.jar"/>
-		<exclude name="jena-2.3.jar"/>
-		<exclude name="lucene-core-2.0.0.jar"/>		 
+		<include name="*.jar"/>		 	 
 	</fileset>
 	<path id="master-classpath">
 		<fileset refid="shared.jars" /> 	
@@ -101,6 +95,7 @@
 				<filter token="obrjdbcusername" value="${obr.jdbc.username}" />
 				<filter token="obrjdbcpassword" value="${obr.jdbc.password}" />
 				<filter token="obrschemahostname" value="${obr.schema.host.name}" />
+				<filter token="obrschemaname" value="${obr.schema.name}" />
 				<filter token="obsschemaname" value="${obs.schema.name}" />
 				
 				<filter token="obrsvncodepath" value="${obr.svn.code.path}" />		
@@ -117,7 +112,12 @@
 				<filter token="obrgrantsjdbcurl" value="${obr.grants.jdbc.url}" />
 				<filter token="obrgrantsjdbcusername" value="${obr.grants.jdbc.username}" />
 				<filter token="obrgrantsjdbcpassword" value="${obr.grants.jdbc.password}" />
-				
+	  
+				<!-- For PubMed resource access tool  						-->
+				<filter token="obrpmprocessxml" value="${obr.pm.process.xml}" />
+				<filter token="obrpmxmlfrom" value="${obr.pm.xml.from}" />
+				<filter token="obrpmxmlto" value="${obr.pm.xml.to}" />
+
 				<!-- For obs master database						-->
 				<filter token="obsmasterschemaname" value="${obs.master.schema.name}" />
 				<filter token="obsmasterschemahost" value="${obs.master.schema.host.name}" />
@@ -142,8 +142,18 @@
 				 
 				<!--Remove ontology from slave obs tables and all resources tables-->
 				<filter token="obsslaveontologyremove" value="${obs.slave.ontology.remove}" />
+				<filter token="obsslaveontologyremovefromlist" value="${obs.slave.ontology.remove.from.list}" />
+				<filter token="obsslaveontologyremovelist" value="${obs.slave.ontology.remove.list}" />
+			 
+				<!--Enable/disable replication machanism -->
+				<filter token="obrtableindexdisabled" value="${obr.table.index.disabled}" />
+ 
+				<!--Enable/disable replication machanism -->
+				<filter token="obrdatabasesync" value="${obr.database.sync}" />
+				<filter token="obrdatabasesyncscriptpath" value="${obr.database.sync.script.path}" />
+				<filter token="obrdatabasesyncobstables" value="${obr.database.sync.obs.tables}" />
 			</filterset>
-		</copy>		 
+		</copy>	 
 	</target> 
 	
 	<!-- ================================= 
@@ -201,10 +211,8 @@
 					<include name="**/*.jar"/>
 				</fileset> 
 				<fileset refid="shared.jars" /> 	
-				<fileset refid="protege.jars" /> 	
-				<!--TODO : comment for test
-				<fileset refid="cananolab.jars" /> 
-				-->
+				<fileset refid="protege.jars" />				 
+				<fileset refid="cananolab.jars" /> 			 
 			</copy>
 			
 			<!-- Copy properties folder containg all properties files to dist directory -->
@@ -218,7 +226,7 @@
 			<!-- Copy all perl scripts and shell scripts requied from src directory -->
 			<mkdir dir="${dist.dir}/script"/>
 			<copy todir="${dist.dir}/script">
-				<fileset dir="${src.perl.dir}">
+				<fileset dir="${src.scripts.dir}">
 					<include name="**/*.pl"/>
 					<include name="**/*.sh"/>
 				</fileset>			 		 

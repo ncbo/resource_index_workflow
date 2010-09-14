@@ -1,4 +1,4 @@
-package org.ncbo.stanford.obr.dao.obs.ontology;
+package org.ncbo.stanford.obr.dao.ontology;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +9,10 @@ import java.util.List;
 
 import obs.common.beans.OntologyBean;
 
+import org.ncbo.stanford.obr.dao.AbstractObrDao;
 import org.ncbo.stanford.obr.dao.obs.AbstractObsDao;
 import org.ncbo.stanford.obr.dao.obs.concept.ConceptDao;
+import org.ncbo.stanford.obr.dao.obs.ontology.OntologyDao.OntologyEntry;
 import org.ncbo.stanford.obr.dao.obs.term.TermDao;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -32,7 +34,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * </ul>
  * 
  */
-public class OntologyDao extends AbstractObsDao{
+public class ObrOntologyDao extends AbstractObrDao{
 	
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obs.ontology.table.suffix");
 
@@ -46,18 +48,18 @@ public class OntologyDao extends AbstractObsDao{
 	private static PreparedStatement getAllOntologyBeansStatement;
 	
 	
-	private OntologyDao() {		
-		super(TABLE_SUFFIX);
+	private ObrOntologyDao() {		
+		super(EMPTY_STRING, TABLE_SUFFIX);
 	} 
 	
 	private static class OntologyDaoHolder {
-		private final static OntologyDao ONTOLOGY_DAO_INSTANCE = new OntologyDao();
+		private final static ObrOntologyDao ONTOLOGY_DAO_INSTANCE = new ObrOntologyDao();
 	}
 	
 	/**
 	 * Returns a OntologyTable object by creating one if a singleton not already exists.
 	 */
-	public static OntologyDao getInstance(){
+	public static ObrOntologyDao getInstance(){
 		return OntologyDaoHolder.ONTOLOGY_DAO_INSTANCE;
 	}
 	
@@ -451,196 +453,5 @@ public class OntologyDao extends AbstractObsDao{
 			logger.error("** PROBLEM ** Cannot get localOntologyIDs from "+this.getTableSQLName()+".", e);
 		}
 		return localOntologyIDs;
-	}	
-	
-	/**
-	 * This class is representation for obs_ontology table entry.
-	 * @author Kuladip Yadav
-	 *
-	 */
-	public static class OntologyEntry{
-		private int id;
-		private String localOntologyID;
-		private String name;
-		private String version;
-		private String description;
-		private int status;
-		private String virtualOntologyID;
-		private String format;
-		private int dictionaryID;
-		
-		public OntologyEntry(int id, String localOntologyID, String name,
-				String version, String description, int status,
-				String virtualOntologyID, String format, int dictionaryID) {
-			super();
-			this.id = id;
-			this.localOntologyID = localOntologyID;
-			this.name = name;
-			this.version = version;
-			this.description = description;
-			this.status = status;
-			this.virtualOntologyID = virtualOntologyID;
-			this.format = format;
-			this.dictionaryID = dictionaryID;
-		}	 
-		
-
-		public OntologyEntry(String localOntologyID, String name,
-				String version, String description, int status,
-				String virtualOntologyID, String format, int dictionaryID) {
-			super(); 
-			this.localOntologyID = localOntologyID;
-			this.name = name;
-			this.version = version;
-			this.description = description;
-			this.status = status;
-			this.virtualOntologyID = virtualOntologyID;
-			this.format = format;
-			this.dictionaryID = dictionaryID;
-		}	 
-
-		/**
-		 * @return the id
-		 */
-		public int getId() {
-			return id;
-		}
-
-		/**
-		 * @param id the id to set
-		 */
-		public void setId(int id) {
-			this.id = id;
-		}
-
-		/**
-		 * @return the localOntologyID
-		 */
-		public String getLocalOntologyID() {
-			return localOntologyID;
-		}
-
-		/**
-		 * @param localOntologyID the localOntologyID to set
-		 */
-		public void setLocalOntologyID(String localOntologyID) {
-			this.localOntologyID = localOntologyID;
-		} 
-		
-		/**
-		 * @return the name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * @param name the name to set
-		 */
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		/**
-		 * @return the version
-		 */
-		public String getVersion() {
-			return version;
-		}
-
-		/**
-		 * @param version the version to set
-		 */
-		public void setVersion(String version) {
-			this.version = version;
-		}
-		
-		/**
-		 * @return the description
-		 */
-		public String getDescription() {
-			return description;
-		}
-		
-		/**
-		 * @param description the description to set
-		 */
-		public void setDescription(String description) {
-			this.description = description;
-		}
-
-		/**
-		 * @return the status
-		 */
-		public int getStatus() {
-			return status;
-		}
-
-		/**
-		 * @param status the status to set
-		 */
-		public void setStatus(int status) {
-			this.status = status;
-		}
-
-		/**
-		 * @return the virtualOntologyID
-		 */
-		public String getVirtualOntologyID() {
-			return virtualOntologyID;
-		}
-		
-		/**
-		 * @param virtualOntologyID the virtualOntologyID to set
-		 */
-		public void setVirtualOntologyID(String virtualOntologyID) {
-			this.virtualOntologyID = virtualOntologyID;
-		}
-
-		/**
-		 * @return the format
-		 */
-		public String getFormat() {
-			return format;
-		}
-
-		/**
-		 * @param format the format to set
-		 */
-		public void setFormat(String format) {
-			this.format = format;
-		}
-
-		/**
-		 * @return the dictionaryID
-		 */
-		public int getDictionaryID() {
-			return dictionaryID;
-		}
-
-		/**
-		 * @param dictionaryID the dictionaryID to set
-		 */
-		public void setDictionaryID(int dictionaryID) {
-			this.dictionaryID = dictionaryID;
-		}
-		
-		public OntologyBean getOntologyBean(){
-			return new OntologyBean(this.localOntologyID, this.name, this.version, this.virtualOntologyID);
-		}
-		
-		public String toString(){
-			StringBuffer sb = new StringBuffer();
-			sb.append("OntologyEntry: [");			 
-			sb.append(this.localOntologyID).append(", ");
-			sb.append(this.name).append(", ");
-			sb.append(this.version).append(", ");
-			sb.append(this.description).append(", ");
-			sb.append(this.status).append(", ");
-			sb.append(this.virtualOntologyID).append("]");
-			sb.append(this.format).append("]");
-			return sb.toString();
-		}
-	}
-	 
+	} 
 }

@@ -35,5 +35,9 @@ public interface StringHelper {
 	public static final String NEW_LINE_REGEX = "\n";
 	// String constant for underscore
 	public static final String UNDERSCORE_STRING = "_"; 
+	// String constant for 'Accession'
+	public  static final String ACCESSION_STRING = "Accession";
+	// String constant for 'Not Applicable'
+	public  static final String NOT_APPLICABLE = "NA";
   
 }

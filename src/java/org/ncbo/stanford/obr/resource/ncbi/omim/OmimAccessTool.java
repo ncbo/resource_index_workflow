@@ -36,7 +36,7 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 			"The full-text, referenced overviews in OMIM contain information on all known mendelian disorders and over 12,000 genes. " +
 			"OMIM focuses on the relationship between phenotype and genotype.";
 	private static final String OMIM_LOGO 		= "http://www.ncbi.nlm.nih.gov/entrez/query/static/gifs/entrez_omim.gif";
-	private static final String OMIM_ELT_URL 	= "http://www.ncbi.nlm.nih.gov/entrez/dispomim.cgi?id=";
+	private static final String OMIM_ELT_URL 	= "http://www.ncbi.nlm.nih.gov/omim/";
 		
 	private static final String OMIM_EUTILS_DB 	= "omim";
 	private static final String OMIM_EUTILS_TERM =  "all[filter]";
@@ -47,6 +47,8 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 	private static final String[] OMIM_ONTOIDS  = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION ,Structure.FOR_CONCEPT_RECOGNITION };
 	private static Structure OMIM_STRUCTURE = new Structure(OMIM_ITEMKEYS, OMIM_RESOURCEID, OMIM_WEIGHTS, OMIM_ONTOIDS);
 	private static String OMIM_MAIN_ITEMKEY = "title";
+	
+	private static String OMIM_ID_STRING = "Oid";
 	
 	public OmimAccessTool(){
 		super(OMIM_NAME, OMIM_RESOURCEID, OMIM_STRUCTURE);
@@ -105,6 +107,7 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 		String[] UIDsTab = new String[UIDs.size()];
 		UIDsTab = UIDs.toArray(UIDsTab);
 		int max;
+		String localElementId = null;
 		
 		for(int step=0; step<UIDsTab.length; step+=EUTILS_MAX){
 			max = step+EUTILS_MAX; 
@@ -122,54 +125,31 @@ public class OmimAccessTool extends AbstractNcbiResourceAccessTool {
 					docSumItems = resultDocSums[i].getItem();
 
 					// This section depends of the structure and the type of content we want to get back					
-					//logger.info("get data of "+docSumItems[0].get_any()[0].toString()+"...");
-
 					// resultDocSums[i].getID contains the UID
 					eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[0]), resultDocSums[i].getId());
-				//	logger.info("result UID: " + resultDocSums[i].getId());
-					
-					//title
-					if(docSumItems[1].get_any()[0]!=null){
-						eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[1]), docSumItems[1].get_any()[0].toString());
-					}else{
-						eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[1]), EMPTY_STRING);
-					}	
-					//logger.info(docSumItems[1].get_any()[0].toString());   // title
-					// altTitles
-					String altTitles=EMPTY_STRING;
-					org.apache.axis.message.MessageElement[] msgEltTab = docSumItems[2].get_any();
-					if(msgEltTab != null){
-						for (int k=0; k<msgEltTab.length; k++){
-							altTitles+=msgEltTab[k].toString();
-							if (k!=(msgEltTab.length-1)){
-								altTitles+=GT_SEPARATOR_STRING;
-							}
-						 }
-						 //logger.info(altTitles);
-						 eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[2]), altTitles);
-					}else{
-						eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[2]), EMPTY_STRING);
-					}						
-					//locus
-					String locus=EMPTY_STRING;
-					org.apache.axis.message.MessageElement[] msgEltTab2 = docSumItems[3].get_any();
-					if(msgEltTab2 != null){
-						for (int k=0; k<msgEltTab2.length; k++){
-							locus+=msgEltTab2[k].toString();
-							if (k!=(msgEltTab2.length-1)){
-								locus+=GT_SEPARATOR_STRING;
-							}
-						 }
-						 //logger.info(locus);
-						 eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[3]), locus);
-					}else{
-						eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[3]), EMPTY_STRING);
-					}	
+				 
+					localElementId = null;
+					for (ItemType itemType : docSumItems) {
+						if(OMIM_ID_STRING.equalsIgnoreCase(itemType.getName())){
+							localElementId = getItemTypeContent(itemType);
+						}else if(OMIM_ITEMKEYS[1].equalsIgnoreCase(itemType.getName())){
+							eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[1]), getItemTypeContent(itemType) );
+						}else if(OMIM_ITEMKEYS[2].equalsIgnoreCase(itemType.getName())){
+							eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[2]), getItemTypeContent(itemType, GT_SEPARATOR_STRING));
+						}else if(OMIM_ITEMKEYS[3].equalsIgnoreCase(itemType.getName())){
+							eltStructure.putContext(Structure.generateContextName(OMIM_RESOURCEID, OMIM_ITEMKEYS[3]), getItemTypeContent(itemType, GT_SEPARATOR_STRING));
+						}else if(OMIM_ID_STRING.equalsIgnoreCase(itemType.getName())){
+							localElementId = getItemTypeContent(itemType);
+						} 
+					} 
 					// localElementID and structure into a new element
-					element = new Element(docSumItems[0].get_any()[0].toString(), eltStructure);
-					if (resourceUpdateService.addElement(element)){
-							nbElement ++;
+					if(localElementId!= null){
+						element = new Element(localElementId, eltStructure);
+						if (resourceUpdateService.addElement(element)){
+								nbElement ++;
 						}
+					}
+					
 				}
 			} catch (RemoteException e) {
 				logger.error("** PROBLEM ** Cannot get information using ESummary.", e);

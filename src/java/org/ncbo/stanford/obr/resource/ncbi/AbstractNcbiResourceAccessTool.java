@@ -5,6 +5,7 @@ import gov.nih.nlm.ncbi.www.soap.eutils.EUtilsServiceSoap;
 import gov.nih.nlm.ncbi.www.soap.eutils.esearch.ESearchRequest;
 import gov.nih.nlm.ncbi.www.soap.eutils.esearch.ESearchResult;
 import gov.nih.nlm.ncbi.www.soap.eutils.esearch.WarningListType;
+import gov.nih.nlm.ncbi.www.soap.eutils.esummary.ItemType;
 
 import java.rmi.RemoteException;
 import java.util.HashSet;
@@ -173,9 +174,36 @@ public abstract class AbstractNcbiResourceAccessTool extends ResourceAccessTool 
 		}
 		return answerUIDs;
 	}
-
+ 
 	protected String stringToNCBITerm(String query){
 		return "%22" + query.replaceAll(" ", "+") + "%22";
+	}
+	
+	protected String getItemTypeContent(ItemType itemType, String separator){
+		String contentType =EMPTY_STRING;
+		int index;
+		if(itemType.getItem() == null){
+			if(itemType.getItemContent()!= null){
+				contentType = itemType.getItemContent();
+			} 
+		}else{
+			ItemType[] subItemTypes = itemType.getItem();
+			index=0;
+			for (ItemType subItemType : subItemTypes) {
+				contentType += getItemTypeContent(subItemType, separator);
+				if(index<subItemTypes.length-1){
+					contentType += separator; 
+				} 
+				index++;
+			}
+			
+			
+		}		
+		return contentType;
+	}
+	
+	protected String getItemTypeContent(ItemType itemType){
+		return getItemTypeContent(itemType, BLANK_SPACE);
 	}
 
 
