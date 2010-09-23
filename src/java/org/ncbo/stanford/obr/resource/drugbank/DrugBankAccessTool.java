@@ -41,7 +41,7 @@ public class DrugBankAccessTool  extends ResourceAccessTool {
 	private static final String DBK_DESCRIPTION 	= "DrugBank is offered to the public as a freely available resource. Use and re-distribution of the data, in whole or in part, for commercial purposes requires explicit permission of the authors and explicit acknowledgment of the source material (DrugBank) and the original publication.";
 	
 	// URL that points to the logo of the resource
-	private static final String DBK_LOGO 			= "http://gchelpdesk.ualberta.ca/news/17oct08/images/DrugBankLogo.png";
+	private static final String DBK_LOGO 			= "http://www.drugbank.ca/public/images/index.png";
 	
 	//Base URL that points to an element when concatenated with an local element ID
 	private static final String DBK_ELT_URL 		= "http://www.drugbank.ca/drugs/";

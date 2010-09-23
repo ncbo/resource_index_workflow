@@ -45,7 +45,7 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 	private static final String AERS_RESOURCEID = "AERS";	
 	private static final String AERS_DESCRIPTION = "Adverse Event Reporting System (AERS) Databases are validated and normalized to provide consistent results to our users that depend on data such as this for research into Adverse Events reported to the FDA by Consumers, Doctors and many other health care related professionals.";
 	private static final String AERS_LOGO = "http://www.aersdata.com/images/newidex.jpg";
-	private static final String AERS_ELT_URL = "http://www.aersdata.com/Quicksearch/QuickAersdata_list.php?a=search&value=1&SearchField=1&SearchOption=Equals&SearchFor=?";
+	private static final String AERS_ELT_URL = "http://www.aersdata.com/Quicksearch/QuickAersdata_list.php?a=search&value=1&SearchField=1&SearchOption=Equals&SearchFor=";
 	private static final String[] AERS_ITEMKEYS	= {"REAC" , "DRUG_CHAR" , "DRUG_NAMES", "DRUG_ADMIN_ROUTE" , "DRUG_INDI"};
 	private static final Double[] AERS_WEIGHTS = {1.0, 0.9, 1.0, 0.9, 1.0};
 	private static final String[] AERS_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
