@@ -444,18 +444,6 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 								+ resourceID.toLowerCase())).newInstance();	
 				resourceTimer.reset();
 				resourceTimer.start();
-				
- 				if(resourceAccessTool.getResourceType()== ResourceType.SMALL){
- 					resourceAccessTool.removeOntologies(localOntologyIDs); 
- 				}else{
- 					List<String> ontologiesToRemove = new ArrayList<String>();
- 					for (String localOntologyID : localOntologyIDs) {
- 						ontologiesToRemove.clear();
- 						ontologiesToRemove.add(localOntologyID);
- 						resourceAccessTool.removeOntologies(ontologiesToRemove); 
- 					} 			 
- 				}		
-				
 				resourceAccessTool.removeOntologies(localOntologyIDs); 
 				resourceTimer.end();
 				logger.info("\t\tRemove ontologies from resource " + resourceID +" completed in : " + resourceTimer.millisecondsToTimeString(resourceTimer.duration()));
