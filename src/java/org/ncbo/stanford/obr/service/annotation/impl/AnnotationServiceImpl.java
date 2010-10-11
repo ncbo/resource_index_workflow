@@ -241,7 +241,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
-				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceID());
+				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceId());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
 				nbAnnotations += elementTableDao.addExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, directAnnotationTableDao);				
 			}
