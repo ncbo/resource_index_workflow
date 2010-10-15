@@ -97,25 +97,24 @@ public class GetReactomeData implements StringHelper{
 	        };
 	        int length = getMaxSizeInListObjects();
 	        for (String clsName : domainClsNames) {
-	            int total  = 0;
-	            int total2 = 0;
-	            
+	            int total  = 0; 	            
 	            Object[] objects = null;
-	            int counter = 0;
-	            while (counter < 1) {
+	           
+	            while (true) {
 	                objects = (Object[]) call.invoke(new Object[]{clsName, total, length});
-	                if (objects == null || objects.length == 0)
-	                    break;
+	                if (objects == null || objects.length == 0){
+	                	 break;
+	                } 
+	                
 	                for (int i = 0; i < objects.length; i++) {
 	                	Event myEvent = (Event) objects[i];
 	                	localElementIDs.add(myEvent.getId());
 	                }
-	                total  += objects.length;
-	                total2 += length;
-	                counter ++;
-	                if(total<total2){
+	                if(objects.length<length){
 	                	break;
 	                }
+	                total  += objects.length;
+	                
 	            }
 	        }			
 		} catch(Exception e) {
