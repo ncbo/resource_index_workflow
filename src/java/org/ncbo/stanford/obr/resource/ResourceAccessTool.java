@@ -80,7 +80,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 			AbstractObrDao.contextTableDao.addEntry(context);
 		}
 		
-		logger.info("ResourceAccessTool " + this.getToolResource().getResourceID() + " created to access " + this.getToolResource().getResourceName() +" (" + this.getToolResource().getResourceID() + ").\n");
+		logger.info("ResourceAccessTool " + this.getToolResource().getResourceId() + " created to access " + this.getToolResource().getResourceName() +" (" + this.getToolResource().getResourceId() + ").\n");
 	} 
 		
 	/** 

@@ -441,7 +441,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 		for (int i= fromNumber; i<=upToNumber; i++){
 			try{				
 				xmlFile = new File(PM_FOLDER + PM_FILE_PREFIX_2010 + this.numberString(i) + ".xml");
-				logger.info("Updating " + this.getToolResource().getResourceID() + " elements with XML file: " + xmlFile.getName());
+				logger.info("Updating " + this.getToolResource().getResourceId() + " elements with XML file: " + xmlFile.getName());
 				dbLoader = new MedlineDbLoader(this);
 				//parse using lingpipe SAX XML parser
 				loadXML(dbLoader, xmlFile);

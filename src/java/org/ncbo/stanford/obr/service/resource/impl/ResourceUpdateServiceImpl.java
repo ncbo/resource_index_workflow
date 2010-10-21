@@ -102,8 +102,8 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		isaExpandedAnnotationTableDao.reInitializeSQLTable();
 		mapExpandedAnnotationTableDao.reInitializeSQLTable();
 		aggregationTableDao.reInitializeSQLTable();
-		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
-		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
+		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceId());
+		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceId());
 	}
 	
 	/**
@@ -284,7 +284,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		 
 		
 		// Get resource id (primary key) from ResourceTable
-		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
+		int resource_id = resourceTableDao.getResourceIdKey(resourceAccessTool.getToolResource().getResourceId()); 
 		 
 		// Iterating for each ontologies
 		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
@@ -355,7 +355,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public boolean updateResourceUpdateInfo(Resource resource) {
 		// TODO Auto-generated method stub
 		int totalElements = elementTableDao.getTotalNumberOfElement();
-		return resourceTableDao.updateNumberOfElementAndDate(resource.getResourceID(), totalElements);
+		return resourceTableDao.updateNumberOfElementAndDate(resource.getResourceId(), totalElements);
 		
 	}
 
@@ -368,7 +368,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public boolean updateResourceWorkflowInfo(Resource resource) {		
 		 DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
-		 return resourceTableDao.updateDictionaryAndWorkflowDate(resource, dictionary.getDictionaryID());
+		 return resourceTableDao.updateDictionaryAndWorkflowDate(resource, dictionary.getDictionaryId());
 		
 	}
 	

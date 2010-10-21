@@ -52,7 +52,7 @@ public class GetUniprotGOAnnotations implements StringHelper{
 	public GetUniprotGOAnnotations(Resource myResource){
 		this.resource = myResource;
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();		 
+		this.resourceID     = myResource.getResourceId();		 
 	}
 	
 	// method

@@ -86,7 +86,7 @@ public class ReactomeAccessTool extends ResourceAccessTool {
 			
 			/************* variable part ****************/
 			// get the list of element present in the original resource
-			HashSet<Long> elementIDList = this.getLocalElementIDs();
+			HashSet<Long> elementIDList = this.getLocalElementIds();
 			
 			// gets the elements already in the corresponding _ET and keeps only the difference
 			HashSet<String> allElementsInET = resourceUpdateService.getAllLocalElementIDs();
@@ -122,12 +122,12 @@ public class ReactomeAccessTool extends ResourceAccessTool {
 	 * Get the list of all elementID of the resource.
 	 * For Reactome database this is the list of elementIDs of Pathways and Reactions (Events).
 	 */
-	public HashSet<Long> getLocalElementIDs(){
+	public HashSet<Long> getLocalElementIds(){
 		HashSet<Long> elementIDList = new HashSet<Long>();
 		logger.info(" Get the list of all elmentIDs from "+REAC_NAME+" ... ");		
 		try{
 			GetReactomeData myExtractor = new GetReactomeData(this.getToolResource(), this); 
-			elementIDList = myExtractor.getLocalElementIDs();			
+			elementIDList = myExtractor.getLocalElementIds();			
 			logger.info(elementIDList.size()+" pathways and reactions found. ");	
 		}catch(Exception e){
 			logger.error("** PROBLEM ** Problem when extracting elementID from the original resource. " +

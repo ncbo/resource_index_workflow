@@ -253,7 +253,7 @@ public class ElementDao extends AbstractObrDao {
 		boolean inserted = false;
 		int index = 2;
 		try {
-			this.addEntryStatement.setString(1, element.getLocalElementID());
+			this.addEntryStatement.setString(1, element.getLocalElementId());
 			for(String contextName: this.contextNames){
 				String itemValue = element.getElementStructure().getText(contextName);
 				this.addEntryStatement.setString(index, StringUtilities.escapeLine(itemValue));				
@@ -268,7 +268,7 @@ public class ElementDao extends AbstractObrDao {
 		}
 		catch (MySQLIntegrityConstraintViolationException e){
 			// TODO: not to catch this exception here 
-			//logger.info("Table " + this.getTableSQLName() + " already contains a row for element " + element.getLocalElementID() +".");
+			//logger.info("Table " + this.getTableSQLName() + " already contains a row for element " + element.getLocalElementId() +".");
 		}
 		catch (SQLException e) {
 			logger.error("** PROBLEM ** Cannot add an entry on table " + this.getTableSQLName(), e);

@@ -165,7 +165,7 @@ public class ResourceDao extends AbstractObrDao {
 		boolean inserted = false;
 		try {			
 			addEntryStatement.setString(1, resource.getResourceName());
-			addEntryStatement.setString(2, resource.getResourceID());
+			addEntryStatement.setString(2, resource.getResourceId());
 			addEntryStatement.setString(3, resource.getResourceStructure().toXMLString());
 			addEntryStatement.setString(4, resource.getMainContext());
 			
@@ -208,7 +208,7 @@ public class ResourceDao extends AbstractObrDao {
 	 */
 	public boolean addEntryOrUpdate(Resource resource){		
 		// if entry already present then update the entry.		
-		if(hasResourceEntry(resource.getResourceID())){
+		if(hasResourceEntry(resource.getResourceId())){
 			return this.updateEntry(resource);
 		} 
 		
@@ -266,7 +266,7 @@ public class ResourceDao extends AbstractObrDao {
 				logoURL =  resource.getResourceLogo().toString();
 			}
 			updateEntryStatement.setString(7, logoURL);
-			updateEntryStatement.setString(8, resource.getResourceID());
+			updateEntryStatement.setString(8, resource.getResourceId());
  
 			this.executeSQLUpdate(updateEntryStatement);
 			
@@ -310,7 +310,7 @@ public class ResourceDao extends AbstractObrDao {
 			queryb.append(dictionaryID);
 			queryb.append(", workflow_completed_date= NOW() WHERE ");
 			queryb.append("resource_id= '");
-			queryb.append(resource.getResourceID());
+			queryb.append(resource.getResourceId());
 			queryb.append("';");
 			
 			this.executeSQLUpdate(queryb.toString());			
@@ -442,7 +442,7 @@ public class ResourceDao extends AbstractObrDao {
 	 * @param resourceID
 	 * @return int - dictionary id 
 	 */
-	public int getDictionaryID(String resourceID){
+	public int getDictionaryId(String resourceID){
 		int dictionaryID = -1;
 		try {
 			getDictioanryIDStatement.setString(1, resourceID); 			 
@@ -456,7 +456,7 @@ public class ResourceDao extends AbstractObrDao {
 		}
 		catch (MySQLNonTransientConnectionException e) {
 			this.openHasEntryStatement();
-			return this.getDictionaryID(resourceID);
+			return this.getDictionaryId(resourceID);
 		} 
 		catch (SQLException e) {			 
 			logger.error("** PROBLEM ** Cannot get resource entry from " + this.getTableSQLName(), e);			 
@@ -472,7 +472,7 @@ public class ResourceDao extends AbstractObrDao {
 	 * @param resourceID
 	 * @return int - id .
 	 */
-	public int getResourceIDKey(String resourceID){ 
+	public int getResourceIdKey(String resourceID){ 
 		int id= -1;
 		try {
 			hasEntryStatement.setString(1, resourceID); 			 
@@ -486,7 +486,7 @@ public class ResourceDao extends AbstractObrDao {
 		}
 		catch (MySQLNonTransientConnectionException e) {
 			this.openHasEntryStatement();
-			return this.getResourceIDKey(resourceID);
+			return this.getResourceIdKey(resourceID);
 		} 
 		catch (SQLException e) {			 
 			logger.error("** PROBLEM ** Cannot get resource id from " + this.getTableSQLName(), e);			 

@@ -47,7 +47,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		logger.info("*** Executing  Direct Annotation process... ");
 		// processes direct mgrep annotations
 		
-		if(elementTableDao.numberOfElementsForMgrepAnnotation(dictionary.getDictionaryID())> 0){
+		if(elementTableDao.numberOfElementsForMgrepAnnotation(dictionary.getDictionaryId())> 0){
 			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
 			 		withCompleteDictionary, stopwords);
 		} else{
@@ -59,7 +59,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		// updates the dictionary column in _ET
 		logger.info("\tUpdating the dictionary field in ElementTable...");		  
 		// Update dictionary id for element table.		 
-		elementTableDao.updateDictionary(dictionary.getDictionaryID());	
+		elementTableDao.updateDictionary(dictionary.getDictionaryId());	
 		
 		timer.end();
 		logger.info("### Direct annotation processed in: " + timer.millisecondsToTimeString(timer.duration()));
@@ -97,7 +97,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 					dictionaryDao.writeDictionaryFile(dictionaryFile);
 				} else {
 					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
-							.getDictionaryID());
+							.getDictionaryId());
 				}
 			}
 		} catch (IOException e) {
@@ -112,7 +112,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		// latest dictionary
 		timer.start();
 		File resourceFile = this.writeMgrepResourceFile(dictionary
-				.getDictionaryID());
+				.getDictionaryId());
 		timer.end();
 		logger.info("\t\tResourceFile created in: "
 				+ timer.millisecondsToTimeString(timer.duration()) + "\n");
@@ -129,7 +129,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		timer.reset();
 		timer.start();
 		nbDirectAnnotation = this.processMgrepFile(mgrepFile, dictionary
-				.getDictionaryID());
+				.getDictionaryId());
 		timer.end();
 		logger.info("\t\tMgrepFile processed in: "
 				+ timer.millisecondsToTimeString(timer.duration()));
@@ -184,7 +184,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 				.info("Exporting the resource content to a file to be annotated with Mgrep...");
 		String name = FileResourceParameters.mgrepInputFolder()
 				+ ResourceAccessTool.RESOURCE_NAME_PREFIX
-				+ resourceAccessTool.getToolResource().getResourceID() + "_V"
+				+ resourceAccessTool.getToolResource().getResourceId() + "_V"
 				+ dictionaryID + "_MGREP.txt";
 		File mgrepResourceFile = new File(name);
 		try {
@@ -218,7 +218,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		logger.info("\t** Processing of existing reported annotations...");
 		timer.start();
  
-		nbReported = addExistingAnnotations(dictionary.getDictionaryID(),
+		nbReported = addExistingAnnotations(dictionary.getDictionaryId(),
 				resourceAccessTool.getToolResource()
 						.getResourceStructure());
 

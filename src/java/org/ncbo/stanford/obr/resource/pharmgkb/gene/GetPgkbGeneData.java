@@ -34,7 +34,7 @@ public class GetPgkbGeneData implements StringHelper{
 	//constructor
 	public GetPgkbGeneData(Resource myResource){	
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();		 
+		this.resourceID     = myResource.getResourceId();		 
 	}
 	public GetPgkbGeneData(){
 		

@@ -95,7 +95,7 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 			// traverses the set of elements returned by Upkb to prune it with the element in ET
 			HashSet<Element> elementsToRemove = new HashSet<Element>(); 
 			for (Element annot: annotList){
-				if (allElementsInET.contains(annot.getLocalElementID())){
+				if (allElementsInET.contains(annot.getLocalElementId())){
 					elementsToRemove.add(annot);
 				}
 			}
@@ -114,7 +114,7 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 						}
 					}				
 				} catch (Exception e) {
-					logger.error("** PROBLEM ** Problem with disease "+ myProt.getLocalElementID() +" when populating the OBR_UPKB_ET table.", e);
+					logger.error("** PROBLEM ** Problem with disease "+ myProt.getLocalElementId() +" when populating the OBR_UPKB_ET table.", e);
 				}
 			}
 		} catch (Exception e) {

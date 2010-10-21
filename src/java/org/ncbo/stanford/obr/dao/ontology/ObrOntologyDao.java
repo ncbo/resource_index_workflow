@@ -121,14 +121,14 @@ public class ObrOntologyDao extends AbstractObrDao{
 		boolean inserted = false;
 		try {
 			this.addEntryStatement.setInt(1, entry.getId());
-			this.addEntryStatement.setString(2, entry.getLocalOntologyID());
+			this.addEntryStatement.setString(2, entry.getLocalOntologyId());
 			this.addEntryStatement.setString(3, entry.getName());
 			this.addEntryStatement.setString(4, entry.getVersion());
 			this.addEntryStatement.setString(5, entry.getDescription());
 			this.addEntryStatement.setInt(6, entry.getStatus());
-			this.addEntryStatement.setString(7, entry.getVirtualOntologyID());
+			this.addEntryStatement.setString(7, entry.getVirtualOntologyId());
 			this.addEntryStatement.setString(8, entry.getFormat());
-			this.addEntryStatement.setInt(9, entry.getDictionaryID());
+			this.addEntryStatement.setInt(9, entry.getDictionaryId());
 			this.executeSQLUpdate(addEntryStatement);
 			inserted = true;
 		}
@@ -306,7 +306,7 @@ public class ObrOntologyDao extends AbstractObrDao{
 			rSet.close();
 			 
 			if(dictionaryID >0){
-				if(dictionaryID > resourceTableDao.getDictionaryID(resourceID)){
+				if(dictionaryID > resourceTableDao.getDictionaryId(resourceID)){
 					return true;
 				}
 			} 
@@ -434,7 +434,7 @@ public class ObrOntologyDao extends AbstractObrDao{
 	 *
 	 * @return {@code Set} of local ontology ids
 	 */
-	public HashSet<String> getLocalOntologyIDs(){
+	public HashSet<String> getLocalOntologyIds(){
 		// Query: SELECT DISTINCT local_ontology_id FROM obs_ontology
 		HashSet<String> localOntologyIDs = new HashSet<String>();
 		StringBuffer queryb = new StringBuffer();

@@ -117,7 +117,7 @@ public class StatisticsDao extends AbstractObrDao {
 	public boolean addEntry(StatisticsEntry entry){
 		boolean inserted = false;
 		try {
-			addEntryStatement.setInt(1, entry.getResourceID());
+			addEntryStatement.setInt(1, entry.getResourceId());
 			addEntryStatement.setInt(2, entry.getOntologyID());
 			addEntryStatement.setLong(3, entry.getAggregatedAnnotations());
 			addEntryStatement.setLong(4, entry.getMgrepAnnotations());
@@ -355,7 +355,7 @@ public class StatisticsDao extends AbstractObrDao {
 		/**
 		 * @return the resourceID
 		 */
-		public int getResourceID() {
+		public int getResourceId() {
 			return resourceID;
 		}
 

@@ -86,7 +86,7 @@ public class MicadAccessTool extends ResourceAccessTool {
 			
 			/************* variable part ****************/
 			// get the list of elements present in the original resource (CSV file)
-			String[][] csvElements = this.getLocalElementIDs();
+			String[][] csvElements = this.getLocalElementIds();
 			
 			// get the list of element Ids from csvElements
 			HashSet<String> elementIDList = new HashSet<String>();
@@ -142,12 +142,12 @@ public class MicadAccessTool extends ResourceAccessTool {
 	 * Get the list of all elementID of the resource.
 	 * For MICAD database, get the list of elementIDs from csv file.
 	 */
-	public String[][] getLocalElementIDs(){
+	public String[][] getLocalElementIds(){
 		String[][] elements = new String [2000][50];
 		logger.info(" Get the list of all elmentIDs from "+MICAD_NAME+" ... ");		
 		try{
 			MicadReadCsv myExtractor = new MicadReadCsv(this.getToolResource(), this); 
-			elements = myExtractor.getLocalElementIDs();
+			elements = myExtractor.getLocalElementIds();
 		}catch(Exception e){
 			logger.error("** PROBLEM ** Problem when extracting elementID from the original resource. " +
 					"Check MicadReadCsv", e);

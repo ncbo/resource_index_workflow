@@ -48,7 +48,7 @@ public class GetPgkbDiseaseData implements StringHelper{
 	//constructor
 	public GetPgkbDiseaseData(Resource myResource){	
 		this.basicStructure = myResource.getResourceStructure();	
-		this.resourceID     = myResource.getResourceID();
+		this.resourceID     = myResource.getResourceId();
 	}
 	
 	public GetPgkbDiseaseData(){		 

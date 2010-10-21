@@ -22,7 +22,7 @@ public class MicadReadWeb implements StringHelper {
 //Main method for testing MicadReadWeb independently
 /*	public static void main(String[] args){
 		
-//		HashSet<String> elementIDList = getLocalElementIDs();
+//		HashSet<String> elementIDList = getLocalElementIds();
 		HashSet<String> elementIDList = new HashSet<String>();
 		
 		elementIDList.add("MLS128-111In");
@@ -61,7 +61,7 @@ public class MicadReadWeb implements StringHelper {
 	public MicadReadWeb(Resource myResource, ResourceAccessTool tool){
 		this.resource       = myResource;
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();
+		this.resourceID     = myResource.getResourceId();
 		this.tool           = tool;
 		//this.logger = LoggerUtils.getCurrentLogger(MicadReadCsv.class);
 	}

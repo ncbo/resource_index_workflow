@@ -144,10 +144,10 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	public boolean addEntry(DirectAnnotationEntry entry ){
 		boolean inserted = false;
 		try {		 
-			this.addEntryStatement.setString (1, entry.getLocalElementID());
+			this.addEntryStatement.setString (1, entry.getLocalElementId());
 			this.addEntryStatement.setString (2, entry.getLocalConceptID());
 			this.addEntryStatement.setString (3, entry.getContextName());
-			this.addEntryStatement.setInt    (4, entry.getDictionaryID());
+			this.addEntryStatement.setInt    (4, entry.getDictionaryId());
 			this.addEntryStatement.setInt(5, entry.getWorkflowStatus());		 
 			this.executeSQLUpdate(this.addEntryStatement);
 			inserted = true;
@@ -198,13 +198,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	public boolean addMgrepEntry(DirectMgrepAnnotationEntry entry){
 		boolean inserted = false;
 		try {
-			this.addMgrepEntryStatement.setString (1, entry.getLocalElementID());
+			this.addMgrepEntryStatement.setString (1, entry.getLocalElementId());
 			this.addMgrepEntryStatement.setString (2, entry.getLocalConceptID());
 			this.addMgrepEntryStatement.setString (3, entry.getContextName());
 			this.addMgrepEntryStatement.setInt    (4, entry.getTermID());
 			this.addMgrepEntryStatement.setInt    (5, entry.getFrom());
 			this.addMgrepEntryStatement.setInt    (6, entry.getTo());
-			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryID());
+			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryId());
 			this.addMgrepEntryStatement.setInt	  (8, entry.getWorkflowStatus());
 		 
 			this.executeSQLUpdate(this.addMgrepEntryStatement);
@@ -514,7 +514,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append(dictionary.getDictionaryId());				 
 			queryb.append( " GROUP BY OT.id; ");
 		} 
 		
@@ -560,7 +560,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NULL AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append(dictionary.getDictionaryId());				 
 			queryb.append( " GROUP BY OT.id; ");
 		}  
 		try {			 			
@@ -637,7 +637,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.workflowStatus =workflowStatus;
 		}
 
-		public String getLocalElementID() {
+		public String getLocalElementId() {
 			return localElementID;
 		}
 
@@ -648,7 +648,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			return contextName;
 		}
 
-		public Integer getDictionaryID() {
+		public Integer getDictionaryId() {
 			return dictionaryID;
 		}	 
 
@@ -713,7 +713,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		public String toString(){
 			StringBuffer sb = new StringBuffer();
 			sb.append("DirectMgrepAnnotationEntry: [");
-			sb.append(this.getLocalElementID());
+			sb.append(this.getLocalElementId());
 			sb.append(", ");
 			sb.append(this.getLocalConceptID());
 			sb.append(", ");
@@ -725,7 +725,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			sb.append(", ");
 			sb.append(this.to);
 			sb.append(", ");			
-			sb.append(this.getDictionaryID());
+			sb.append(this.getDictionaryId());
 			sb.append(", ");			
 			sb.append(this.getWorkflowStatus());		 
 			sb.append("]");

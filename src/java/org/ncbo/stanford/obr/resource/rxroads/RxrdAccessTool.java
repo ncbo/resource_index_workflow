@@ -162,7 +162,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				// get data related to each element and create this element
 				myGrant = this.getElementData(localElementID, basicStructure);
 				// write element data in the OBR_XX_ET table
-				//System.out.println("add grant: "+myGrant.getLocalElementID()+", "+myGrant.getElementStructure().getContexts().get("RXRD_title"));
+				//System.out.println("add grant: "+myGrant.getLocalElementId()+", "+myGrant.getElementStructure().getContexts().get("RXRD_title"));
 				if(!myGrant.getElementStructure().hasNullValues()){	
 					if(resourceUpdateService.addElement(myGrant)){
 						nbAdded++;				

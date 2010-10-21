@@ -18,7 +18,7 @@ public class MicadReadCsv {
 
 // Main method for testing MicadReadCsv independently	
 /*	public static void main(String[] args){
-		String[][] text = getLocalElementIDs();
+		String[][] text = getLocalElementIds();
 		System.out.println(text[3][18]);
 		System.out.println(text.length);
 	}
@@ -37,13 +37,13 @@ public class MicadReadCsv {
 	public MicadReadCsv(Resource myResource, ResourceAccessTool tool){
 		this.resource       = myResource;
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();
+		this.resourceID     = myResource.getResourceId();
 		this.tool           = tool;
 		//this.logger = LoggerUtils.getCurrentLogger(MicadReadCsv.class);
 	}
 	
 	// methods
-	public String[][] getLocalElementIDs() {
+	public String[][] getLocalElementIds() {
 		
 		String [][] text = new String [2000][50];
 		URL url = null;

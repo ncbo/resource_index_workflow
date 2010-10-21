@@ -67,7 +67,7 @@ public abstract class AbstractNcbiResourceAccessTool extends ResourceAccessTool 
 			allUIDsinET = resourceUpdateService.getAllLocalElementIDs();
 		}
 		else{
-			allUIDsinET = resourceUpdateService.getAllValuesByColumn(this.getToolResource().getResourceID().toLowerCase()+ "_"+columnToUse);	
+			allUIDsinET = resourceUpdateService.getAllValuesByColumn(this.getToolResource().getResourceId().toLowerCase()+ "_"+columnToUse);	
 		}
 		allUIDs.removeAll(allUIDsinET);
 		try {

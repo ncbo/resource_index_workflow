@@ -29,22 +29,22 @@ public abstract class AbstractResourceService implements DaoFactory, StringHelpe
 		super();
 		
 		if(AbstractResourceService.resourceAccessTool== null 
-				|| AbstractResourceService.resourceAccessTool.getToolResource().getResourceID()!=resourceAccessTool.getToolResource().getResourceID()){
+				|| AbstractResourceService.resourceAccessTool.getToolResource().getResourceId()!=resourceAccessTool.getToolResource().getResourceId()){
 			 AbstractResourceService.resourceAccessTool = resourceAccessTool;
 				
 			// Creating Element Table Dao for given resource access tool
-			 elementTableDao= new ElementDao(resourceAccessTool.getToolResource().getResourceID() 
+			 elementTableDao= new ElementDao(resourceAccessTool.getToolResource().getResourceId() 
 					, resourceAccessTool.getToolResource().getResourceStructure()) ;
 					 
-			 directAnnotationTableDao= new DirectAnnotationDao(resourceAccessTool.getToolResource().getResourceID()) ;
+			 directAnnotationTableDao= new DirectAnnotationDao(resourceAccessTool.getToolResource().getResourceId()) ;
 			
-			 isaExpandedAnnotationTableDao= new IsaExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
+			 isaExpandedAnnotationTableDao= new IsaExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceId());
 			 
-			 mapExpandedAnnotationTableDao= new MapExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceID());
+			 mapExpandedAnnotationTableDao= new MapExpandedAnnotationDao(resourceAccessTool.getToolResource().getResourceId());
 			
-			 aggregationTableDao = new AggregationDao(resourceAccessTool.getToolResource().getResourceID());
+			 aggregationTableDao = new AggregationDao(resourceAccessTool.getToolResource().getResourceId());
 			 
-			 conceptFrequencyDao = new ConceptFrequencyDao(resourceAccessTool.getToolResource().getResourceID());			
+			 conceptFrequencyDao = new ConceptFrequencyDao(resourceAccessTool.getToolResource().getResourceId());			
 		}
 		
 		

@@ -119,7 +119,7 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean addEntry(AggregationAnnotation entry){
 		boolean inserted = false;
 		try {
-			this.addEntryStatement.setString(1, entry.getLocalElementID());
+			this.addEntryStatement.setString(1, entry.getLocalElementId());
 			this.addEntryStatement.setString(2, entry.getLocalConceptID());
 			this.addEntryStatement.setFloat(3, entry.getScore());
 			this.executeSQLUpdate(this.addEntryStatement);
@@ -431,7 +431,7 @@ public class AggregationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append(dictionary.getDictionaryId());				 
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		
@@ -474,7 +474,7 @@ public class AggregationDao extends AbstractObrDao {
 			this.score = score;
 		}
 
-		public String getLocalElementID() {
+		public String getLocalElementId() {
 			return localElementID;
 		}
 

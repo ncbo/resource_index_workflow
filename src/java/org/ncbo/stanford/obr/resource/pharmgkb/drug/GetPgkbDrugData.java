@@ -47,7 +47,7 @@ public class GetPgkbDrugData implements StringHelper{
 	//constructor
 	public GetPgkbDrugData(Resource myResource){	
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();		 
+		this.resourceID     = myResource.getResourceId();		 
 	}
 	
 	public GetPgkbDrugData(){		

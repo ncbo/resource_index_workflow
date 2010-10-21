@@ -267,7 +267,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append(dictionary.getDictionaryId());				 
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		

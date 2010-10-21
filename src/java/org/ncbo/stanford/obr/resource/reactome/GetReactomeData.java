@@ -81,12 +81,12 @@ public class GetReactomeData implements StringHelper{
 	//constructor
 	public GetReactomeData(Resource myResource, ResourceAccessTool tool){	 
 		this.basicStructure = myResource.getResourceStructure();
-		this.resourceID     = myResource.getResourceID();
+		this.resourceID     = myResource.getResourceId();
 		this.tool           = tool;		 
 	}
 	
 	// methods
-	public HashSet<Long> getLocalElementIDs() {			
+	public HashSet<Long> getLocalElementIds() {			
 		
 		HashSet<Long> localElementIDs = new HashSet<Long>() ;	
 		try {					
