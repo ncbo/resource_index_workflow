@@ -210,9 +210,9 @@
 				<fileset dir="${obs.common.dir}/dist">
 					<include name="**/*.jar"/>
 				</fileset> 
+				<fileset refid="cananolab.jars" /> 
 				<fileset refid="shared.jars" /> 	
-				<fileset refid="protege.jars" />				 
-				<fileset refid="cananolab.jars" /> 			 
+				<fileset refid="protege.jars" />
 			</copy>
 			
 			<!-- Copy properties folder containg all properties files to dist directory -->
