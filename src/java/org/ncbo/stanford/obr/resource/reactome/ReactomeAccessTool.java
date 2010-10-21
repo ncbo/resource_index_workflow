@@ -26,7 +26,7 @@ public class ReactomeAccessTool extends ResourceAccessTool {
 	private static final String REAC_RESOURCEID  = "REAC";
 	private static final String REAC_DESCRIPTION = "A curated knowledgebase of biological pathways.";
 	private static final String REAC_LOGO        = "http://www.reactome.org/icons/R-purple.png";
-	private static final String REAC_ELT_URL     = "http://www.reactome.org/cgi-bin/eventbrowser?DB=gk_current&ID=";
+	private static final String REAC_ELT_URL     = "http://www.reactome.org/cgi-bin/eventbrowser?ID=";
 	
 	private static final String[] REAC_ITEMKEYS  = {"name", 							"participants", 					"goBiologicalProcess",	"goCellCompartiment"};
 	private static final Double[] REAC_WEIGHTS 	 = {  1.0,       						0.8,             					0.7,                	0.2};  			       

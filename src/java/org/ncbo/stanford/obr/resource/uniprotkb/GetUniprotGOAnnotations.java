@@ -89,7 +89,7 @@ public class GetUniprotGOAnnotations implements StringHelper{
 						protAnnotAttribute = new Hashtable<String, String>();	
 						if (!annotMatcher.group(1).equals(EMPTY_STRING)){
 							
-							localElementID = annotMatcher.group(1);	
+							localElementID = annotMatcher.group(1).trim();	
 							//IF the protein is already annotated: UPDATE
 							if(allProtAnnot.containsKey(localElementID)){
 								if (!annotMatcher.group(4).equals(EMPTY_STRING)&&!annotMatcher.group(5).equals(EMPTY_STRING)){	

@@ -154,8 +154,8 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 	public HashMap<String, String>  createLocalOntologyIDMap(Structure structure){
 		HashMap<String, String> localOntologyIDMap = new HashMap<String, String>();
 		String virtualOntologyID;
-		for (String contextName: structure.getOntoIDs().keySet()){
-			virtualOntologyID = structure.getOntoIDs().get(contextName);
+		for (String contextName: structure.getOntoIds().keySet()){
+			virtualOntologyID = structure.getOntoIds().get(contextName);
 			if(!virtualOntologyID.equals(Structure.FOR_CONCEPT_RECOGNITION) && 
 					!virtualOntologyID.equals(Structure.NOT_FOR_ANNOTATION)){
 				localOntologyIDMap.put(contextName, ontlogyService.getLatestLocalOntologyID(virtualOntologyID));
