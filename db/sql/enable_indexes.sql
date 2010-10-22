@@ -2,7 +2,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `resource_index`.`enable_indexes`$$
 
-CREATE  PROCEDURE `enable_indexes`(IN TableToPopulate VARCHAR(100), IN BigTable BOOL)
+CREATE PROCEDURE `enable_indexes`(IN TableToPopulate VARCHAR(100), IN BigTable BOOL)
 BEGIN	 
 	SET @EnableKeysQuery =  Concat( 'ALTER TABLE ',TableToPopulate, ' ENABLE KEYS;');
 	  

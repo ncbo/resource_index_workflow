@@ -2,7 +2,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `resource_index`.`load_obs_tables_into_memory`$$
 
-CREATE DEFINER=`optra`@`%` PROCEDURE `load_obs_tables_into_memory`()
+CREATE PROCEDURE `load_obs_tables_into_memory`()
 BEGIN
     -- 
     -- LOAD only the necessary part of obr_term and stuff it into memory.
@@ -72,7 +72,7 @@ BEGIN
 	FROM obs_relation; 
 	
 	-- 
-	-- LOAD obr_concept and stuff it into memory.
+	-- LOAD obr_comcept and stuff it into memory.
 	-- 
 	DROP TABLE IF EXISTS `resource_index`.`obr_concept_mem`;	
 	

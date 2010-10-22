@@ -2,7 +2,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `resource_index`.`common_batch_insert`$$
 
-CREATE DEFINER=`optra`@`%` PROCEDURE `common_batch_insert`(IN TableToPopulate VARCHAR(100),IN InsertQueryString text, IN DisableKeys BOOL, OUT RowsAffected BIGINT)
+CREATE PROCEDURE `common_batch_insert`(IN TableToPopulate VARCHAR(100),IN InsertQueryString text, IN DisableKeys BOOL, OUT RowsAffected BIGINT)
 BEGIN
         # Define counter 
         DECLARE counter BIGINT(20) unsigned DEFAULT 0; 
