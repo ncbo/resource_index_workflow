@@ -218,6 +218,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 			String virtualOntologyID, String splitString) {
 		String localOntologyID= ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
 		
+		if(localOntologyID== null){
+			return EMPTY_STRING;
+		}
+		
 		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID, splitString );
 		 
 		return concepts.replaceAll(localOntologyID, virtualOntologyID);
@@ -229,6 +233,10 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 */
 	public String mapTermsToVirtualLocalConceptIDs(java.util.HashSet<String> terms, String virtualOntologyID ) {
 		String localOntologyID= ontologyDao.getLatestLocalOntologyID(virtualOntologyID );
+		
+		if(localOntologyID== null){
+			return EMPTY_STRING;
+		}
 		
 		String concepts =mapTermsToLocalConceptIDs(terms, localOntologyID);
 		 
