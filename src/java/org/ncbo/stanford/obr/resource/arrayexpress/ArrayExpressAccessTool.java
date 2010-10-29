@@ -22,22 +22,29 @@ public class ArrayExpressAccessTool extends AbstractXmlResourceAccessTool {
 	private static final String AE_RESOURCEID = "AE";
 	private static final String AE_DESCRIPTION = "ArrayExpress is a public repository for microarray data, which is aimed at storing MIAME-compliant data in accordance with MGED recommendations. The ArrayExpress Data Warehouse stores gene-indexed expression profiles from a curated subset of experiments in the repository.";
 	private static final String AE_LOGO = "http://www.ebi.ac.uk/microarray-as/aer/include/aelogo.png";
-	private static final String AE_SERVICE = "http://www.ebi.ac.uk/microarray-as/aer/jsp/ae_expts.jsp";
-	private static final String AE_ELT_URL = "http://www.ebi.ac.uk/microarray-as/ae/browse.html?detailedview=on&keywords=";
+	private static final String AE_SERVICE = "http://www.ebi.ac.uk/arrayexpress/xml/v2/experiments";
+	
+	private static final String AE_ELT_URL = "http://www.ebi.ac.uk/arrayexpress/experiments/";
 
-	private static final String[] AE_ITEMKEYS = {"name", "description", "species"};
-	private static final Double[] AE_WEIGHTS  = {1.0, 0.8, 1.0};
+	private static final String[] AE_ITEMKEYS = {"name", "description", "species", "experiment_type"};
+	private static final Double[] AE_WEIGHTS  = {1.0, 0.8, 1.0, 0.9};
 	
 	// OntoID associated for reported annotations
-	private static final String[] AE_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "1132"};
+	private static final String[] AE_ONTOIDS  = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, "1132", "1136"};
 	
 	private static Structure AE_STRUCTURE = new Structure(AE_ITEMKEYS, AE_RESOURCEID, AE_WEIGHTS, AE_ONTOIDS);
 	private static String AE_MAIN_ITEMKEY = "name";
 	
 	// Constant for 'experiment' string
 	private static final String AE_EXPERIMENT = "experiment";
-	private static final String ELT_ACCNUM = "accnum";
+	private static final String AE_EXPERIMENT_TYPE = "experimenttype";
+	private static final String ELT_ACCNUM = "accession";
 	
+	private static final String ELT_NAME = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[0]);
+	private static final String ELT_SPECIES = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[2]);
+	private static final String ELT_DESCRIPTION = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[1]); 
+	private static final String ELT_EXPERIMENT_TYPE = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[3]); 
+	 
 	public ArrayExpressAccessTool(){
 		super(AE_NAME, AE_RESOURCEID, AE_STRUCTURE );
 		try {
@@ -79,7 +86,7 @@ public class ArrayExpressAccessTool extends AbstractXmlResourceAccessTool {
 			for(int i = 0 ; i <listSize; i++) {
 				aeElement = new ArrayExpressElement((org.w3c.dom.Element)experimentList.item(i), this);
 				element = aeElement.getElement();
-				if (resourceUpdateService.addElement(element)){
+				if (element != null && resourceUpdateService.addElement(element)){
 					nbElement ++;
 				}
 			}
@@ -133,38 +140,44 @@ public class ArrayExpressAccessTool extends AbstractXmlResourceAccessTool {
 
 	private class ArrayExpressElement {
 
-		ArrayExpressAccessTool eltAETool;
-		HashMap<String,String> eltInfo;		
-		final String ELT_NAME = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[0]);
-		final String ELT_SPECIES = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[2]);
-		final String ELT_DESCRIPTION = Structure.generateContextName(AE_RESOURCEID, AE_ITEMKEYS[1]); 
-
+		private ArrayExpressAccessTool eltAETool;
+		private HashMap<String,String> eltInfo;	
+		
 		ArrayExpressElement(org.w3c.dom.Element experimentElt, ArrayExpressAccessTool aeTool){
 			this.eltAETool = aeTool;
-			this.eltInfo = new HashMap<String, String>(3);
-
-			this.eltInfo.put(ELT_ACCNUM, experimentElt.getAttribute(ELT_ACCNUM));
-			this.eltInfo.put(ELT_NAME, experimentElt.getAttribute(AE_ITEMKEYS[0]));
-			String species = experimentElt.getAttribute(AE_ITEMKEYS[2]);
-			if(species!= null && species.length() >0){
-				species=  resourceUpdateService.mapTermsToVirtualLocalConceptIDs(species, AE_ONTOIDS[2], COMMA_STRING);
-			}else{
-				species =EMPTY_STRING;
-			}
+			this.eltInfo = new HashMap<String, String>(3); 
+			String nodeName = null;
+			String description= EMPTY_STRING;
+			String experimentType = EMPTY_STRING;	
+			String species= EMPTY_STRING;
+			String name= EMPTY_STRING;
+			String accession  = null;
+			for (int i = 0; i < experimentElt.getChildNodes().getLength(); i++) {
+				Node node = experimentElt.getChildNodes().item(i);
+				nodeName= node.getNodeName();
+				
+				if(ELT_ACCNUM.equals(nodeName)){ // Extracting accession
+					accession= node.getTextContent();
+				}else if(AE_ITEMKEYS[0].equals(nodeName)){// Extracting name
+					name = node.getTextContent();
+				}else if(AE_ITEMKEYS[1].equals(nodeName)){ // Extracting Description
+					for (int j = 0; j < node.getChildNodes().getLength(); j++) {
+						if("text".equals(node.getChildNodes().item(j).getNodeName())){
+							description+= BLANK_SPACE + node.getChildNodes().item(j).getTextContent();
+						}
+					} 					 
+				}else if(AE_ITEMKEYS[2].equals(nodeName)){// Extracting species
+					species=  resourceUpdateService.mapTermsToVirtualLocalConceptIDs(node.getTextContent(), AE_ONTOIDS[2], null);
+				}else if(AE_EXPERIMENT_TYPE.equals(nodeName)){ // Extracting experiment type
+					experimentType=  resourceUpdateService.mapTermsToVirtualLocalConceptIDs(node.getTextContent(), AE_ONTOIDS[3], null);
+				} 
+			} 	
+			
+			this.eltInfo.put(ELT_ACCNUM, accession);
+			this.eltInfo.put(ELT_NAME, name);			
+			this.eltInfo.put(ELT_DESCRIPTION, description.trim()); 
 			this.eltInfo.put(ELT_SPECIES, species);
-			String description = EMPTY_STRING;
-			NodeList descriptionList;
-			Node descriptionNode;
-			descriptionList = experimentElt.getElementsByTagName(AE_ITEMKEYS[1]);
-			//for each 'description' XML element
-			if(descriptionList != null && descriptionList.getLength() > 0) {
-				int listSize = descriptionList.getLength();
-				for(int j=0; j<listSize; j++){
-					descriptionNode = descriptionList.item(j);
-					description += BLANK_SPACE + descriptionNode.getTextContent();
-				}
-			}
-			this.eltInfo.put(ELT_DESCRIPTION, description);
+			this.eltInfo.put(ELT_EXPERIMENT_TYPE, experimentType);
 		}
 
 		Element getElement(){
