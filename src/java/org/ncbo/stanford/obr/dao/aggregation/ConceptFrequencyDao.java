@@ -50,7 +50,7 @@ public class ConceptFrequencyDao extends AbstractObrDao {
 	@Override
 	protected String creationQuery(){
 		return "CREATE TABLE " + getTableSQLName() +" (" +
-					"id INT(11) UNSIGNED NOT NULL, " +
+					"id INT(11) UNSIGNED NOT NULL PRIMARY KEY, " +
 					"counts BIGINT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +	
 					"INDEX X_" + this.getTableSQLName() +"_counts(counts) USING BTREE, " +	
