@@ -15,6 +15,7 @@ import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -256,6 +257,26 @@ public class AggregationDao extends AbstractObrDao {
 				+ " in  : " + timer.millisecondsToTimeString(timer.duration()));  		
 		return this.numberOfEntry();
 	} 
+	
+	/**
+	 * 
+	 * 
+	 * @param resourceType
+	 */
+	public boolean sortAggregation(ResourceType resourceType){
+		try{
+			if(ResourceType.BIG== resourceType){
+				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), "1");
+			}else{
+				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), "0");
+			}			
+			return true;
+		}
+		catch(Exception e){
+			logger.error("** PROBLEM ** Cannot sort aggregation table " + this.getTableSQLName(), e);
+		}		
+		return false;
+	}
 
 	/**
 	 *  

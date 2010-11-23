@@ -5,6 +5,8 @@ package org.ncbo.stanford.obr.service.aggregation;
 
 import java.util.List;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
+
 import obs.obr.populate.ObrWeight;
 
 /**
@@ -23,6 +25,15 @@ public interface AggregationService {
 	 * 
 	 */
 	public long aggregation(ObrWeight weights);
+	
+	/**
+	 *  Sort Aggregation
+	 * 
+	 * @param resourceType  Used for calculating score
+	 * @return  Boolean  
+	 * 
+	 */
+	public boolean sortAggregation(ResourceType resourceType);
 	
 	/**
 	 * Method removes indexing done for given ontology versions.
