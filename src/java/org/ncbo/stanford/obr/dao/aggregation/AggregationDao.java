@@ -40,6 +40,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 public class AggregationDao extends AbstractObrDao {
 
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.table.suffix"); // element Index Table
+	private static final String WORKFLOW_TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.workflow.table.suffix");
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
@@ -49,14 +50,18 @@ public class AggregationDao extends AbstractObrDao {
 	 * The suffix that will be added for Aggregation table is "_aggregation".
 	 */
 	public AggregationDao(String resourceID) {
-		super(resourceID, TABLE_SUFFIX);
+		super(resourceID, WORKFLOW_TABLE_SUFFIX);
 	}
 
 	/**
 	 * Returns the SQL table name for a given resourceID 
 	 */
 	public static String name(String resourceID){
-		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFFIX;
+		return OBR_PREFIX + resourceID.toLowerCase() + WORKFLOW_TABLE_SUFFIX;
+	}
+	
+	private String getSortedTableSQLName(){
+		return OBR_PREFIX + this.resourceID.toLowerCase() + TABLE_SUFFIX;
 	}
 	
 	@Override
@@ -65,8 +70,8 @@ public class AggregationDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"UNIQUE INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE, " +	
-					"INDEX X_" + getTableSQLName() +"_concept_id(concept_id) USING BTREE " +	
+					"UNIQUE INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE " +	
+					//"INDEX X_" + getTableSQLName() +"_concept_id(concept_id) USING BTREE " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
 	
@@ -266,9 +271,9 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean sortAggregation(ResourceType resourceType){
 		try{
 			if(ResourceType.BIG== resourceType){
-				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), "1");
+				this.callStoredProcedure("sort_aggregation_table", this.getSortedTableSQLName(), "1");
 			}else{
-				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), "0");
+				this.callStoredProcedure("sort_aggregation_table", this.getSortedTableSQLName(), "0");
 			}			
 			return true;
 		}
