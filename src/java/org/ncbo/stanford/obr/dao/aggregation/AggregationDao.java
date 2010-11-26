@@ -15,6 +15,7 @@ import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
