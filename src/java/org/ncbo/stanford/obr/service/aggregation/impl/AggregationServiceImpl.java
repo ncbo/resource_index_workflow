@@ -5,6 +5,7 @@ import java.util.List;
 import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.ObrWeight;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
 import org.ncbo.stanford.obr.service.aggregation.AggregationService;
@@ -31,6 +32,17 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 		logger.info("### Aggregation processed in: " + timer.millisecondsToTimeString(timer.duration()));
 		return nbAnnotation;
 	} 
+	
+	public boolean sortAggregation(ResourceType resourceType) {
+		boolean result= false;
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		logger.info("*** Executing aggregation sorting process.... ");
+		result = aggregationTableDao.sortAggregation(resourceType);
+		timer.end();
+		logger.info("### Aggregation sorted in: " + timer.millisecondsToTimeString(timer.duration()));
+		return result;
+	}
 	
 	/**
 	 * Method removes indexing done for given ontology versions.

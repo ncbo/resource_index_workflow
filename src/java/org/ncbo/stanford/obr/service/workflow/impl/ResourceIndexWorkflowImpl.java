@@ -308,6 +308,9 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				+ " new aggregated annotations) from resource "
 				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		
+		// Sorting aggregation
+		resourceAccessTool.getAggregationService().sortAggregation(resourceAccessTool.getResourceType());
+		
 		// Update obr_statistics and concept_frequency table.
 		if(nbAggregatedAnnotation > 0) {
 			resourceAccessTool.calulateConceptFrequncy();
