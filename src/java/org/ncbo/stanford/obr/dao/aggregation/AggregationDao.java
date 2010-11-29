@@ -271,9 +271,9 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean sortAggregation(ResourceType resourceType){
 		try{
 			if(ResourceType.BIG== resourceType){
-				this.callStoredProcedure("sort_aggregation_table", this.getSortedTableSQLName(), "1");
+				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), this.getSortedTableSQLName(), "1");
 			}else{
-				this.callStoredProcedure("sort_aggregation_table", this.getSortedTableSQLName(), "0");
+				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), this.getSortedTableSQLName(), "0");
 			}			
 			return true;
 		}
