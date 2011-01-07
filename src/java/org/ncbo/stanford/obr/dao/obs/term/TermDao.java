@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import obs.common.utils.Utilities;
 
@@ -176,6 +177,54 @@ public class TermDao extends AbstractObsDao{
 		}
 		return localConceptIDs;
 	} 
+
+	/**
+	 *  
+	 * @param terms
+	 * @param localOntologyID
+	 * @return
+	 */
+	public HashSet<String> mapTermsToLocalConceptIDs(Set<String> terms, String localOntologyID){
+		HashSet<String> localConceptIDs = new HashSet<String>();
+		
+		if(terms== null || terms.isEmpty()){
+			return localConceptIDs;
+		}
+		
+		try {
+			ResultSet rSet;	 
+			StringBuffer queryb = new StringBuffer();
+			queryb.append(mapStringQueries());
+			queryb.append(" AND ");
+			queryb.append(this.getTableSQLName());
+			queryb.append(".name IN (");
+			for(Iterator<String> it = terms.iterator(); it.hasNext();){
+				queryb.append("'");
+				queryb.append(it.next().replace("'", "\\'"));
+				queryb.append("'");
+				if(it.hasNext()){
+					queryb.append(", ");
+				}
+			}
+			queryb.append(") AND local_ontology_id= ");
+			queryb.append(localOntologyID);
+			queryb.append(";");
+			
+			rSet = this.executeSQLQuery(queryb.toString());
+			 
+			while(rSet.next()){
+				localConceptIDs.add(rSet.getString(1));
+			}
+			rSet.close();
+		}
+		catch (MySQLNonTransientConnectionException e) {
+			 return this.mapTermsToLocalConceptIDs(terms, localOntologyID);
+		}
+		catch (SQLException e) {
+			logger.error("** PROBLEM ** Cannot get concepts from "+this.getTableSQLName()+" that map string: "+ terms +" in ontology: "+localOntologyID+". Empty set returned.", e);
+		}
+		return localConceptIDs;
+	}
 	
 	/**
 	 * Method loads the data entries from given file to term table.

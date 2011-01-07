@@ -187,14 +187,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	public String mapTermsToLocalConceptIDs(HashSet<String> terms, String localOntologyID){
 		  
 		HashSet<String> concepts= new HashSet<String>();
-		
-		for (String term : terms) {
-			try {
-				concepts.addAll(termDao.mapStringToLocalConceptIDs(term.trim(),localOntologyID));
-			} catch (Exception e) {				 
-				logger.error("** PROBLEM ** Non Valid Local Ontology ID "+ localOntologyID );
-			}
-		} 
+		concepts= termDao.mapTermsToLocalConceptIDs(terms, localOntologyID); 
 		// Put all conceptIDs collection to StringBuffer.
 		StringBuilder conceptIDs=new StringBuilder();
 		if (!concepts.isEmpty()){    	   
