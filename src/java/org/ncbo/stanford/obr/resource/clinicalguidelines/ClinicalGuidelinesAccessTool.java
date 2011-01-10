@@ -180,7 +180,13 @@ public class ClinicalGuidelinesAccessTool extends AbstractXmlResourceAccessTool 
 			} 
 			 
 			try {
-				element = new Element(this.eltInfo.get(CGL_GUID), eltStructure);
+				if(!this.eltInfo.get(ELT_TITLE).equals(EMPTY_STRING)){
+					element = new Element(this.eltInfo.get(CGL_GUID), eltStructure);
+				}else {
+					logger.error("Found elment with empty title with guid : " + this.eltInfo.get(CGL_GUID));
+					return null;
+				}
+				
 			} catch (BadElementStructureException e) {			 
 				logger.error("** PROBLEM ** Cannot create Element for ClinicalGuidelinesElement with guid: " + this.eltInfo.get(CGL_GUID) + ". Null have been returned.", e);
 			}
