@@ -81,21 +81,21 @@ public class ClinicalGuidelinesAccessTool extends AbstractXmlResourceAccessTool 
 	@Override
 	public int updateResourceContent() {
 		int nbElement = 0;
-		ClinicalGuidelinesElement aeElement;
+		ClinicalGuidelinesElement cglElement;
 		Element element;
 		//parse using builder to get DOM representation of the XML file
 		Document dom = AbstractXmlResourceAccessTool.parseXML(CGL_SERVICE);
 		//get the root element
 		org.w3c.dom.Element domRoot = dom.getDocumentElement();
-		//get a node list of 'experiment' XML elements
-		NodeList experimentList = domRoot.getElementsByTagName(CGL_ITEM);
-		if(experimentList != null && experimentList.getLength() > 0) {
-			int listSize = experimentList.getLength();
+		//get a node list of 'item' XML elements
+		NodeList itemList = domRoot.getElementsByTagName(CGL_ITEM);
+		if(itemList != null && itemList.getLength() > 0) {
+			int listSize = itemList.getLength();
 			logger.info("Total number of elements on " + this.getToolResource().getResourceName() + ": " + listSize);
 			// for each 'experiment' XML element
 			for(int i = 0 ; i <listSize; i++) {
-				aeElement = new ClinicalGuidelinesElement((org.w3c.dom.Element)experimentList.item(i), this);
-				element = aeElement.getElement();
+				cglElement = new ClinicalGuidelinesElement((org.w3c.dom.Element)itemList.item(i), this);
+				element = cglElement.getElement();
 				if (element != null && resourceUpdateService.addElement(element)){
 					nbElement ++;
 				}
@@ -132,7 +132,7 @@ public class ClinicalGuidelinesAccessTool extends AbstractXmlResourceAccessTool 
 		private ClinicalGuidelinesAccessTool eltAETool;
 		private HashMap<String,String> eltInfo;	
 		
-		ClinicalGuidelinesElement(org.w3c.dom.Element experimentElt, ClinicalGuidelinesAccessTool aeTool){
+		ClinicalGuidelinesElement(org.w3c.dom.Element itemElement, ClinicalGuidelinesAccessTool aeTool){
 			this.eltAETool = aeTool;
 			this.eltInfo = new HashMap<String, String>(3); 
 			String nodeName = null; 
@@ -143,8 +143,8 @@ public class ClinicalGuidelinesAccessTool extends AbstractXmlResourceAccessTool 
 			String link  = EMPTY_STRING;
 			HashSet<String> meshTerms= new HashSet<String>();
 			
-			for (int i = 0; i < experimentElt.getChildNodes().getLength(); i++) {
-				Node node = experimentElt.getChildNodes().item(i);
+			for (int i = 0; i < itemElement.getChildNodes().getLength(); i++) {
+				Node node = itemElement.getChildNodes().item(i);
 				nodeName= node.getNodeName();
 				
 				if(CGL_GUID.equals(nodeName)){ // Extracting guid as local_element_id
@@ -182,7 +182,7 @@ public class ClinicalGuidelinesAccessTool extends AbstractXmlResourceAccessTool 
 			try {
 				element = new Element(this.eltInfo.get(CGL_GUID), eltStructure);
 			} catch (BadElementStructureException e) {			 
-				logger.error("** PROBLEM ** Cannot create Element for ClinicalGuidelinesElement with accnum: " + this.eltInfo.get(CGL_GUID) + ". Null have been returned.", e);
+				logger.error("** PROBLEM ** Cannot create Element for ClinicalGuidelinesElement with guid: " + this.eltInfo.get(CGL_GUID) + ". Null have been returned.", e);
 			}
 			return element;
 		}
