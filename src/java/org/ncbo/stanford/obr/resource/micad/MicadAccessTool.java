@@ -26,7 +26,7 @@ public class MicadAccessTool extends ResourceAccessTool {
 	private static final String MICAD_NAME        = "MICAD";
 	private static final String MICAD_RESOURCEID  = "MICAD";
 	private static final String MICAD_DESCRIPTION = "Molecular Imaging and Contrast Agent Database";
-	private static final String MICAD_LOGO        = "http://www.ncbi.nlm.nih.gov/bookshelf/corehtml/pmc/pmcgifs/bookshelf/banners/micadBanner-sm.png";
+	private static final String MICAD_LOGO        = "http://www.ncbi.nlm.nih.gov/corehtml/pmc/pmcgifs/bookshelf/thumbs/th-micad-lrg.png";
 	private static final String MICAD_ELT_URL     = "http://www.ncbi.nlm.nih.gov/bookshelf/br.fcgi?book=micad&part=";
 	
 	private static final String[] MICAD_ITEMKEYS  = {"Name", "Abbreviated", "Synonym", "Agent_Category", "Target", "Target_Category", 
