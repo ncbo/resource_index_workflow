@@ -87,7 +87,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	// Absolute path for folder containing pubmed xml files	
 	private static final String PM_FOLDER = FileResourceParameters.resourceFolder() +"/pubmed/";
 		
-	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
+	private static final String PM_FILE_PREFIX_2010 = "medline11n";	
 		
 	// Start processing xml file number
     private static int START_XML_NUMBER = Integer.parseInt(MessageUtils.getMessage("obr.pm.xml.from"));
@@ -170,7 +170,8 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 			 nbElements = downloadResourceContent();	
 		}else{
 			// Get number of day's since last update.
-			 this.numberOfDays = new Integer(EMPTY_STRING + this.numberOfDaysSinceLastUpdate());
+			// this.numberOfDays = new Integer(EMPTY_STRING + this.numberOfDaysSinceLastUpdate());
+			 this.numberOfDays = new Integer(365);
 			 nbElements += super.eutilsUpdateAll(null);	
 		} 
 			
