@@ -87,7 +87,7 @@ public class PubMedAccessTool extends AbstractNcbiResourceAccessTool {
 	// Absolute path for folder containing pubmed xml files	
 	private static final String PM_FOLDER = FileResourceParameters.resourceFolder() +"/pubmed/";
 		
-	private static final String PM_FILE_PREFIX_2010 = "medline10n";	
+	private static final String PM_FILE_PREFIX_2010 = "medline11n";	
 		
 	// Start processing xml file number
     private static int START_XML_NUMBER = Integer.parseInt(MessageUtils.getMessage("obr.pm.xml.from"));
