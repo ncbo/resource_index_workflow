@@ -60,10 +60,12 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 			dictionaryDao.addEntry(DictionaryBean.DICO_NAME+Utilities.getRandomString(4));
 		}
 		// Getting latest dictionary.
-		int dictionaryID = dictionaryDao.getLastDictionaryBean().getDictionaryId();
+		//int dictionaryID = dictionaryDao.getLastDictionaryBean().getDictionaryId();comment by jay
 		// Get ontologies available currently in slave table. 
-		List<String> currentSlaveOntologies = ontologyDao.getAllLocalOntologyIDs();
-		List<String>  localOntologyIDs = populateOntologySlaveData(dictionaryID, currentSlaveOntologies);
+		//List<String> currentSlaveOntologies = ontologyDao.getAllLocalOntologyIDs();comment by jay
+		//List<String>  localOntologyIDs = populateOntologySlaveData(dictionaryID, currentSlaveOntologies);comment by jay
+		List<String>  localOntologyIDs = new ArrayList<String>();
+		localOntologyIDs.add("40646");
 		
 		if(localOntologyIDs != null && localOntologyIDs.size()>0){
 			populateConceptsSlaveData(localOntologyIDs);
