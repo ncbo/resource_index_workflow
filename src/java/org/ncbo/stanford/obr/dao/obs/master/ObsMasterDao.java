@@ -416,7 +416,7 @@ public class ObsMasterDao implements DaoFactory{
 		// Bug with java when using the ">" redirection character, so we need to do like that:
 		String[] mysqlCommand = {"/bin/sh", "-c", command.toString()};				
 		//Unix command execution
-		logger.info("Executing Mysql command...");	 
+		logger.info("Executing Mysql command..."+FileResourceParameters.dictionaryFolder());	 
 		Process p = Runtime.getRuntime().exec(mysqlCommand);
 		int exitValue = p.waitFor();
 		
