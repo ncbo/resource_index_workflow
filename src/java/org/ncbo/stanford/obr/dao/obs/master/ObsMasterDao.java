@@ -2,6 +2,7 @@ package org.ncbo.stanford.obr.dao.obs.master;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -395,8 +396,8 @@ public class ObsMasterDao implements DaoFactory{
 	 * @throws Exception 
 	 */
 	public File writeQueryResultFile(String sqlQuery, String fileName) throws Exception{		
-		File outputFile = new File(FileResourceParameters.dictionaryFolder() + fileName + ".txt");	
-		
+		File outputFile = new File(FileResourceParameters.dictionaryFolder() + fileName + ".txt");
+		FileWriter fw = new FileWriter(outputFile);
 		// Creating mysql command
 		StringBuffer command = new StringBuffer();
 		command.append("mysql -h ");
