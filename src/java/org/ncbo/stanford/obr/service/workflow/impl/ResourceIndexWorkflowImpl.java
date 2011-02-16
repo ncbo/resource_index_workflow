@@ -1,8 +1,10 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,8 @@ import org.ncbo.stanford.obr.util.MessageUtils;
 import org.ncbo.stanford.obr.util.ProcessExecutor;
 import org.ncbo.stanford.obr.util.StringUtilities;
 import org.ncbo.stanford.obr.util.helper.StringHelper;
+
+
 
 /**
  * A service  {@code ResourceIndexWorkflowImpl} is main service for workflow execution
@@ -199,14 +203,25 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		}
 
 		// Get the latest dictionary from OBS_DVT
- 		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
- 	    // Adding into execution entry.
+ 		//DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();//Comment by jay
+		Calendar cal=Calendar.getInstance();
+ 		cal.set(Calendar.MONTH, 10);
+ 		cal.set(Calendar.DATE, 29);
+ 		cal.set(Calendar.YEAR, 2010);
+ 		cal.set(Calendar.HOUR,1);
+ 		cal.set(Calendar.MINUTE,47);
+ 		cal.set(Calendar.SECOND, 46);
+		DictionaryBean dictionary = new DictionaryBean(1,"OBS_DICO_4275",cal);
+ 	
+ 	
+  	    // Adding into execution entry.
 		executionEntry.setDictionaryId(dictionary.getDictionaryId());		
-    	
+ 		
 		// Adding into execution entry.
 		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
 		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryId()));
+		
 		 
 		// Execute the workflow according to resource type. 
 	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
