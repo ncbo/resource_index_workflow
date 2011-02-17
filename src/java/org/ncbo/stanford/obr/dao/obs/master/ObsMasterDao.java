@@ -404,7 +404,7 @@ public class ObsMasterDao implements DaoFactory{
 		command.append(MASTER_OBS_HOST_NAME);
 		command.append(" -u ");
 		command.append(MASTER_OBS_USER);
-		command.append(" -p ");
+		command.append(" -p");
 		command.append(MASTER_OBS_PASSWORD);
 		command.append(" ");
 		command.append(MASTER_OBS_SCEHMA_NAME);
