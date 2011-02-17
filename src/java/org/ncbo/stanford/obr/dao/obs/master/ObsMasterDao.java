@@ -421,6 +421,8 @@ public class ObsMasterDao implements DaoFactory{
 		Process p = Runtime.getRuntime().exec(mysqlCommand);
 		int exitValue = p.waitFor();
 		
+		logger.info("exitValue ......"+exitValue);
+		
 		if (exitValue != 0){
 			logger.info("Problem during the mysql command execution...");
 			BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
