@@ -400,7 +400,7 @@ public class ObsMasterDao implements DaoFactory{
 		FileWriter fw = new FileWriter(outputFile);
 		// Creating mysql command
 		StringBuffer command = new StringBuffer();
-		command.append("mysql -h ");
+		command.append("sudo mysql -h ");
 		command.append(MASTER_OBS_HOST_NAME);
 		command.append(" -u ");
 		command.append(MASTER_OBS_USER);
