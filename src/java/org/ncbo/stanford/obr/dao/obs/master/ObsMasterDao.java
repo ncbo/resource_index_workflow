@@ -404,7 +404,7 @@ public class ObsMasterDao implements DaoFactory{
 		command.append(MASTER_OBS_HOST_NAME);
 		command.append(" -u ");
 		command.append(MASTER_OBS_USER);
-		command.append(" -p");
+		command.append(" -p ");
 		command.append(MASTER_OBS_PASSWORD);
 		command.append(" ");
 		command.append(MASTER_OBS_SCEHMA_NAME);
@@ -414,6 +414,7 @@ public class ObsMasterDao implements DaoFactory{
 		command.append(outputFile.getAbsolutePath());
 		command.append("' ");		
 		// Bug with java when using the ">" redirection character, so we need to do like that:
+		logger.info("Command Generated : "+command.toString());
 		String[] mysqlCommand = {"/bin/sh", "-c", command.toString()};				
 		//Unix command execution
 		logger.info("Executing Mysql command..."+FileResourceParameters.dictionaryFolder());	 
