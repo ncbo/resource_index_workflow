@@ -125,6 +125,7 @@ public class ConceptDao extends AbstractObsDao {
 		queryb.append("' IGNORE INTO TABLE ");
 		queryb.append(this.getTableSQLName());
 		queryb.append(" FIELDS TERMINATED BY '\t' IGNORE 1 LINES"); 
+		logger.info("populateSlaveConceptTableFromFile ::::"+queryb.toString());
 		try{
 			 nbInserted = this.executeSQLUpdate(queryb.toString());			
 		} catch (SQLException e) {			 
