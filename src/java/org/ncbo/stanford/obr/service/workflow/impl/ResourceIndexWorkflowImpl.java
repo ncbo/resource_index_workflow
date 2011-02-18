@@ -212,7 +212,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
  		cal.set(Calendar.MINUTE,49);
  		cal.set(Calendar.SECOND, 44);
 		//DictionaryBean dictionary = new DictionaryBean(2,"OBS_DICO_4275",cal);
- 		DictionaryBean dictionary = new DictionaryBean(2,"OBS_DICO_336f",cal);
+ 		DictionaryBean dictionary = new DictionaryBean(15,"OBS_DICO_336f",cal);
  	
  	
   	    // Adding into execution entry.
