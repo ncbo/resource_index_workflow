@@ -130,7 +130,7 @@ public class ObsDataPopulationServiceImpl implements ObsDataPopulationService, D
 		}finally {
 			 // Delete generated file.
 			 if(conceptEntryFile!= null && conceptEntryFile.exists()){
-				 conceptEntryFile.delete();
+				// conceptEntryFile.delete();
 			 }
 		}		
 		return numberOfConceptsAdded;
