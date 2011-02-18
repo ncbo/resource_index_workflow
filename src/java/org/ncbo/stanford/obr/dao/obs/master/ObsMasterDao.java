@@ -417,7 +417,7 @@ public class ObsMasterDao implements DaoFactory{
 		logger.info("Command Generated : "+command.toString());
 		String[] mysqlCommand = {"/bin/sh", "-c", command.toString()};				
 		//Unix command execution
-		logger.info("Executing Mysql command..."+FileResourceParameters.dictionaryFolder());	 
+		logger.info("Executing Mysql command..."+outputFile.getName());	 
 		Process p = Runtime.getRuntime().exec(mysqlCommand);
 		int exitValue = p.waitFor();
 		
