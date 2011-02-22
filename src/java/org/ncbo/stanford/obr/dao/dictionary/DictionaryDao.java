@@ -191,6 +191,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 */
 	
 	public static String dictionaryFileName(DictionaryBean dictionary){
+		logger.info("Mgrep file created ::"+FileResourceParameters.dictionaryFolder()+dictionary.getDictionaryName()+"_MGREP.txt");
 		return FileResourceParameters.dictionaryFolder() + dictionary.getDictionaryName() + "_MGREP.txt";
 	}
 	
