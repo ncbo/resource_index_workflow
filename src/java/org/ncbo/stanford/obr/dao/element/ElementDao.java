@@ -440,7 +440,8 @@ public class ElementDao extends AbstractObrDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("SELECT count(id) FROM ");
 		queryb.append(this.getTableSQLName());		 
-		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		//queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
+		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id=");
 		queryb.append(dictionaryID);		 
 		queryb.append(";");
 		
