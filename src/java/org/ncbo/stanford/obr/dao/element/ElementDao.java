@@ -444,10 +444,10 @@ public class ElementDao extends AbstractObrDao {
 		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id=");
 		queryb.append(dictionaryID);		 
 		queryb.append(";");
-		logger.info("Query :::: "+queryb.toString());
 		try{
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			if(rSet.first()){
+				logger.info("Query :::: "+queryb.toString() +rSet.getInt(1) );
 				return rSet.getInt(1);
 				 
 			} 
