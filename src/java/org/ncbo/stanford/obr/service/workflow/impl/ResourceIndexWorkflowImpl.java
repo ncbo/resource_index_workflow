@@ -205,14 +205,14 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Get the latest dictionary from OBS_DVT
  		//DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();//Comment by jay
 		Calendar cal=Calendar.getInstance();
- 		cal.set(Calendar.MONTH, 02);
- 		cal.set(Calendar.DATE, 11);
- 		cal.set(Calendar.YEAR, 2011);
- 		cal.set(Calendar.HOUR,2);
- 		cal.set(Calendar.MINUTE,49);
- 		cal.set(Calendar.SECOND, 44);
+ 		cal.set(Calendar.MONTH, 10);
+ 		cal.set(Calendar.DATE, 29);
+ 		cal.set(Calendar.YEAR, 2010);
+ 		cal.set(Calendar.HOUR,1);
+ 		cal.set(Calendar.MINUTE,47);
+ 		cal.set(Calendar.SECOND, 46);
 		//DictionaryBean dictionary = new DictionaryBean(2,"OBS_DICO_4275",cal);
- 		DictionaryBean dictionary = new DictionaryBean(2,"OBS_DICO_336f",cal);
+ 		DictionaryBean dictionary = new DictionaryBean(1,"OBS_DICO_4275",cal);
  	
  	
   	    // Adding into execution entry.
@@ -251,8 +251,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		ExecutionTimer timer = new ExecutionTimer();
 		
 		// Total number of entries found in element table for annotation.	
-		int nbEntry  = resourceAccessTool.getAnnotationService()
-							.getNumberOfElementsForAnnotation(dictionary.getDictionaryId());	 
+		//int nbEntry  = resourceAccessTool.getAnnotationService()
+			//				.getNumberOfElementsForAnnotation(dictionary.getDictionaryId());
+		
+		int nbEntry= 15729;
 		
 		if(nbEntry == 0){
 			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceId());
