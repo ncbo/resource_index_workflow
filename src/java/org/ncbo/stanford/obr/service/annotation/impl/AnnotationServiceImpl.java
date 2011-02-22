@@ -87,6 +87,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 				dictionaryFile = new File(DictionaryDao
 						.completeDictionaryFileName(dictionary));
 			} else {
+				logger.info("Else block 1:: "+dictionary.getDictionaryName());
 				dictionaryFile = new File(DictionaryDao
 						.dictionaryFileName(dictionary));
 			}
