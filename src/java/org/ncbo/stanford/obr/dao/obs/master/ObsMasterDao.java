@@ -400,7 +400,7 @@ public class ObsMasterDao implements DaoFactory{
 		FileWriter fw = new FileWriter(outputFile);
 		// Creating mysql command
 		StringBuffer command = new StringBuffer();
-		command.append("sudo mysql -h ");
+		command.append("mysql -h ");
 		command.append(MASTER_OBS_HOST_NAME);
 		command.append(" -u ");
 		command.append(MASTER_OBS_USER);
@@ -413,15 +413,10 @@ public class ObsMasterDao implements DaoFactory{
 		command.append("\" > '");
 		command.append(outputFile.getAbsolutePath());
 		command.append("' ");		
-		// Bug with java when using the ">" redirection character, so we need to do like that:
-		logger.info("Command Generated : "+command.toString());
 		String[] mysqlCommand = {"/bin/sh", "-c", command.toString()};				
-		//Unix command execution
-		logger.info("Executing Mysql command..."+outputFile.getName());	 
 		Process p = Runtime.getRuntime().exec(mysqlCommand);
 		int exitValue = p.waitFor();
 		
-		logger.info("exitValue ......"+exitValue);
 		
 		if (exitValue != 0){
 			logger.info("Problem during the mysql command execution...");
