@@ -122,6 +122,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		//				WHERE DAT.concept_id = ISAPT.concept_id
 		//					AND is_a_closure_done = false; 
 		
+		logger.info("\nIn isaClosureExpansion()");
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("INSERT ");
 		queryb.append(this.getTableSQLName());
@@ -135,6 +136,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		queryb.append(" AS ISAPT WHERE DAT.concept_id = ISAPT.concept_id AND DAT.workflow_status = ");
 		queryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());		 
 		queryb.append("; ");
+		logger.info("\nInsertion Query = "+queryb.toString());
 		
 		StringBuffer updatingQueryb = new StringBuffer();
 		updatingQueryb.append("UPDATE ");
@@ -145,7 +147,9 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
 		try{
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), false);
+			logger.info("\nUpdate Query = "+updatingQueryb.toString());
 			this.executeSQLUpdate(updatingQueryb.toString());
+			logger.info("\nStored Procedure Executed ...");
 		}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot execute the isa transitive closure on table " + this.getTableSQLName() +". 0 returned", e);
@@ -267,7 +271,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryID());				 
+			queryb.append(dictionary.getDictionaryId());				 
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		
