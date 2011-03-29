@@ -308,7 +308,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		toolLogger.info(nbEntry + " elements aggregated (with "
 				+ nbAggregatedAnnotation
 				+ " new aggregated annotations) from resource "
-				+ resourceAccessTool.getToolResource().getResourceId() + ".\n");
+				+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		
 		// Sorting aggregation
 		resourceAccessTool.getAggregationService().sortAggregation(resourceAccessTool.getResourceType());
