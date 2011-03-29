@@ -119,11 +119,11 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 				resourceAccessTool = (ResourceAccessTool) Class.forName(
 						MessageUtils.getMessage("resource."
 								+ resourceID.toLowerCase())).newInstance();				 
-				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceId() + ")....\n");
+				logger.info("Start processing Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ")....\n");
 				timer.start();
 				resourceProcessing(resourceAccessTool, executionEntry);
 				timer.end();
-				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceId() + ") processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
+				logger.info("Resource " + resourceAccessTool.getToolResource().getResourceName() + "("+ resourceAccessTool.getToolResource().getResourceID() + ") processed in: " + timer.millisecondsToTimeString(timer.duration()) +"\n");
 			} catch (Exception e) {
 				logger.error(
 						"Problem in creating resource tool for resource id : "
@@ -164,7 +164,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		Logger toolLogger = ResourceAccessTool.getLogger();
 		timer1.start();
 		toolLogger.info("**** Resource "
-				+ resourceAccessTool.getToolResource().getResourceId() + " processing");
+				+ resourceAccessTool.getToolResource().getResourceID() + " processing");
 		toolLogger.info("Workflow Parameters[withCompleteDictionary= " 	+ withCompleteDictionary 
 									+ ", updateResource= " + updateResource 
 									+ ", reInitializeAllTables= " + reInitializeAllTables
@@ -201,12 +201,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Get the latest dictionary from OBS_DVT
  		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
  	    // Adding into execution entry.
-		executionEntry.setDictionaryId(dictionary.getDictionaryId());		
+		executionEntry.setDictionaryId(dictionary.getDictionaryID());		
     	
 		// Adding into execution entry.
 		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
-		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryId()));
+		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryID()));
 		 
 		// Execute the workflow according to resource type. 
 	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
@@ -238,10 +238,10 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		// Total number of entries found in element table for annotation.	
 		int nbEntry  = resourceAccessTool.getAnnotationService()
-							.getNumberOfElementsForAnnotation(dictionary.getDictionaryId());	 
+							.getNumberOfElementsForAnnotation(dictionary.getDictionaryID());	 
 		
 		if(nbEntry == 0){
-			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceId());
+			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceID());
 			return 0;
 		}
 
@@ -268,7 +268,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			toolLogger.info(nbEntry + " elements annotated (with "
 					+ nbDirectAnnotation
 					+ " new direct annotations) from resource "
-					+ resourceAccessTool.getToolResource().getResourceId() + ".\n");
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 
 			// Flag for mapping expansion.  
 			boolean isaClosureExpansion = Boolean.parseBoolean(MessageUtils
@@ -289,7 +289,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			toolLogger.info(nbEntry + " elements annotated (with "
 					+ nbExpandedAnnotation
 					+ " new expanded annotations) from resource "
-					+ resourceAccessTool.getToolResource().getResourceId() + ".\n");
+					+ resourceAccessTool.getToolResource().getResourceID() + ".\n");
 		}finally{
 			if(disableIndexes){
 				toolLogger.info("*** Enabling indexes on annotation tables starts...");
@@ -358,12 +358,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		// Check for duplicate ontologies i.e two or more versions of same ontology
 		for (OntologyBean ontologyBean1 : allOntologyBeans) {
-			localOntologyID1= ontologyBean1.getLocalOntologyId();
-			virtualOntologyID1 =ontologyBean1.getVirtualOntologyId();
+			localOntologyID1= ontologyBean1.getLocalOntologyID();
+			virtualOntologyID1 =ontologyBean1.getVirtualOntologyID();
 			// traverses all the ontologies of the the OBS DB
 			for (OntologyBean ontologyBean2 : allOntologyBeans) {
-				localOntologyID2= ontologyBean2.getLocalOntologyId();
-				virtualOntologyID2= ontologyBean2.getVirtualOntologyId();				
+				localOntologyID2= ontologyBean2.getLocalOntologyID();
+				virtualOntologyID2= ontologyBean2.getVirtualOntologyID();				
 				// searches for duplicates
 				if(virtualOntologyID1.equals(virtualOntologyID2) && !localOntologyID1.equals(localOntologyID2) ){
 					// removes the ontology with the smallest localOntologyID (that situation will should happen only for BioPortal ontologies)
