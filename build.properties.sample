@@ -99,6 +99,7 @@ obr.reinitialize.all=false
 # Re initialized all tables except element table
 obr.reinitialize.only.annotation=false
 
+
 # Used to update element table for resources.
 obr.update.resource=true
 
