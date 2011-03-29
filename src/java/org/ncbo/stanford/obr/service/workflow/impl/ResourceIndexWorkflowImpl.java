@@ -316,7 +316,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Update obr_statistics and concept_frequency table.
 		if(nbAggregatedAnnotation > 0) {
 			resourceAccessTool.calulateConceptFrequncy();
-			if(!disableStatistics){
+			if(!disableStatistics)
+			{
 				resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
 			}
 		}  
