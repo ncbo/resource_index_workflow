@@ -88,7 +88,6 @@ obs.slave.ontology.remove.list=list_of_local_ontology_ids
 
 obr.resources.process=true
 
-
 # Flag used to disable statistics step for all resources.
 # Flag =false will execute statistics step for all resources.
 # Flag =true will not execute statistics step for all resources.
