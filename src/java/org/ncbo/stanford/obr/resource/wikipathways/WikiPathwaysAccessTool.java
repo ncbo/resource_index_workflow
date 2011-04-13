@@ -129,7 +129,7 @@ public class WikiPathwaysAccessTool extends ResourceAccessTool {
 		HashMap<String, WSPathwayInfo> pathwayMap = new HashMap<String, WSPathwayInfo>();
 		WikiPathwaysPortTypeProxy proxy = new WikiPathwaysPortTypeProxy();
 		try {
-			WSPathwayInfo[] pathways =proxy.listPathways("");		 
+			WSPathwayInfo[] pathways =proxy.listPathways();		 
 			for (WSPathwayInfo pathwayInfo : pathways) {
 				pathwayMap.put(pathwayInfo.getId(), pathwayInfo);
 			}
