@@ -1,10 +1,10 @@
 package org.ncbo.stanford.obr.service.workflow.impl;
 
 import java.io.File;
-import java.sql.Timestamp;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +108,6 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// gets all resource ids for processing, 
 		String[] resourceIDs = StringUtilities.splitSecure(MessageUtils
 				.getMessage("obr.resource.ids"), ",");		
-		
 		//Initialize the Execution timer 		
 		ExecutionTimer timer = new ExecutionTimer();	
 		logger.info("***********************************************\n");
@@ -203,32 +202,24 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		}
 
 		// Get the latest dictionary from OBS_DVT
- 		//DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();//Comment by jay
-		Calendar cal=Calendar.getInstance();
- 		cal.set(Calendar.MONTH, 10);
- 		cal.set(Calendar.DATE, 29);
- 		cal.set(Calendar.YEAR, 2010);
- 		cal.set(Calendar.HOUR,1);
- 		cal.set(Calendar.MINUTE,47);
- 		cal.set(Calendar.SECOND, 46);
-		//DictionaryBean dictionary = new DictionaryBean(2,"OBS_DICO_4275",cal);
- 		DictionaryBean dictionary = new DictionaryBean(1,"OBS_DICO_4275",cal);
- 	
- 	
+ 		DictionaryBean dictionary = dictionaryDao.getLastDictionaryBean();
+	 	
   	    // Adding into execution entry.
 		executionEntry.setDictionaryId(dictionary.getDictionaryId());		
  		
 		// Adding into execution entry.
 		executionEntry.setWithCompleteDictionary(withCompleteDictionary);
 		
+		//resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);//Added by jay
+		
 		executionEntry.setNbElement(resourceAccessTool.getAnnotationService().getNumberOfElementsForAnnotation(dictionary.getDictionaryId()));
 		
 		 
 		// Execute the workflow according to resource type. 
-	    executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary,  toolLogger);
+		executeWorkflow(resourceAccessTool, dictionary, withCompleteDictionary, toolLogger);//jay comment
 		 
 	    // Update resource table entry for latest dictionary and date for resource workflow completed
-		resourceAccessTool.updateResourceWorkflowInfo();
+		resourceAccessTool.updateResourceWorkflowInfo();//jay comment
 	    
 		timer1.end();
 		toolLogger.info("#### Resource " + resourceAccessTool.getToolResource().getResourceName()
@@ -250,11 +241,12 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		
 		ExecutionTimer timer = new ExecutionTimer();
 		
-		// Total number of entries found in element table for annotation.	
-		//int nbEntry  = resourceAccessTool.getAnnotationService()
-			//				.getNumberOfElementsForAnnotation(dictionary.getDictionaryId());
+		boolean disableStatistics = Boolean.parseBoolean(MessageUtils.getMessage("obr.statistics.populate"));
 		
-		int nbEntry= 15729;
+		// Total number of entries found in element table for annotation.	
+		int nbEntry  = resourceAccessTool.getAnnotationService()
+							.getNumberOfElementsForAnnotation(dictionary.getDictionaryId());
+		
 		
 		if(nbEntry == 0){
 			logger.info("\tNo element present for annotation for resource : " + resourceAccessTool.getToolResource().getResourceId());
@@ -280,6 +272,7 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 			long nbDirectAnnotation = resourceAccessTool.getAnnotationService()
 					.resourceAnnotation(withCompleteDictionary, dictionary, 
 							Utilities.arrayToHashSet(FileResourceParameters.STOP_WORDS)); 
+			
 			
 			toolLogger.info(nbEntry + " elements annotated (with "
 					+ nbDirectAnnotation
@@ -332,7 +325,8 @@ public class ResourceIndexWorkflowImpl implements ResourceIndexWorkflow, DaoFact
 		// Update obr_statistics and concept_frequency table.
 		if(nbAggregatedAnnotation > 0) {
 			resourceAccessTool.calulateConceptFrequncy();
-			resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
+			if(!disableStatistics)
+				resourceAccessTool.calculateObrStatistics(withCompleteDictionary, dictionary);
 			
 		}  
 		 
