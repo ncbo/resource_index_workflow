@@ -145,9 +145,21 @@ public class ConceptDao extends AbstractObsDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("DELETE CT FROM ");
 		queryb.append(this.getTableSQLName());		
+		queryb.append(" CT ");
+		queryb.append(" WHERE CT.ontology_id in (");
+		queryb.append(" SELECT id from  ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE OT.local_ontology_id in ");
+		queryb.append(" ( ?  ");
+		queryb.append("));");
+		
+		
+		/*queryb.append("DELETE CT FROM ");
+		queryb.append(this.getTableSQLName());		
 		queryb.append(" CT, ");
 		queryb.append(OntologyDao.name());		
-		queryb.append(" OT WHERE CT.ontology_id = OT.id AND OT.local_ontology_id = ?;" );
+		queryb.append(" OT WHERE CT.ontology_id = OT.id AND OT.local_ontology_id = ?;" );*/
 		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
