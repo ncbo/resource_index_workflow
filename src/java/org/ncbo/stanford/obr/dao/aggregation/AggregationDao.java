@@ -400,7 +400,7 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
 		boolean deleted = false;
 		StringBuffer queryb = new StringBuffer();
-		queryb.append("DELETE IT FROM ");
+		/*queryb.append("DELETE IT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" IT, ");
 		queryb.append(conceptDao.getMemoryTableSQLName());	
@@ -415,8 +415,29 @@ public class AggregationDao extends AbstractObrDao {
 			queryb.append("', ");
 		}
 		queryb.delete(queryb.length()-2, queryb.length());
-		queryb.append(");");
-
+		queryb.append(");");*/
+		
+		queryb.append("DELETE IT FROM ");
+		queryb.append(this.getTableSQLName());
+		queryb.append(" IT ");
+		queryb.append(" WHERE IT.concept_id IN ");
+		queryb.append(" ( SELECT id FROM  ");
+		queryb.append(conceptDao.getMemoryTableSQLName());
+		queryb.append(" CT ");
+		queryb.append(" WHERE CT.ontology_id IN ");
+		queryb.append(" ( SELECT id FROM  ");
+		queryb.append(ontologyDao.getMemoryTableSQLName());
+		queryb.append(" OT ");
+		
+		queryb.append(" Where OT.local_ontology_id IN ( "); 
+		for (String localOntologyID : localOntologyIDs) {
+			queryb.append("'");
+			queryb.append(localOntologyID);
+			queryb.append("', ");
+		}
+		queryb.delete(queryb.length()-2, queryb.length());
+		queryb.append(")));");
+		
 		try{			 
 			this.executeSQLUpdate(queryb.toString() );
 			deleted = true;
