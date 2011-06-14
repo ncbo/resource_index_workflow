@@ -113,12 +113,30 @@ public class SemanticTypeDao extends AbstractObsDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("DELETE ST FROM ");
 		queryb.append(this.getTableSQLName());		
+		queryb.append(" ST ");
+		queryb.append(" WHERE ST.concept_id in (");
+		queryb.append(" SELECT id from  ");
+		queryb.append(ConceptDao.name( ));	
+		queryb.append(" CT ");
+		queryb.append(" WHERE CT.ontology_id in (");
+		queryb.append(" SELECT id from  ");
+		queryb.append(OntologyDao.name());
+		queryb.append(" OT ");
+		queryb.append(" WHERE OT.local_ontology_id in ");
+		queryb.append(" ( ?  ");
+		queryb.append(")));");
+		
+		
+		
+		
+		/*queryb.append("DELETE ST FROM ");
+		queryb.append(this.getTableSQLName());		
 		queryb.append(" ST, ");
 		queryb.append(ConceptDao.name( ));	
 		queryb.append(" CT, ");
 		queryb.append(OntologyDao.name());
 		queryb.append(" OT ");
-		queryb.append(" WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
+		queryb.append(" WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");*/
 		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
