@@ -14,15 +14,15 @@ import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
  
 /**
- * extract GO annotation on protein entry of uniprot. This data are in the following file
- * ftp://ftp.geneontology.org/pub/go/gene-associations/gene_association.goa_human.gz
+ * extract GO annotation on protein entry of uniprot form UniprotDB directly. 
  * @author  Adrien Coulet
  * @version OBR v1
  * @date    21-Nov-2008
  */
 public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 
-	//	private static final String UPKB_FILE    = "ftp://ftp.geneontology.org/pub/go/gene-associations/gene_association.goa_human.gz";
+	// bellow variable is not used now because we directly accessing data form UniprotDB
+	// private static final String UPKB_FILE    = "ftp://ftp.geneontology.org/pub/go/gene-associations/gene_association.goa_human.gz";	
 	private static final String UPKB_URL         = "http://www.uniprot.org/";
 	private static final String UPKB_NAME        = "UniProt KB";
 	private static final String UPKB_RESOURCEID  = "UPKB";
@@ -30,10 +30,10 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 	private static final String UPKB_LOGO        = "http://www.uniprot.org/images/logo.gif";
 	private static final String UPKB_ELT_URL     = "http://www.uniprot.org/uniprot/";
 	
-	private static final String[] UPKB_ITEMKEYS  = {"geneSymbol",						"goAnnotationList",	"proteinName"};
-	private static final Double[] UPKB_WEIGHTS 	 = {1.0,                				1.0,           		0.7};
+	private static final String[] UPKB_ITEMKEYS  = {"geneSymbol",						"goAnnotationList",	"proteinName","organism","naturalVariant","mutagenesis","biologicalProcess","cellularComponent","molecularFunction"};
+	private static final Double[] UPKB_WEIGHTS 	 = {1.0,                				1.0,           		0.7,	        0.8,		0.7,			0.7,			0.7,				0.7,				0.7};
 	// Virtual ontlogy id for gene ontology (GO)- 1070
-	private static final String[] UPKB_ONTOIDS 	 = {Structure.FOR_CONCEPT_RECOGNITION, 	"1070",        		Structure.FOR_CONCEPT_RECOGNITION}; // "" when the itemkey is not an annotation, the static id (internal) of the ontology which is used for annotations
+	private static final String[] UPKB_ONTOIDS 	 = {Structure.FOR_CONCEPT_RECOGNITION, 	"1070",        		Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION,	Structure.FOR_CONCEPT_RECOGNITION}; // "" when the itemkey is not an annotation, the static id (internal) of the ontology which is used for annotations
 	
 	// XX_ITEMKEYS_ONTOID: "null" if the corresponding itemkey is not an annotation; if the corresponding itemkey is an existing annotation, then it is the OBS static id (internal) of the ontology used for annotations 
 	// OBS static ontology id examples are: "GO", "NCI" for UMLS ontologies or 1061 (SO-Pharm), 1032 (NCI) for bioportal ontologies  
@@ -86,20 +86,10 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 	public int updateResourceContent() {
 		int nbElement = 0;	
 		try {		
-			Element  myProt;		
-			
-			HashSet<Element> annotList = this.getAllAnnotations();
-			
-			// gets the elements already in the corresponding _ET
-			HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
-			// traverses the set of elements returned by Upkb to prune it with the element in ET
-			HashSet<Element> elementsToRemove = new HashSet<Element>(); 
-			for (Element annot: annotList){
-				if (allElementsInET.contains(annot.getLocalElementId())){
-					elementsToRemove.add(annot);
-				}
-			}
-			annotList.removeAll(elementsToRemove);
+			Element  myProt;			
+						
+			//Get all elements from resource site
+			HashSet<Element> annotList = this.getAllAnnotations();			
 			logger.info("Number of new elements to dump: " + annotList.size());
 			
 			// for each protein annotation accessed by the tool
@@ -125,7 +115,7 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 	}
 
 	/**
-	 * get all Uniprot protein in the file ftp://ftp.geneontology.org/pub/go/gene-associations/gene_association.goa_human.gz
+	 * get all Uniprot protein from UniprotKB databse directly.
 	 * This access tool get all the data with only one function (no getList then getOneElementData).
 	 * This choice is due to the format of the resource: an file downloaded by ftp and parsed once. 
 	 */
@@ -135,7 +125,9 @@ public class UpkbAnnotAccessTool extends ResourceAccessTool  {
 		int nbAdded = 0;
 		try{
 			GetUniprotGOAnnotations myExtractor = new GetUniprotGOAnnotations(this.getToolResource()); 
-			annotList = myExtractor.getElements(localOntologyIDMap);
+			// Gets the elements already in the corresponding _ET
+			HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();			
+			annotList = myExtractor.getElements(localOntologyIDMap,allElementsInET);
 		}catch(Exception e){
 			logger.error("** PROBLEM ** Problem with extracting annotation from distant file. Maybe check the script 'getGoUniprotAnnot.sh'", e);
 		}
