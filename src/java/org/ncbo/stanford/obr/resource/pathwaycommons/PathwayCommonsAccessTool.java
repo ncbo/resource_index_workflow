@@ -66,7 +66,7 @@ public class PathwayCommonsAccessTool extends ResourceAccessTool {
 	private static final String PC_MAIN_ITEMKEY = "name";
 	  
 	// Path way data file down load location (URL)  
-	private static final String PC_URL_ZIP="http://www.pathwaycommons.org/pc-snapshot/biopax/by_source/";
+	private static final String PC_URL_ZIP="http://www.pathwaycommons.org/pc-snapshot/april-2011/biopax/by_source/";
 	
 	//Cancer cell map data source file name
 	private static final String PC_CELL_MAP_ZIP="cell-map.owl.zip";

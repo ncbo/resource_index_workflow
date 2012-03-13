@@ -59,7 +59,7 @@ public class DrugBankAccessTool  extends ResourceAccessTool {
 	private static final Structure DBK_STRUCTURE 	= new Structure(DBK_ITEMKEYS, DBK_RESOURCEID, DBK_WEIGHTS, DBK_ONTOIDS);
 	
 	//Flat file output
-	private static final String DBK_FLATFILE_URL	="http://www.drugbank.ca/public/downloads/current/drugcards.zip";
+	private static final String DBK_FLATFILE_URL	="http://www.drugbank.ca/system/downloads/2.5/drugcards.zip";
 	
 	// A context name used to describe the associated element
 	private static final String DBK_MAIN_ITEMKEY 	= "name";
