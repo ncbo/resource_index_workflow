@@ -39,5 +39,7 @@ public interface StringHelper {
 	public  static final String ACCESSION_STRING = "Accession";
 	// String constant for 'Not Applicable'
 	public  static final String NOT_APPLICABLE = "NA";
+        // String constant for end tag
+        public static final String endTag = "\">";        
   
 }
