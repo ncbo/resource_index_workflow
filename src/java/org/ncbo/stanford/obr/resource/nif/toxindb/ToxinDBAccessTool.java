@@ -37,7 +37,7 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
     private static final Double[] TOXIN_WEIGHTS = {1.0, 0.9, 0.8, 0.4, 0.7, 0.7, 0.7, 0.9};
     private static final String[] TOXIN_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure TOXIN_STRUCTURE = new Structure(TOXIN_ITEMKEYS, TOXIN_RESOURCEID, TOXIN_WEIGHTS, TOXIN_ONTOIDS);
-    private static String TOXIN_MAIN_ITEMKEY = "title";
+    private static String TOXIN_MAIN_ITEMKEY = "toxinName";
     // Constant for 'experiment' string
     private static final String TOXIN_Database = "T3DB";
     private static final String TOXIN_Indexable = "Toxins";
