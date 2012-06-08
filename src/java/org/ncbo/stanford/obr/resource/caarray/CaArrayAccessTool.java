@@ -27,11 +27,11 @@ public class CaArrayAccessTool extends ResourceAccessTool {
     private static final String CARY_DESCRIPTION = "caArray is an open-source, web and programmatically accessible array data management system. caArray guides the annotation and exchange of array data using a federated model of local installations whose results are shareable across the cancer Biomedical Informatics Grid (caBIG™). caArray furthers translational cancer research through acquisition, dissemination and aggregation of semantically interoperable array data to support subsequent analysis by tools and services on and off the Grid. As array technology advances and matures, caArray will extend its logical library of assay management.";
     private static final String CARY_LOGO = "https://array.nci.nih.gov/caarray/images/logo_caarray.gif";
     private static final String CARY_ELT_URL = "https://array-stage.nci.nih.gov/caarray/project/";
-    private static final String[] CARY_ITEMKEYS = {"title", "description", "organism", "tissueSites", "cellTypes", "diseaseState"};
+    private static final String[] CARY_ITEMKEYS = {"Title", "Description", "Organism", "Tissue_Sites", "Cell_Types", "Disease_State"};
     private static final Double[] CARY_WEIGHTS = {1.0, 0.8, 0.9, 0.8, 0.8, 0.8};
     private static final String[] CARY_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure CARY_STRUCTURE = new Structure(CARY_ITEMKEYS, CARY_RESOURCEID, CARY_WEIGHTS, CARY_ONTOIDS);
-    private static String CARY_MAIN_ITEMKEY = "title";
+    private static String CARY_MAIN_ITEMKEY = "Title";
     private Map<String, String> localOntologyIDMap;
 
     // constructor

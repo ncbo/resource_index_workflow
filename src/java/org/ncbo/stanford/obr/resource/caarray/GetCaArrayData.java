@@ -38,7 +38,7 @@ public class GetCaArrayData implements StringHelper {
     // Connection properties
     private static final String SERVER_HOSTNAME_KEY = "server.hostname";
     private static final String SERVER_JNDI_PORT_KEY = "server.jndi.port";
-    private static final String SERVER_HOSTNAME_DEFAULT = "array-stage.nci.nih.gov";//array.nci.nih.gov
+    private static final String SERVER_HOSTNAME_DEFAULT = "array.nci.nih.gov";//array-stage.nci.nih.gov
     private static final String SERVER_JNDI_PORT_DEFAULT = "8080";
     Resource resource;
     Structure basicStructure = null;
@@ -122,13 +122,13 @@ public class GetCaArrayData implements StringHelper {
                     }
                 }
 
-                expAttribute.put("title", title);
-                expAttribute.put("description", description);
-                expAttribute.put("organism", organism);
-                expAttribute.put("diseaseState", diseaseState.toString());
-                expAttribute.put("tissueSites", tissueSites.toString());
-                expAttribute.put("materialTypes", materialTypes.toString());
-                expAttribute.put("cellTypes", cellTypes.toString());
+                expAttribute.put("Title", title);
+                expAttribute.put("Description", description);
+                expAttribute.put("Organism", organism);
+                expAttribute.put("Disease_State", diseaseState.toString());
+                expAttribute.put("Tissue_Sites", tissueSites.toString());
+                expAttribute.put("Material_Types", materialTypes.toString());
+                expAttribute.put("Cell_Types", cellTypes.toString());
                 allExperiments.put(localElementID, expAttribute);
             }
             // end of parsing								
