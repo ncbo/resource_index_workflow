@@ -136,13 +136,13 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_MDB_ET table.", e);
+                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_PDSP_ET table.", e);
                 }
             }
         } catch (Exception e) {
             logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e);
         }
-        logger.info(nbElement + " elements added to the OBR_MDB_ET table.");
+        logger.info(nbElement + " elements added to the OBR_PDSP_ET table.");
         return nbElement;
     }
 
@@ -150,7 +150,7 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
      * get all Elements.
      */
     public HashSet<Element> getAllElements() {
-        logger.info("* Get All Elements for ModelDB ... ");
+        logger.info("* Get All Elements for PDSP ... ");
         HashSet<Element> elementSet = new HashSet<Element>();
         int nbAdded = 0;
         int offset = 0;

@@ -135,13 +135,13 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_MDB_ET table.", e);
+                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_CCDB_ET table.", e);
                 }
             }
         } catch (Exception e) {
             logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e);
         }
-        logger.info(nbElement + " elements added to the OBR_MDB_ET table.");
+        logger.info(nbElement + " elements added to the OBR_CCDB_ET table.");
         return nbElement;
     }
 
