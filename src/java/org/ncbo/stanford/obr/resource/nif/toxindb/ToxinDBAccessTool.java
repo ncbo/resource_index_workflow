@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
 
     private static final String TOXIN_URL = "http://www.t3db.org/";
-    private static final String TOXIN_NAME = "ToxinDB";
+    private static final String TOXIN_NAME = "NIF ToxinDB";
     private static final String TOXIN_RESOURCEID = "TOXIN";
     private static final String TOXIN_DESCRIPTION = "Toxin and Toxin Target Database (T3DB) is a unique bioinformatics resource that combines detailed toxin data with comprehensive toxin target information. The database currently houses over 2900 toxins described by over 34200 synonyms, including pollutants, pesticides, drugs, and food toxins, which are linked to over 1300 corresponding toxin target records. Altogether there are over 33800 toxins, toxin target associations. "
             + "Each toxin record (ToxCard) contains over 50 data fields and holds information such as chemical properties and descriptors, toxicity values, molecular and cellular interactions, and medical information. This information has been extracted from over 5600 sources, which include other databases, government documents, books, and scientific literature. "

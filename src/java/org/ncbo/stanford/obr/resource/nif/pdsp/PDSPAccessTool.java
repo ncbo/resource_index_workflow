@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.ncbo.stanford.obr.resource.nif.modeldb;
+package org.ncbo.stanford.obr.resource.nif.pdsp;
 
 import org.ncbo.stanford.obr.resource.nif.AbstractNifResourceAccessTool;
 import java.net.MalformedURLException;
@@ -18,50 +18,53 @@ import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 /**
- * AccessTool for NIF ModelDB 
+ * AccessTool for NIF PDSP
  * @author s.kharat
  */
-public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
-
-    private static final String MDB_URL = "http://senselab.med.yale.edu/ModelDB/";
-    private static final String MDB_NAME = "NIF ModelDB";
-    private static final String MDB_RESOURCEID = "MDB";
-    private static final String MDB_DESCRIPTION = "ModelDB provides an accessible location for storing and efficiently retrieving computational neuroscience models. ModelDB is tightly coupled with NeuronDB. Models can be coded in any language for any environment. Model code can be viewed before downloading and browsers can be set to auto-launch the models. "
-            + "ModelDB is a curated database of published models in the broad domain of computational neuroscience. It addresses the need for access to such models in order to evaluate their validity and extend their use. It can handle computational models expressed in any textual form, including procedural or declarative languages (e.g. C , XML dialects) and source code written for any simulation environment. The model source code doesn't even have to reside inside ModelDB; it just has to be available from some publicly accessible online repository or WWW site. "
-            + "ModelDB is curated in order to maximize the scientific utility of its contents. The ideal model entry would contain \"original\" (author-written) source code, especially if it works and reproduces at least one figure from a published article. Original source code has tremendous value because it is what the authors used to generate the simulation results from which they derived their published insights and conclusions. High quality \"third party\" re-implementations of published models are also relevant, especially those involving models that are of wide interest.";
-    private static final String MDB_LOGO = "http://neurolex.org/w/images/7/74/Modeldb.png";
-    private static final String MDB_ELT_URL = "http://senselab.med.yale.edu/ModelDB/ShowModel.asp?model=";
-    private static final String[] MDB_ITEMKEYS = {"title", "modelTypes", "cellTypes", "channels", "receptors", "transmitters"};
-    private static final Double[] MDB_WEIGHTS = {1.0, 1.0, 1.0, 0.8, 0.8, 0.8};
-    private static final String[] MDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
-    private static Structure MDB_STRUCTURE = new Structure(MDB_ITEMKEYS, MDB_RESOURCEID, MDB_WEIGHTS, MDB_ONTOIDS);
-    private static String MDB_MAIN_ITEMKEY = "title";
+public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     
-    // Constants 
-    private static final String MDB_Database = "ModelDB";
-    private static final String MDB_Indexable = "Models";
-    private static final String title = "Model Name";
-    private static final String modelTypes = "Type";
-    private static final String cellTypes = "Neurons";
-    private static final String channels = "Currents";
-    private static final String receptors = "Receptors";
-    private static final String transmitters = "Neurotransmitters";
+    private static final String PDSP_URL = "http://pdsp.med.unc.edu/pdsp.php";
+    private static final String PDSP_NAME = "NIF PDSP Ki database";
+    private static final String PDSP_RESOURCEID = "PDSP";
+    private static final String PDSP_DESCRIPTION = "The PDSP Ki database is a unique resource in the public domain which provides information on the abilities of drugs to interact with an expanding number of molecular targets. "
+            + "The Ki database serves as a data warehouse for published and internally-derived Ki, or affinity, values for a large number of drugs and drug candidates at an expanding number of G-protein coupled receptors, ion channels, transporters and enzymes. "
+            + "The query interface is designed to let you search by any field, or combination of them to refine your search criteria. The flexible user interface also provides for customized data mining.";
+    private static final String PDSP_LOGO = "http://neurolex.org/w/images/a/a3/PDSPKI.gif";
+    private static final String PDSP_ELT_URL = "http://pdsp.med.unc.edu/pdsp.php?knowID=retreive+this+value+only&kiKey=";
+    private static final String PDSP_ELT_URL_1 = "&receptorDD=&receptor=&speciesDD=&species=&sourcesDD=&source=&hotLigandDD=&hotLigand=&testLigandDD=&testLigand=&referenceDD=&reference=&KiGreater=&KiLess=&kiAllRadio=all";
+    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure"};
+    private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9};
+    private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
+    private static Structure PDSP_STRUCTURE = new Structure(PDSP_ITEMKEYS, PDSP_RESOURCEID, PDSP_WEIGHTS, PDSP_ONTOIDS);
+    private static String PDSP_MAIN_ITEMKEY = "Receptor";
+    
+    // Constant 
+    private static final String PDSP_Database = "KiDatabase";
+    private static final String PDSP_Indexable = "AffinityValues";
+    
+    private static final String PDSP_SearchKi = "Search Ki";
+    private static final String PDSP_Receptor = "Receptor";
+    private static final String PDSP_Ligand = "Ligand";
+    private static final String PDSP_HotLigand = "Hot Ligand";
+    private static final String PDSP_Organism = "Organism";
+    private static final String PDSP_Struct = "Structure";
+   
+
     private Map<String, String> localOntologyIDMap;
 
-    // constructor
-    public ModelDBAccessTool() {
-        super(MDB_NAME, MDB_RESOURCEID, MDB_STRUCTURE);
+    // constructors
+    public PDSPAccessTool() {
+        super(PDSP_NAME, PDSP_RESOURCEID, PDSP_STRUCTURE);
         try {
-            this.getToolResource().setResourceURL(new URL(MDB_URL));
-            this.getToolResource().setResourceDescription(MDB_DESCRIPTION);
-            this.getToolResource().setResourceLogo(new URL(MDB_LOGO));
-            this.getToolResource().setResourceElementURL(MDB_ELT_URL);
+            this.getToolResource().setResourceURL(new URL(PDSP_URL));
+            this.getToolResource().setResourceDescription(PDSP_DESCRIPTION);
+            this.getToolResource().setResourceLogo(new URL(PDSP_LOGO));
+            this.getToolResource().setResourceElementURL(PDSP_ELT_URL);
         } catch (MalformedURLException e) {
             logger.error(EMPTY_STRING, e);
         }
-        localOntologyIDMap = createLocalOntologyIDMap(MDB_STRUCTURE);
+        localOntologyIDMap = createLocalOntologyIDMap(PDSP_STRUCTURE);
     }
 
     @Override
@@ -84,12 +87,12 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public String elementURLString(String elementLocalID) {
-        return MDB_ELT_URL + elementLocalID;
+        return PDSP_ELT_URL + elementLocalID +PDSP_ELT_URL_1;
     }
 
     @Override
     public String mainContextDescriptor() {
-        return MDB_MAIN_ITEMKEY;
+        return PDSP_MAIN_ITEMKEY;
     }
 
     /**
@@ -160,7 +163,7 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(MDB_Database, MDB_Indexable, query, offset, rowCount);
+                Document dom = queryFederation(PDSP_Database, PDSP_Indexable, query, offset, rowCount);
                 Node tableData = dom.getFirstChild();
                 //get total records
                 totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
@@ -186,27 +189,26 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
                                 value = vals.item(k).getTextContent();
                             }
                         }
-                        if (name.equalsIgnoreCase(title)) { //localElementId and Tittle
-                            localElementId = value.substring(value.indexOf(MDB_ELT_URL) + MDB_ELT_URL.length(), value.indexOf(endTag));                      
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[0]), Jsoup.parse(value).text());
-                       //     System.out.println(localElementId + " : " + elementAttributes.get(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[0])));
-                        } else if (name.equalsIgnoreCase(modelTypes)) { //ModelType
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[1]), value);
-                        } else if (name.equalsIgnoreCase(cellTypes)) { //cellType
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[2]), value);
-                        } else if (name.equalsIgnoreCase(channels)) { //Channels
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[3]), value);
-                        } else if (name.equalsIgnoreCase(receptors)) { //Receptors
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[4]), value);
-                        } else if (name.equalsIgnoreCase(transmitters)) { //Transmitters
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[5]), value);
-                        }
-                        //Check if elementId is present locally.
-                        if (allElementsInET.contains(localElementId)) {
-                            continue;
-                        } else {
-                            allRowsData.put(localElementId, elementAttributes);
-                        }
+                        if (name.equalsIgnoreCase(PDSP_SearchKi)) { //localElementId 
+                            localElementId = Jsoup.parse(value).text();                           
+                        } else if (name.equalsIgnoreCase(PDSP_Receptor)) { //Receptor
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[0]), value);
+                        } else if (name.equalsIgnoreCase(PDSP_Ligand)) { //Ligand
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[1]), value);
+                        } else if (name.equalsIgnoreCase(PDSP_HotLigand)) { //HotLigand
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[2]), value);
+                        } else if (name.equalsIgnoreCase(PDSP_Organism)) { //Organism
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[3]), value);
+                        } else if (name.equalsIgnoreCase(PDSP_Struct)) { //Structure
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[4]), value);
+                        } 
+                    }
+                    
+                    //Check if elementId is present locally.
+                    if (allElementsInET.contains(localElementId)) {
+                        continue;
+                    } else {
+                        allRowsData.put(localElementId, elementAttributes);
                     }
                 }
 
@@ -220,15 +222,15 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
                 elementAttributes = allRowsData.get(localElementID);
 
                 // PUT DATA INTO A STRUCTURE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                Structure elementStructure = new Structure(MDB_STRUCTURE.getContextNames());
-                for (String contextName : MDB_STRUCTURE.getContextNames()) {
+                Structure elementStructure = new Structure(PDSP_STRUCTURE.getContextNames());
+                for (String contextName : PDSP_STRUCTURE.getContextNames()) {
                     boolean attributeHasValue = false;
 
                     for (String att : elementAttributes.keySet()) {
                         if (contextName.equals(att)) {
                             // not an existing annotation
-                            if (MDB_STRUCTURE.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION)
-                                    || MDB_STRUCTURE.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)) {
+                            if (PDSP_STRUCTURE.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION)
+                                    || PDSP_STRUCTURE.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)) {
                                 elementStructure.putContext(contextName, elementAttributes.get(att));
                                 attributeHasValue = true;
 

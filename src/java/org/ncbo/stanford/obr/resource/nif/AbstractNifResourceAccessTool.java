@@ -45,7 +45,7 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
     protected Document queryFederation(String db, String indexable, String query, int offset, int count) {
         Document dom = null;
         try {
-            logger.info("Getting federation data...");
+           // logger.info("Getting federation data...");
             String response = resource.path(db).path(indexable).
                     queryParam("q", query).
                     queryParam("offset", Integer.toString(offset)).
