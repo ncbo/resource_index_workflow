@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
 public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     
     private static final String PDSP_URL = "http://pdsp.med.unc.edu/pdsp.php";
-    private static final String PDSP_NAME = "NIF PDSP Ki database";
+    private static final String PDSP_NAME = "PDSP Ki database (via NIF)";
     private static final String PDSP_RESOURCEID = "PDSP";
     private static final String PDSP_DESCRIPTION = "The PDSP Ki database is a unique resource in the public domain which provides information on the abilities of drugs to interact with an expanding number of molecular targets. "
             + "The Ki database serves as a data warehouse for published and internally-derived Ki, or affinity, values for a large number of drugs and drug candidates at an expanding number of G-protein coupled receptors, ion channels, transporters and enzymes. "

@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
 public class CcDBAccessTool extends AbstractNifResourceAccessTool{
     
     private static final String CCDB_URL = "http://ccdb.ucsd.edu";
-    private static final String CCDB_NAME = "NIF Cell Centered Database";
+    private static final String CCDB_NAME = "Cell Centered Database (via NIF)";
     private static final String CCDB_RESOURCEID = "CCDB";
     private static final String CCDB_DESCRIPTION = "The Cell Centered Database is a publicly accessible resource for high resolution 2D, 3D and 4D data from light and electron microscopy, including correlated imaging. Techniques range from wide field mosaics taken with multiphoton microscopy to 3D reconstructions of cellular ultrastructure using electron tomography. Contributions from the community are welcome. "
             + "The CCDB was designed around the process of reconstruction from 2D micrographs, capturing key steps in the process from experiment to analysis. The CCDB refers to the set of images taken from the as the Microscopy Product. The microscopy product refers to a set of related 2D images taken by light (epifluorescence, transmitted light, confocal or multiphoton) or electron microscopy (conventional or high voltage transmission electron microscopy). "

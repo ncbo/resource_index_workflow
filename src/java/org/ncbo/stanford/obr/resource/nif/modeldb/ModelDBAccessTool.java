@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
 
     private static final String MDB_URL = "http://senselab.med.yale.edu/ModelDB/";
-    private static final String MDB_NAME = "NIF ModelDB";
+    private static final String MDB_NAME = "ModelDB (via NIF)";
     private static final String MDB_RESOURCEID = "MDB";
     private static final String MDB_DESCRIPTION = "ModelDB provides an accessible location for storing and efficiently retrieving computational neuroscience models. ModelDB is tightly coupled with NeuronDB. Models can be coded in any language for any environment. Model code can be viewed before downloading and browsers can be set to auto-launch the models. "
             + "ModelDB is a curated database of published models in the broad domain of computational neuroscience. It addresses the need for access to such models in order to evaluate their validity and extend their use. It can handle computational models expressed in any textual form, including procedural or declarative languages (e.g. C , XML dialects) and source code written for any simulation environment. The model source code doesn't even have to reside inside ModelDB; it just has to be available from some publicly accessible online repository or WWW site. "
