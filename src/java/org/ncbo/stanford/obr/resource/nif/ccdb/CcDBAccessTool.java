@@ -161,7 +161,7 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
             for(String indexable : CCDB_Indexable){    
                 int offset = 0;
                 int totalCount = 0;
-                //System.out.println("****************CCDB_Indexable ::" + indexable);
+                
                 //parsing data
                 do {
                     Document dom = queryFederation(CCDB_Database, indexable, query, offset, rowCount);
@@ -191,7 +191,7 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
                                 }
                             }
                             if (name.equalsIgnoreCase(CCDB_Image)) { //localElementId 
-                                localElementId = value.substring(value.indexOf(CCDB_ELT_URL) + CCDB_ELT_URL.length(), value.indexOf(endTag));                              
+                                localElementId = value.substring(value.indexOf(CCDB_ELT_URL) + CCDB_ELT_URL.length(), value.indexOf(endTag));
                             } else if (name.equalsIgnoreCase(CCDB_ProjectName)) { //ProjectName
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]), value);
                             } else if (name.equalsIgnoreCase(CCDB_Species)) { //Species
@@ -207,7 +207,10 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
 //                            } else if (name.equalsIgnoreCase(CCDB_Organ)) { //Organ
 //                                elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[5]), value);
 //                            }                            
-                        }
+                          }                        
+                            //appending localElementId to project Name. 
+                            elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]),elementAttributes.get(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0])) + " " + localElementId);
+                                
                             //Check if elementId is present locally.
                             if (allElementsInET.contains(localElementId)) {
                                 continue;
