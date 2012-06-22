@@ -33,8 +33,8 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
             + "The focus of the T3DB is on providing mechanisms of toxicity and target proteins for each toxin. This dual nature of the T3DB, in which toxin and toxin target records are interactively linked in both directions, makes it unique from existing databases. It is also fully searchable and supports extensive text, sequence, chemical structure, and relational query searches.";
     private static final String TOXIN_LOGO = "http://neurolex.org/w/images/9/91/T3DB.png";
     private static final String TOXIN_ELT_URL = "http://t3db.org/toxins/";
-    private static final String[] TOXIN_ITEMKEYS = {"toxinName", "description", "synonyms", "route_of_exposure", "mechanism_of_Action", "metabolism", "treatment", "health_Effects"};
-    private static final Double[] TOXIN_WEIGHTS = {1.0, 0.9, 0.8, 0.4, 0.7, 0.7, 0.7, 0.9};
+    private static final String[] TOXIN_ITEMKEYS = {"toxinName", "description", "synonyms", "exposure", "mechanism_of_Action", "metabolism", "treatment", "health_Effects"};
+    private static final Double[] TOXIN_WEIGHTS = {1.0, 0.9, 0.8, 0.8, 0.7, 0.7, 0.7, 0.9};
     private static final String[] TOXIN_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure TOXIN_STRUCTURE = new Structure(TOXIN_ITEMKEYS, TOXIN_RESOURCEID, TOXIN_WEIGHTS, TOXIN_ONTOIDS);
     private static String TOXIN_MAIN_ITEMKEY = "toxinName";
