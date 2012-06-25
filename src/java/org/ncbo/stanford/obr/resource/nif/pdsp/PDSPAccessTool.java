@@ -33,9 +33,9 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     private static final String PDSP_LOGO = "http://neurolex.org/w/images/a/a3/PDSPKI.gif";
     private static final String PDSP_ELT_URL = "http://pdsp.med.unc.edu/pdsp.php?knowID=retreive+this+value+only&kiKey=";
     private static final String PDSP_ELT_URL_1 = "&receptorDD=&receptor=&speciesDD=&species=&sourcesDD=&source=&hotLigandDD=&hotLigand=&testLigandDD=&testLigand=&referenceDD=&reference=&KiGreater=&KiLess=&kiAllRadio=all";
-    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure"};
-    private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9};
-    private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
+    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure","ki_nM"};
+    private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9,0.5};
+    private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.NOT_FOR_ANNOTATION};
     private static Structure PDSP_STRUCTURE = new Structure(PDSP_ITEMKEYS, PDSP_RESOURCEID, PDSP_WEIGHTS, PDSP_ONTOIDS);
     private static String PDSP_MAIN_ITEMKEY = "Receptor";
     
@@ -49,7 +49,7 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     private static final String PDSP_HotLigand = "Hot Ligand";
     private static final String PDSP_Organism = "Organism";
     private static final String PDSP_Struct = "Structure";
-   
+    private static final String PDSP_Ki = "ki(nM)";
 
     private Map<String, String> localOntologyIDMap;
 
@@ -189,18 +189,20 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
                                 value = vals.item(k).getTextContent();
                             }
                         }
-                        if (name.equalsIgnoreCase(PDSP_SearchKi)) { //localElementId 
+                        if (name.equalsIgnoreCase(PDSP_SearchKi)) {         //localElementId 
                             localElementId = Jsoup.parse(value).text();                           
-                        } else if (name.equalsIgnoreCase(PDSP_Receptor)) { //Receptor
+                        } else if (name.equalsIgnoreCase(PDSP_Receptor)) {  //Receptor
                             elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[0]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Ligand)) { //Ligand
+                        } else if (name.equalsIgnoreCase(PDSP_Ligand)) {    //Ligand
                             elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[1]), value);
                         } else if (name.equalsIgnoreCase(PDSP_HotLigand)) { //HotLigand
                             elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[2]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Organism)) { //Organism
+                        } else if (name.equalsIgnoreCase(PDSP_Organism)) {  //Organism
                             elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[3]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Struct)) { //Structure
+                        } else if (name.equalsIgnoreCase(PDSP_Struct)) {    //Structure
                             elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[4]), value);
+                        } else if (name.equalsIgnoreCase(PDSP_Ki)) {        //ki_nM
+                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[5]), value);
                         } 
                     }
                     
