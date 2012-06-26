@@ -33,7 +33,7 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     private static final String PDSP_LOGO = "http://neurolex.org/w/images/a/a3/PDSPKI.gif";
     private static final String PDSP_ELT_URL = "http://pdsp.med.unc.edu/pdsp.php?knowID=retreive+this+value+only&kiKey=";
     private static final String PDSP_ELT_URL_1 = "&receptorDD=&receptor=&speciesDD=&species=&sourcesDD=&source=&hotLigandDD=&hotLigand=&testLigandDD=&testLigand=&referenceDD=&reference=&KiGreater=&KiLess=&kiAllRadio=all";
-    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure","ki_nM"};
+    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure","unit_nM"};
     private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9,0.5};
     private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.NOT_FOR_ANNOTATION};
     private static Structure PDSP_STRUCTURE = new Structure(PDSP_ITEMKEYS, PDSP_RESOURCEID, PDSP_WEIGHTS, PDSP_ONTOIDS);

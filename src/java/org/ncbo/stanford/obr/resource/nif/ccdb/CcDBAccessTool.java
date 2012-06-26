@@ -34,9 +34,9 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
             + "The goal of the CCDB project is to make unique and valuable datasets available to the scientific community for visualization, reuse and reanalysis. Data in the CCDB can be accessed by performing a Search or by browsing through our Gallery. Data in the CCDB may be downloaded freely and reused for non-profit use within the terms of our usage agreement.";
     private static final String CCDB_LOGO = "http://neurolex.org/w/images/a/a4/Ccdb.jpg";
     private static final String CCDB_ELT_URL = "http://ccdb.ucsd.edu/sand/main?event=displaySum&mpid=";
-    private static final String[] CCDB_ITEMKEYS = {"ProjectName", "Species", "Region", "CellType"}; //, "System", "Organ"
-    private static final Double[] CCDB_WEIGHTS = {1.0, 0.8, 0.9, 0.9}; //, 0.6, 0.8
-    private static final String[] CCDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION}; //, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION
+    private static final String[] CCDB_ITEMKEYS = {"ProjectName", "Species", "Region", "CellType","Age","Microscope_Type"}; //, "System", "Organ"
+    private static final Double[] CCDB_WEIGHTS = {1.0, 0.8, 0.9, 0.9,0.5,0.5}; //, 0.6, 0.8
+    private static final String[] CCDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.NOT_FOR_ANNOTATION,Structure.NOT_FOR_ANNOTATION}; //, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION
     private static Structure CCDB_STRUCTURE = new Structure(CCDB_ITEMKEYS, CCDB_RESOURCEID, CCDB_WEIGHTS, CCDB_ONTOIDS);
     private static String CCDB_MAIN_ITEMKEY = "ProjectName";
     
@@ -50,6 +50,8 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
     private static final String CCDB_System = "System";
     private static final String CCDB_Organ = "Organ";  
     private static final String CCDB_Image = "Image"; //Required to retrive localElementId 
+    private static final String CCDB_Age = "Age";
+    private static final String CCDB_MicroscopeType = "Microscope Type";         
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -190,23 +192,21 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
                                     value = vals.item(k).getTextContent();
                                 }
                             }
-                            if (name.equalsIgnoreCase(CCDB_Image)) { //localElementId 
+                            if (name.equalsIgnoreCase(CCDB_Image)) {                //localElementId 
                                 localElementId = value.substring(value.indexOf(CCDB_ELT_URL) + CCDB_ELT_URL.length(), value.indexOf(endTag));
-                            } else if (name.equalsIgnoreCase(CCDB_ProjectName)) { //ProjectName
+                            } else if (name.equalsIgnoreCase(CCDB_ProjectName)) {   //ProjectName
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]), value);
-                            } else if (name.equalsIgnoreCase(CCDB_Species)) { //Species
+                            } else if (name.equalsIgnoreCase(CCDB_Species)) {       //Species
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[1]), value);
-                            } else if (name.equalsIgnoreCase(CCDB_Region)) { //Region
+                            } else if (name.equalsIgnoreCase(CCDB_Region)) {        //Region
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[2]), value);
-                            } else if (name.equalsIgnoreCase(CCDB_CellTypes)) { //CellTypes
+                            } else if (name.equalsIgnoreCase(CCDB_CellTypes)) {     //CellTypes
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[3]), value);
-                            } 
-                            //Currently not retrieved  from the resource site. 
-//                            else if (name.equalsIgnoreCase(CCDB_System)) { //System
-//                                elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[4]), value);
-//                            } else if (name.equalsIgnoreCase(CCDB_Organ)) { //Organ
-//                                elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[5]), value);
-//                            }                            
+                            } else if (name.equalsIgnoreCase(CCDB_Age)) {           //Age
+                                elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[4]), value);
+                            } else if (name.equalsIgnoreCase(CCDB_MicroscopeType)) {//Microscope Type
+                                elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[5]), value);
+                            }                            
                           }                        
                             //appending localElementId to project Name. 
                             elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]),elementAttributes.get(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0])) + " " + localElementId);
