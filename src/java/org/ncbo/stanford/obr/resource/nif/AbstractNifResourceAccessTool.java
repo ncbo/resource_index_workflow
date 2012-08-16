@@ -21,6 +21,7 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
 
     private static final String SERVER = "http://nif-services.neuinfo.org/nif/services/federationQuery/";
     private final WebResource resource = getClient().resource(SERVER);
+    private static final int MAX_RECONNECT = 5;
     protected static final int rowCount = 100;  //100 records for each request.
     protected static final String query = "*";  //mins all records.
     
@@ -43,9 +44,23 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
      * @return Document
      */
     protected Document queryFederation(String db, String indexable, String query, int offset, int count) {
+        return queryFederation( db,  indexable,  query,  offset,  count, 0);
+    }
+    
+    /**
+     * 
+     * @param db
+     * @param indexable
+     * @param query
+     * @param offset
+     * @param count
+     * @param reconnectNum
+     * @return 
+     */
+    private Document queryFederation(String db, String indexable, String query, int offset, int count,int reconnectNum) {
         Document dom = null;
         try {
-           // logger.info("Getting federation data...");
+          //  logger.info("Offset: " + offset + " Count: " + count);
             String response = resource.path(db).path(indexable).
                     queryParam("q", query).
                     queryParam("offset", Integer.toString(offset)).
@@ -53,10 +68,18 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
                     accept(MediaType.APPLICATION_XML_TYPE).get(String.class);
             dom = buildDom(response);
         } catch (Exception e) {
-            logger.error("** PROBLEM ** in getting federation data.", e);
+              // Retrying to access bioportal response for 5 more times.
+              if (reconnectNum < MAX_RECONNECT) {
+                        reconnectNum++;
+                        logger.info("\n\tRetrying for " + reconnectNum + " time");
+                        return queryFederation( db,  indexable,  query,  offset,  count, reconnectNum);
+              } else{
+                   logger.error("** After Retrying still their is problem in getting federation data for Offset: " + offset , e);
+              }
         }
         return dom;
     }
+    
 
     @Provides
     @Singleton
