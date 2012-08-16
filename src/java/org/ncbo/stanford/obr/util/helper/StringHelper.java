@@ -40,6 +40,8 @@ public interface StringHelper {
 	// String constant for 'Not Applicable'
 	public  static final String NOT_APPLICABLE = "NA";
         // String constant for end tag
-        public static final String endTag = "\">";        
+        public static final String endTag = "\">";      
+        // String Regular expression constant for extra white spaces.
+        public static final String whitespace_regx = "\\s+";
   
 }
