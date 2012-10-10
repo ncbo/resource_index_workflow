@@ -191,10 +191,10 @@ public class GENETAccessTool extends AbstractNifResourceAccessTool {
                                     value = vals.item(k).getTextContent();
                                 }
                             }
-                            if (name.equalsIgnoreCase(GENET_Gene_Name)) {                       //Gene_Name & localElementId
-                                elementAttributes.put(Structure.generateContextName(GENET_RESOURCEID, GENET_ITEMKEYS[0]), Jsoup.parse(value).text());
+                            if (name.equalsIgnoreCase(GENET_Gene_Name)) { //Gene_Name & localElementId
+                                geneName = Jsoup.parse(value).text().toLowerCase();
+                                elementAttributes.put(Structure.generateContextName(GENET_RESOURCEID, GENET_ITEMKEYS[0]), geneName);
                                 localElementId = value.substring(value.indexOf(GENET_ELT_URL) + GENET_ELT_URL.length(), value.indexOf(endTag));      //+ Jsoup.parse(value).text()
-                                geneName = Jsoup.parse(value).text();
                             } 
                             else if (name.equalsIgnoreCase(GENET_Chr_location)) {             //Chr_location
                                 elementAttributes.put(Structure.generateContextName(GENET_RESOURCEID, GENET_ITEMKEYS[1]), value);
