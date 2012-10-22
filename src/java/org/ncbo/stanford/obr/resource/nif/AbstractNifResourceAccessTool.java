@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 import org.ncbo.stanford.obr.resource.AbstractXmlResourceAccessTool;
 
@@ -24,7 +25,6 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
     private static final int MAX_RECONNECT = 5;
     protected static final int rowCount = 100;  //100 records for each request.
     protected static final String query = "*";  //mins all records.
-    
     // String constant for all NIF resources.
     protected static final String nodeName = "name";
     protected static final String nodeValue = "value";
@@ -44,9 +44,9 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
      * @return Document
      */
     protected Document queryFederation(String db, String indexable, String query, int offset, int count) {
-        return queryFederation( db,  indexable,  query,  offset,  count, 0);
+        return queryFederation(db, indexable, query, offset, count, 0);
     }
-    
+
     /**
      * 
      * @param db
@@ -57,29 +57,37 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
      * @param reconnectNum
      * @return 
      */
-    private Document queryFederation(String db, String indexable, String query, int offset, int count,int reconnectNum) {
+    private Document queryFederation(String db, String indexable, String query, int offset, int count, int reconnectNum) {
         Document dom = null;
         try {
-          //  logger.info("Offset: " + offset + " Count: " + count);
+            ExecutionTimer timer = new ExecutionTimer();
+            timer.start();
             String response = resource.path(db).path(indexable).
                     queryParam("q", query).
                     queryParam("offset", Integer.toString(offset)).
                     queryParam("count", Integer.toString(count)).
                     accept(MediaType.APPLICATION_XML_TYPE).get(String.class);
+            timer.end();
+            if (timer.duration() < 2500) {
+                logger.info("Response time: " + timer.millisecondsToTimeString(timer.duration()));
+            }
+
+            timer.reset();
+            //added delay for 5 Seconds between two requests.
+            Thread.sleep(5000);
             dom = buildDom(response);
         } catch (Exception e) {
-              // Retrying to access bioportal response for 5 more times.
-              if (reconnectNum < MAX_RECONNECT) {
-                        reconnectNum++;
-                        logger.info("\n\tRetrying for " + reconnectNum + " time");
-                        return queryFederation( db,  indexable,  query,  offset,  count, reconnectNum);
-              } else{
-                   logger.error("** After Retrying still their is problem in getting federation data for Offset: " + offset , e);
-              }
+            // Retrying to access NIF resource response for 5 more times.
+            if (reconnectNum < MAX_RECONNECT) {
+                reconnectNum++;
+                logger.info("\n\tRetrying for " + reconnectNum + " time");
+                return queryFederation(db, indexable, query, offset, count, reconnectNum);
+            } else {
+                logger.error("** After Retrying still their is problem in getting federation data for Offset: " + offset, e);
+            }
         }
         return dom;
     }
-    
 
     @Provides
     @Singleton
