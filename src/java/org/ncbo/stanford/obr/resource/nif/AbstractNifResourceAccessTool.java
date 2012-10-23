@@ -60,19 +60,17 @@ public abstract class AbstractNifResourceAccessTool extends AbstractXmlResourceA
     private Document queryFederation(String db, String indexable, String query, int offset, int count, int reconnectNum) {
         Document dom = null;
         try {
-            ExecutionTimer timer = new ExecutionTimer();
-            timer.start();
+           // ExecutionTimer timer = new ExecutionTimer();
+           // timer.start();
             String response = resource.path(db).path(indexable).
                     queryParam("q", query).
                     queryParam("offset", Integer.toString(offset)).
                     queryParam("count", Integer.toString(count)).
                     accept(MediaType.APPLICATION_XML_TYPE).get(String.class);
-            timer.end();
-            if (timer.duration() < 2500) {
-                logger.info("Response time: " + timer.millisecondsToTimeString(timer.duration()));
-            }
-
-            timer.reset();
+            //timer.end();
+            //logger.info("Response time: " + timer.millisecondsToTimeString(timer.duration()));
+            //timer.reset();
+            
             //added delay for 5 Seconds between two requests.
             Thread.sleep(5000);
             dom = buildDom(response);
