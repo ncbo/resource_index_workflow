@@ -203,7 +203,7 @@ public class BIOAccessTool extends AbstractNifResourceAccessTool {
 
                     if (model.getChildNodes().item(i).getNodeName().equals(Notes_tag)) {
                         Node note = model.getChildNodes().item(i);
-                        elementAttributes.put(Structure.generateContextName(BIOM_RESOURCEID, BIOM_ITEMKEYS[2]), note.getTextContent().replaceAll(whitespace_regx, BLANK_SPACE).trim());
+                        elementAttributes.put(Structure.generateContextName(BIOM_RESOURCEID, BIOM_ITEMKEYS[2]), Jsoup.parse(note.getTextContent()).text().replaceAll(whitespace_regx, BLANK_SPACE).trim());
                     } else if (model.getChildNodes().item(i).getNodeName().equals(listofspecies_tag)) {
                         StringBuffer species = new StringBuffer();
                         Node speciesList = model.getChildNodes().item(i);
