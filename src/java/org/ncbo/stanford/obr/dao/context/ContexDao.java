@@ -16,7 +16,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
  * 
  * <ul>
  * <li> id 			        SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
- * <li> name  	            VARCHAR(30) NOT NULL UNIQUE,
+ * <li> name  	            VARCHAR(100) NOT NULL UNIQUE,
  * <li> weight  	            FLOAT NOT NULL ,
  * <li> static_ontology_id            VARCHAR(XX) NOT NULL. 		//This attribute is used when the context is an existing annotation. Then it is the static ontology ID to which this annot refers to.
  * </ul>
@@ -41,7 +41,7 @@ public class ContexDao extends AbstractObrDao {
 	protected String creationQuery(){
 		return "CREATE TABLE " + getTableSQLName() +" (" +
 					"id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
-					"name VARCHAR(50) NOT NULL UNIQUE, " +
+					"name VARCHAR(100) NOT NULL UNIQUE, " +
 					"weight DOUBLE default '1.0', " +
 					"static_ontology_id VARCHAR(20) default '0'" +
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";

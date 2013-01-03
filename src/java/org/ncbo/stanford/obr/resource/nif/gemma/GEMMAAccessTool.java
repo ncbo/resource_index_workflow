@@ -33,21 +33,17 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
             + "coexpression and differential expression results.";
     private static final String GEMMA_LOGO = "http://neurolex.org/w/images/0/08/Gemma.gif";
     private static final String GEMMA_ELT_URL = "http://www.chibi.ubc.ca/Gemma/expressionExperiment/showExpressionExperiment.html?id=";
-    private static final String[] GEMMA_ITEMKEYS = {"Source", "Gene_Symbol", "Tissue", "Organism", "Experimental_factor", "Exp_vs_Control", "Gene_expression", "Description", "Array_Platform"};
-    private static final Double[] GEMMA_WEIGHTS = {1.0, 0.9, 0.9, 0.9, 0.4, 0.7, 0.4, 0.7, 0.4};
-    private static final String[] GEMMA_ONTOIDS = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
+    private static final String[] GEMMA_ITEMKEYS = {"Source", "differentially_expressed_genes_in_listed_tissues", "Tissue", "Organism", "Description", "Array_Platform"};
+    private static final Double[] GEMMA_WEIGHTS = {1.0, 0.9, 0.9, 0.9, 0.7, 0.4};
+    private static final String[] GEMMA_ONTOIDS = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
     private static Structure GEMMA_STRUCTURE = new Structure(GEMMA_ITEMKEYS, GEMMA_RESOURCEID, GEMMA_WEIGHTS, GEMMA_ONTOIDS);
     private static String GEMMA_MAIN_ITEMKEY = "Source";
-    
     // Constant 
     private static final String GEMMA_Database = "Gemma";
     private static final String GEMMA_Indexable = "Microarray";
     private static final String Gene_Symbol = "Gene Symbol";
     private static final String Tissue = "Tissue";
     private static final String Organism = "Organism";
-    private static final String Experimental_factor = "Experimental Factor";
-    private static final String Exp_vs_Control = "Exp vs Control";
-    private static final String Gene_expression = "Gene Expression";
     private static final String Description = "Description";
     private static final String Source = "Source";
     private static final String Array_Platform = "Array Platform";
@@ -179,6 +175,7 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                         Map<String, String> elementAttributes = new HashMap<String, String>();
 
                         Node row = rows.item(i);
+
                         for (int j = 0; j < row.getChildNodes().getLength(); j++) {
                             NodeList vals = row.getChildNodes().item(j).getChildNodes();
                             String name = null;
@@ -191,40 +188,44 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                                 }
                             }
 
-                            if (name.equalsIgnoreCase(Source)) {                 //Source & localElementId
+                            if (name.equalsIgnoreCase(Source)) {                        //Source & localElementId
                                 elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[0]), Jsoup.parse(value).text());
-                                localElementId = value.substring(value.indexOf(GEMMA_ELT_URL) + GEMMA_ELT_URL.length(), value.indexOf(endTag));                            
-                            } else if (name.equalsIgnoreCase(Gene_Symbol)) {                   //Gene_Symbol 
+                                localElementId = value.substring(value.indexOf(GEMMA_ELT_URL) + GEMMA_ELT_URL.length(), value.indexOf(endTag));
+                            } else if (name.equalsIgnoreCase(Gene_Symbol)) {            //Gene_Symbol 
                                 elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(Tissue)) {                 //Tissue                               
                                 elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]), value);
                             } else if (name.equalsIgnoreCase(Organism)) {               //Organism
                                 elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[3]), value);
-                            } else if (name.equalsIgnoreCase(Experimental_factor)) {    //Experimental_factor
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[4]), value);
-                            } else if (name.equalsIgnoreCase(Exp_vs_Control)) {         //Exp_vs_Control
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[5]), value);
-                            } else if (name.equalsIgnoreCase(Gene_expression)) {        //Gene_expression
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[6]), value);
                             } else if (name.equalsIgnoreCase(Description)) {            //Description
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[7]), value);
+                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[4]), value);
                             } else if (name.equalsIgnoreCase(Array_Platform)) {         //Array_Platform
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[8]), value);
+                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[5]), value);
                             }
                         }
-
 
                         //Check if elementId is present locally.
                         if (allElementsInET.contains(localElementId)) {
                             continue;
                         } else {
                             if (allRowsData.containsKey(localElementId)) {
+                                //comma separated tissues
                                 String previousTissue = allRowsData.get(localElementId).get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]));
                                 String currentTissue = elementAttributes.get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]));
+
                                 if (previousTissue.length() > 0 && currentTissue.length() > 0 && !previousTissue.contains(currentTissue)) {
-                                   previousTissue += "," + currentTissue;
+                                    previousTissue += "," + currentTissue;
                                 }
                                 allRowsData.get(localElementId).put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]), previousTissue);
+
+                                //comma separated gene symbols
+                                String currentGeneSymbol = elementAttributes.get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]));
+                                String previousGeneSymbol = allRowsData.get(localElementId).get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]));;
+
+                                if (previousGeneSymbol.length() > 0 && currentGeneSymbol.length() > 0 && !previousGeneSymbol.contains(currentGeneSymbol)) {
+                                    previousGeneSymbol += "," + currentGeneSymbol;
+                                }
+                                allRowsData.get(localElementId).put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]), previousGeneSymbol);
                             } else {
                                 allRowsData.put(localElementId, elementAttributes);
                             }
