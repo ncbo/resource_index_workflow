@@ -35,7 +35,7 @@ public class NIVAccessTool extends AbstractNifResourceAccessTool {
             + "JoVE is a peer reviewed, PubMed indexed journal devoted to the publication of biological research in a video format and NIH video "
             + "is a vast archive of scientific talks given at various NIH meetings and functions.";
     private static final String LOGO = "http://neurolex.org/w/images/e/e0/NIF_Integrated_Video.PNG";
-    private static final String ELT_URL = "";
+    private static final String ELT_URL = "NA";
     private static final String[] ITEMKEYS = {"Title", "Description", "Author", "Database", "Category", "Date_published", "Runtime"};
     private static final Double[] WEIGHTS = {1.0, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0};
     private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};

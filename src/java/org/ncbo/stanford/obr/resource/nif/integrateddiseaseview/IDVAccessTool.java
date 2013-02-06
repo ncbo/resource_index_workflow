@@ -31,7 +31,7 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
     private static final String DESCRIPTION = "The NIF Integrated Disease View is a virtual database currently indexing authoritative information on disease "
             + "and treatment options from NINDS Disorder List - http://www.ninds.nih.gov/disorders/disorder_index.htm and PubMed Health - http://www.ncbi.nlm.nih.gov/pubmedhealth";
     private static final String LOGO = "http://neurolex.org/w/images/e/ee/NIF_Integrated_Disease.PNG";
-    private static final String ELT_URL = "";
+    private static final String ELT_URL = "NA";
     private static final String[] ITEMKEYS = {"Name", "Synonym", "Description", "Symptoms", "Treatment", "Prognosis", "Research"};
     private static final Double[] WEIGHTS = {1.0, 0.9, 0.9, 0.9, 0.9, 0.7, 0.5};
     private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
