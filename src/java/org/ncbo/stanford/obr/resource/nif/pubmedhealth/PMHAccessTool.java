@@ -39,10 +39,8 @@ public class PMHAccessTool extends AbstractNifResourceAccessTool {
         Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure PMH_STRUCTURE = new Structure(PMH_ITEMKEYS, PMH_RESOURCEID, PMH_WEIGHTS, PMH_ONTOIDS);
     private static String PMH_MAIN_ITEMKEY = "Name";
-    
     // Constants 
-    private static final String PMH_Database = "PubMedHealth";
-    private static final String PMH_Indexable = "Drug";
+    private static final String nifId = "nlx_32805-3";
     private static final String pmh_title = "Title";
     private static final String pmh_text = "Text";
     private static final String PMH_Name = "Name";
@@ -167,14 +165,14 @@ public class PMHAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(PMH_Database, PMH_Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -189,12 +187,12 @@ public class PMHAccessTool extends AbstractNifResourceAccessTool {
                             NodeList vals = row.getChildNodes().item(j).getChildNodes();
                             String name = null;
                             String value = null;
-                            
+
                             for (int k = 0; k < vals.getLength(); k++) {
                                 if (nodeName.equals(vals.item(k).getNodeName())) {
                                     name = vals.item(k).getTextContent();
                                 } else if (nodeValue.equals(vals.item(k).getNodeName())) {
-                                     value = vals.item(k).getTextContent();
+                                    value = vals.item(k).getTextContent();
                                 }
                             }
                             if (name.equalsIgnoreCase(PMH_Name)) {
@@ -206,16 +204,15 @@ public class PMHAccessTool extends AbstractNifResourceAccessTool {
                                 attTitle = value;
                             }
                         }
-                        
-                       
-                        if (attTitle.equalsIgnoreCase(How_to_use) || attTitle.contains("How to Use") 
-                                ) {//|| attTitle.contains("About your treatment") || attTitle.contains("Administering your medication")
+
+
+                        if (attTitle.equalsIgnoreCase(How_to_use) || attTitle.contains("How to Use")) {//|| attTitle.contains("About your treatment") || attTitle.contains("Administering your medication")
                             elementAttributes.put(Structure.generateContextName(PMH_RESOURCEID, PMH_ITEMKEYS[1]), attValue);
                         } else if (attTitle.equalsIgnoreCase(Side_effects) || attTitle.contains("risks")) {
                             elementAttributes.put(Structure.generateContextName(PMH_RESOURCEID, PMH_ITEMKEYS[2]), attValue);
                         } else if (attTitle.equalsIgnoreCase(Other_information)) {
                             elementAttributes.put(Structure.generateContextName(PMH_RESOURCEID, PMH_ITEMKEYS[3]), attValue);
-                        } else if (attTitle.equalsIgnoreCase(Why_is_this_medication_prescribed) ) {//|| attTitle.contains("What is")
+                        } else if (attTitle.equalsIgnoreCase(Why_is_this_medication_prescribed)) {//|| attTitle.contains("What is")
                             elementAttributes.put(Structure.generateContextName(PMH_RESOURCEID, PMH_ITEMKEYS[4]), attValue);
                         } else if (attTitle.equalsIgnoreCase(Storage_conditions)) {
                             elementAttributes.put(Structure.generateContextName(PMH_RESOURCEID, PMH_ITEMKEYS[5]), attValue);

@@ -18,12 +18,13 @@ import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 /**
  * AccessTool for NIF PDSP
  * @author s.kharat
  */
-public class PDSPAccessTool extends AbstractNifResourceAccessTool{
-    
+public class PDSPAccessTool extends AbstractNifResourceAccessTool {
+
     private static final String PDSP_URL = "http://pdsp.med.unc.edu/pdsp.php";
     private static final String PDSP_NAME = "PDSP Ki database (via NIF)";
     private static final String PDSP_RESOURCEID = "PDSP";
@@ -33,16 +34,13 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     private static final String PDSP_LOGO = "http://neurolex.org/w/images/a/a3/PDSPKI.gif";
     private static final String PDSP_ELT_URL = "http://pdsp.med.unc.edu/pdsp.php?knowID=retreive+this+value+only&kiKey=";
     private static final String PDSP_ELT_URL_1 = "&receptorDD=&receptor=&speciesDD=&species=&sourcesDD=&source=&hotLigandDD=&hotLigand=&testLigandDD=&testLigand=&referenceDD=&reference=&KiGreater=&KiLess=&kiAllRadio=all";
-    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure","unit_nM"};
-    private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9,0.5};
-    private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.NOT_FOR_ANNOTATION};
+    private static final String[] PDSP_ITEMKEYS = {"Receptor", "Ligand", "Hotligand", "Organism", "Structure", "unit_nM"};
+    private static final Double[] PDSP_WEIGHTS = {1.0, 0.9, 0.5, 0.9, 0.9, 0.5};
+    private static final String[] PDSP_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
     private static Structure PDSP_STRUCTURE = new Structure(PDSP_ITEMKEYS, PDSP_RESOURCEID, PDSP_WEIGHTS, PDSP_ONTOIDS);
     private static String PDSP_MAIN_ITEMKEY = "Receptor";
-    
     // Constant 
-    private static final String PDSP_Database = "KiDatabase";
-    private static final String PDSP_Indexable = "AffinityValues";
-    
+    private static final String nifId = "nif-0000-01866-1";
     private static final String PDSP_SearchKi = "Search Ki";
     private static final String PDSP_Receptor = "Receptor";
     private static final String PDSP_Ligand = "Ligand";
@@ -50,7 +48,6 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
     private static final String PDSP_Organism = "Organism";
     private static final String PDSP_Struct = "Structure";
     private static final String PDSP_Ki = "ki(nM)";
-
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -87,7 +84,7 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
 
     @Override
     public String elementURLString(String elementLocalID) {
-        return PDSP_ELT_URL + elementLocalID +PDSP_ELT_URL_1;
+        return PDSP_ELT_URL + elementLocalID + PDSP_ELT_URL_1;
     }
 
     @Override
@@ -163,57 +160,60 @@ public class PDSPAccessTool extends AbstractNifResourceAccessTool{
 
             //parsing data
             do {
-                Document dom = queryFederation(PDSP_Database, PDSP_Indexable, query, offset, rowCount);
-                Node tableData = dom.getFirstChild();
-                //get total records
-                totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
-                offset += rowCount;
+                Document dom = queryFederation(nifId, query, offset, rowCount);
+                if (dom != null) {
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
+                    //get total records
+                    totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
+                    offset += rowCount;
 
-                Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
-                // Iterate over the returned structure 
-                NodeList rows = results.getChildNodes();
-                for (int i = 0; i < rows.getLength(); i++) {
-                    String localElementId = EMPTY_STRING;
-                    Map<String, String> elementAttributes = new HashMap<String, String>();
+                    // Iterate over the returned structure 
+                    NodeList rows = results.getChildNodes();
+                    for (int i = 0; i < rows.getLength(); i++) {
+                        String localElementId = EMPTY_STRING;
+                        Map<String, String> elementAttributes = new HashMap<String, String>();
 
-                    Node row = rows.item(i);
-                    for (int j = 0; j < row.getChildNodes().getLength(); j++) {
-                        NodeList vals = row.getChildNodes().item(j).getChildNodes();
-                        String name = null;
-                        String value = null;
-                        for (int k = 0; k < vals.getLength(); k++) {
-                            if (nodeName.equals(vals.item(k).getNodeName())) {
-                                name = vals.item(k).getTextContent();
-                            } else if (nodeValue.equals(vals.item(k).getNodeName())) {
-                                value = vals.item(k).getTextContent();
+                        Node row = rows.item(i);
+                        for (int j = 0; j < row.getChildNodes().getLength(); j++) {
+                            NodeList vals = row.getChildNodes().item(j).getChildNodes();
+                            String name = null;
+                            String value = null;
+                            for (int k = 0; k < vals.getLength(); k++) {
+                                if (nodeName.equals(vals.item(k).getNodeName())) {
+                                    name = vals.item(k).getTextContent();
+                                } else if (nodeValue.equals(vals.item(k).getNodeName())) {
+                                    value = vals.item(k).getTextContent();
+                                }
+                            }
+                            if (name.equalsIgnoreCase(PDSP_SearchKi)) {         //localElementId 
+                                localElementId = Jsoup.parse(value).text();
+                            } else if (name.equalsIgnoreCase(PDSP_Receptor)) {  //Receptor
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[0]), value);
+                            } else if (name.equalsIgnoreCase(PDSP_Ligand)) {    //Ligand
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[1]), value);
+                            } else if (name.equalsIgnoreCase(PDSP_HotLigand)) { //HotLigand
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[2]), value);
+                            } else if (name.equalsIgnoreCase(PDSP_Organism)) {  //Organism
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[3]), value);
+                            } else if (name.equalsIgnoreCase(PDSP_Struct)) {    //Structure
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[4]), value);
+                            } else if (name.equalsIgnoreCase(PDSP_Ki)) {        //ki_nM
+                                elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[5]), value);
                             }
                         }
-                        if (name.equalsIgnoreCase(PDSP_SearchKi)) {         //localElementId 
-                            localElementId = Jsoup.parse(value).text();                           
-                        } else if (name.equalsIgnoreCase(PDSP_Receptor)) {  //Receptor
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[0]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Ligand)) {    //Ligand
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[1]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_HotLigand)) { //HotLigand
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[2]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Organism)) {  //Organism
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[3]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Struct)) {    //Structure
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[4]), value);
-                        } else if (name.equalsIgnoreCase(PDSP_Ki)) {        //ki_nM
-                            elementAttributes.put(Structure.generateContextName(PDSP_RESOURCEID, PDSP_ITEMKEYS[5]), value);
-                        } 
-                    }
-                    
-                    //Check if elementId is present locally.
-                    if (allElementsInET.contains(localElementId)) {
-                        continue;
-                    } else {
-                        allRowsData.put(localElementId, elementAttributes);
-                    }
-                }
 
+                        //Check if elementId is present locally.
+                        if (allElementsInET.contains(localElementId)) {
+                            continue;
+                        } else {
+                            allRowsData.put(localElementId, elementAttributes);
+                        }
+                    }
+                } else {
+                    offset += rowCount;
+                }
             } while (offset < totalCount);
 
             //parsing ends

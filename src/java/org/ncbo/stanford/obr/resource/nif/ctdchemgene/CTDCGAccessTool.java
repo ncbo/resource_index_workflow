@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.ncbo.stanford.obr.resource.nif.gemma;
+package org.ncbo.stanford.obr.resource.nif.ctdchemgene;
 
 import org.ncbo.stanford.obr.resource.nif.AbstractNifResourceAccessTool;
 import java.net.MalformedURLException;
@@ -20,46 +20,48 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * AccessTool for NIF GEMMA 
+ *
  * @author s.kharat
  */
-public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
+public class CTDCGAccessTool extends AbstractNifResourceAccessTool {
 
-    private static final String GEMMA_URL = "http://www.chibi.ubc.ca/Gemma/home.html";
-    private static final String GEMMA_NAME = "GEMMA (via NIF)";
-    private static final String GEMMA_RESOURCEID = "GEMMA";
-    private static final String GEMMA_DESCRIPTION = "Gemma is a database and software system for the meta-analysis of gene expression data. Gemma contains "
-            + "data from hundreds of public microarray data sets, referencing hundreds of published papers. Users can search, access and visualize "
-            + "coexpression and differential expression results.";
-    private static final String GEMMA_LOGO = "http://neurolex.org/w/images/0/08/Gemma.gif";
-    private static final String GEMMA_ELT_URL = "http://www.chibi.ubc.ca/Gemma/expressionExperiment/showExpressionExperiment.html?id=";
-    private static final String[] GEMMA_ITEMKEYS = {"Source", "differentially_expressed_genes_in_listed_tissues", "Tissue", "Organism", "Description", "Array_Platform"};
-    private static final Double[] GEMMA_WEIGHTS = {1.0, 0.9, 0.9, 0.9, 0.7, 0.4};
-    private static final String[] GEMMA_ONTOIDS = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
-    private static Structure GEMMA_STRUCTURE = new Structure(GEMMA_ITEMKEYS, GEMMA_RESOURCEID, GEMMA_WEIGHTS, GEMMA_ONTOIDS);
-    private static String GEMMA_MAIN_ITEMKEY = "Source";
+    private static final String URL = "http://ctdbase.org/";
+    private static final String NAME = "CTD ChemGene (via NIF)";
+    private static final String RESOURCEID = "CTDCG";
+    private static final String DESCRIPTION = "A public database that enhances understanding about the effects of environmental chemicals on human health. "
+            + "In detail, it contains information about gene/protein-disease associations, chemical-disease associations, interactions between chemicals and genes/proteins, "
+            + "as well as the related pathways.";
+    private static final String LOGO = "http://neurolex.org/w/images/b/bb/CTD.PNG";
+    private static final String ELT_URL = "http://ctdbase.org/detail.go?type=gene&acc=";
+    private static final String[] ITEMKEYS = {"Gene_Symbol", "Chemical_Name", "Gene_Forms", "Organism", "Interaction", "Type_of_Interactions", "References"};
+    private static final Double[] WEIGHTS = {1.0, 0.9, 0.5, 0.7, 0.9, 0.8, 0.0};
+    private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
+        Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
+    private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
+    private static String MAIN_ITEMKEY = "Gene_Symbol";
     // Constant 
-    private static final String nifId = "nif-0000-08127-1";
-    private static final String Gene_Symbol = "Gene Symbol";
-    private static final String Tissue = "Tissue";
+    private static final String nifId = "nif-0000-02683-1";
+    private static final String GeneSymbol = "Gene Symbol";
+    private static final String ChemicalName = "Chemical Name";
+    private static final String GeneForms = "Gene Forms";
     private static final String Organism = "Organism";
-    private static final String Description = "Description";
-    private static final String Source = "Source";
-    private static final String Array_Platform = "Array Platform";
+    private static final String Interaction = "Interaction";
+    private static final String Types_of_Interaction = "Type of Interactions";
+    private static final String References = "References";
     private Map<String, String> localOntologyIDMap;
 
     // constructors
-    public GEMMAAccessTool() {
-        super(GEMMA_NAME, GEMMA_RESOURCEID, GEMMA_STRUCTURE);
+    public CTDCGAccessTool() {
+        super(NAME, RESOURCEID, STRUCTURE);
         try {
-            this.getToolResource().setResourceURL(new URL(GEMMA_URL));
-            this.getToolResource().setResourceDescription(GEMMA_DESCRIPTION);
-            this.getToolResource().setResourceLogo(new URL(GEMMA_LOGO));
-            this.getToolResource().setResourceElementURL(GEMMA_ELT_URL);
+            this.getToolResource().setResourceURL(new URL(URL));
+            this.getToolResource().setResourceDescription(DESCRIPTION);
+            this.getToolResource().setResourceLogo(new URL(LOGO));
+            this.getToolResource().setResourceElementURL(ELT_URL);
         } catch (MalformedURLException e) {
             logger.error(EMPTY_STRING, e);
         }
-        localOntologyIDMap = createLocalOntologyIDMap(GEMMA_STRUCTURE);
+        localOntologyIDMap = createLocalOntologyIDMap(STRUCTURE);
     }
 
     @Override
@@ -82,12 +84,12 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public String elementURLString(String elementLocalID) {
-        return GEMMA_ELT_URL + elementLocalID;
+        return ELT_URL + elementLocalID;
     }
 
     @Override
     public String mainContextDescriptor() {
-        return GEMMA_MAIN_ITEMKEY;
+        return MAIN_ITEMKEY;
     }
 
     /**
@@ -122,7 +124,6 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
             // for each experiments accessed by the tool
             Iterator<Element> i = allElementList.iterator();
             while (i.hasNext()) {
-                // populates OBR_GEMMA_ET with each of these experiments.
                 myExp = i.next();
                 try {
                     if (!myExp.getElementStructure().hasNullValues()) {
@@ -131,30 +132,32 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_GEMMA_ET table.", e);
+                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_CTDCG_ET table.", e);
                 }
             }
         } catch (Exception e) {
             logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e);
         }
-        logger.info(nbElement + " elements added to the OBR_GEMMA_ET table.");
+        logger.info(nbElement + " elements added to the OBR_CTDCG_ET table.");
         return nbElement;
     }
 
-    /**
-     * get all Elements.
+    /** This method is used to get all elements from resource site.
+     *  @return HashSet<Element>
      */
     public HashSet<Element> getAllElements() {
-        logger.info("* Get All Elements for GEEMA... ");
+        logger.info("* Get All Elements for NIF CTD ChemGene ... ");
         HashSet<Element> elementSet = new HashSet<Element>();
         int nbAdded = 0;
         int offset = 0;
         int totalCount = 0;
 
         try {
-            //get all elements from _ET table
+            //get all elements from _ET table            
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
+
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
+            int rowcnt = 1;
 
             //parsing data
             do {
@@ -174,7 +177,6 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                         Map<String, String> elementAttributes = new HashMap<String, String>();
 
                         Node row = rows.item(i);
-
                         for (int j = 0; j < row.getChildNodes().getLength(); j++) {
                             NodeList vals = row.getChildNodes().item(j).getChildNodes();
                             String name = null;
@@ -186,52 +188,34 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                                     value = vals.item(k).getTextContent();
                                 }
                             }
-
-                            if (name.equalsIgnoreCase(Source)) {                        //Source & localElementId
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[0]), Jsoup.parse(value).text());
-                                localElementId = value.substring(value.indexOf(GEMMA_ELT_URL) + GEMMA_ELT_URL.length(), value.indexOf(endTag));
-                            } else if (name.equalsIgnoreCase(Gene_Symbol)) {            //Gene_Symbol 
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]), Jsoup.parse(value).text());
-                            } else if (name.equalsIgnoreCase(Tissue)) {                 //Tissue                               
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]), value);
-                            } else if (name.equalsIgnoreCase(Organism)) {               //Organism
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[3]), value);
-                            } else if (name.equalsIgnoreCase(Description)) {            //Description
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[4]), value);
-                            } else if (name.equalsIgnoreCase(Array_Platform)) {         //Array_Platform
-                                elementAttributes.put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[5]), value);
+                            if (name.equalsIgnoreCase(GeneSymbol)) {
+                                localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), Jsoup.parse(value).text());
+                            } else if (name.equalsIgnoreCase(ChemicalName)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), Jsoup.parse(value).text());
+                            } else if (name.equalsIgnoreCase(GeneForms)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), value);
+                            } else if (name.equalsIgnoreCase(Organism)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), Jsoup.parse(value).text());
+                            } else if (name.equalsIgnoreCase(Interaction)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), value);
+                            } else if (name.equalsIgnoreCase(Types_of_Interaction)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), value);
+                            } else if (name.equalsIgnoreCase(References)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), Jsoup.parse(value).text());
                             }
                         }
 
-                        //Check if elementId is present locally.
+                        //Check if elementId is present in database.
                         if (allElementsInET.contains(localElementId)) {
                             continue;
                         } else {
-                            if (allRowsData.containsKey(localElementId)) {
-                                //comma separated tissues
-                                String previousTissue = allRowsData.get(localElementId).get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]));
-                                String currentTissue = elementAttributes.get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]));
-
-                                if (previousTissue.length() > 0 && currentTissue.length() > 0 && !previousTissue.contains(currentTissue)) {
-                                    previousTissue += "," + currentTissue;
-                                }
-                                allRowsData.get(localElementId).put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[2]), previousTissue);
-
-                                //comma separated gene symbols
-                                String currentGeneSymbol = elementAttributes.get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]));
-                                String previousGeneSymbol = allRowsData.get(localElementId).get(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]));;
-
-                                if (previousGeneSymbol.length() > 0 && currentGeneSymbol.length() > 0 && !previousGeneSymbol.contains(currentGeneSymbol)) {
-                                    previousGeneSymbol += "," + currentGeneSymbol;
-                                }
-                                allRowsData.get(localElementId).put(Structure.generateContextName(GEMMA_RESOURCEID, GEMMA_ITEMKEYS[1]), previousGeneSymbol);
-                            } else {
-                                allRowsData.put(localElementId, elementAttributes);
-                            }
+                            localElementId += SLASH_STRING + rowcnt;
+                            rowcnt++;
+                            allRowsData.put(localElementId, elementAttributes);
                         }
                     }
                 } else {
-                    logger.info("Increase OFFSET: No Results for page : " + offset);
                     offset += rowCount;
                 }
             } while (offset < totalCount);
@@ -244,15 +228,15 @@ public class GEMMAAccessTool extends AbstractNifResourceAccessTool {
                 elementAttributes = allRowsData.get(localElementID);
 
                 // PUT DATA INTO A STRUCTURE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                Structure elementStructure = new Structure(GEMMA_STRUCTURE.getContextNames());
-                for (String contextName : GEMMA_STRUCTURE.getContextNames()) {
+                Structure elementStructure = new Structure(STRUCTURE.getContextNames());
+                for (String contextName : STRUCTURE.getContextNames()) {
                     boolean attributeHasValue = false;
 
                     for (String att : elementAttributes.keySet()) {
                         if (contextName.equals(att)) {
                             // not an existing annotation
-                            if (GEMMA_STRUCTURE.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION)
-                                    || GEMMA_STRUCTURE.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)) {
+                            if (STRUCTURE.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION)
+                                    || STRUCTURE.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)) {
                                 elementStructure.putContext(contextName, elementAttributes.get(att));
                                 attributeHasValue = true;
 

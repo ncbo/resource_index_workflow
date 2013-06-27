@@ -38,10 +38,9 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
     private static final String[] TOXIN_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure TOXIN_STRUCTURE = new Structure(TOXIN_ITEMKEYS, TOXIN_RESOURCEID, TOXIN_WEIGHTS, TOXIN_ONTOIDS);
     private static String TOXIN_MAIN_ITEMKEY = "toxinName";
-    
+   
     // Constant for 'experiment' string
-    private static final String TOXIN_Database = "T3DB";
-    private static final String TOXIN_Indexable = "Toxins";
+    private static final String nifId = "nif-0000-22933-1";
     private static final String ToxinName = "Toxin Name";
     private static final String Description = "Description";
     private static final String Synonyms = "Synonyms";
@@ -153,7 +152,7 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
         HashSet<Element> elementSet = new HashSet<Element>();
         int nbAdded = 0;
         int offset = 0;
-        int totalCount = 0;        
+        int totalCount = 0;
 
         try {
             //get all elements from _ET table
@@ -162,16 +161,16 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(TOXIN_Database, TOXIN_Indexable, query, offset, rowCount);
-              
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
-                    //Get total records
-                    totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());                  
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
+                    //get total records
+                    totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
+                    offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
-                    //Iterate over the returned structure 
+                    // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
                     for (int i = 0; i < rows.getLength(); i++) {
                         String localElementId = EMPTY_STRING;
@@ -191,8 +190,7 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
                             }
                             if (name.equalsIgnoreCase(ToxinName)) {                     //localElementId and Tittle
                                 localElementId = value.substring(value.indexOf(TOXIN_ELT_URL) + TOXIN_ELT_URL.length(), value.indexOf(endTag));
-                                elementAttributes.put(Structure.generateContextName(TOXIN_RESOURCEID, TOXIN_ITEMKEYS[0]), Jsoup.parse(value).text());
-                                //System.out.println(localElementId + " : " + elementAttributes.get(Structure.generateContextName(TOXIN_RESOURCEID, TOXIN_ITEMKEYS[0])));
+                                elementAttributes.put(Structure.generateContextName(TOXIN_RESOURCEID, TOXIN_ITEMKEYS[0]), Jsoup.parse(value).text());                               
                             } else if (name.equalsIgnoreCase(Description)) {            //Description
                                 elementAttributes.put(Structure.generateContextName(TOXIN_RESOURCEID, TOXIN_ITEMKEYS[1]), value);
                             } else if (name.equalsIgnoreCase(Synonyms)) {               //Synonyms
@@ -218,7 +216,7 @@ public class ToxinDBAccessTool extends AbstractNifResourceAccessTool {
                         }
                     }
                 }
-                 offset += rowCount;
+                offset += rowCount;
             } while (offset < totalCount);
 
             //parsing ends

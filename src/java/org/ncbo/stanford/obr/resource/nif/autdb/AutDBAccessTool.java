@@ -38,9 +38,7 @@ public class AutDBAccessTool extends AbstractNifResourceAccessTool {
     private static Structure AUTDB_STRUCTURE = new Structure(AUTDB_ITEMKEYS, AUTDB_RESOURCEID, AUTDB_WEIGHTS, AUTDB_ONTOIDS);
     private static String AUTDB_MAIN_ITEMKEY = "Animal_Model";
     // Constant 
-    private static final String AUTDB_Database = "AutDB";
-    private static final String AUTDB_Indexable = "AnimalModels";
-   
+    private static final String nifId = "nif-0000-02587-1";
     private static final String Animal_Model = "Animal Model";
     private static final String Gene_Symbol = "Gene Symbol";
     private static final String Gene_Name = "Gene Name";
@@ -159,14 +157,14 @@ public class AutDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(AUTDB_Database, AUTDB_Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -188,7 +186,7 @@ public class AutDBAccessTool extends AbstractNifResourceAccessTool {
                             }
                             if (name.equalsIgnoreCase(Animal_Model)) {                   //Gene_Symbol & localElementId
                                 elementAttributes.put(Structure.generateContextName(AUTDB_RESOURCEID, AUTDB_ITEMKEYS[0]), Jsoup.parse(value).text());
-                                localElementId = value.substring(value.indexOf(AUTDB_ELT_URL) + AUTDB_ELT_URL.length(), value.indexOf(endTag));                
+                                localElementId = value.substring(value.indexOf(AUTDB_ELT_URL) + AUTDB_ELT_URL.length(), value.indexOf(endTag));
                             } else if (name.equalsIgnoreCase(Gene_Symbol)) {                 //Tissue                               
                                 elementAttributes.put(Structure.generateContextName(AUTDB_RESOURCEID, AUTDB_ITEMKEYS[1]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(Gene_Name)) {               //Organism
@@ -211,7 +209,7 @@ public class AutDBAccessTool extends AbstractNifResourceAccessTool {
                                 String oldPhenotypeProfile = oldElementAttributes.get(Structure.generateContextName(AUTDB_RESOURCEID, AUTDB_ITEMKEYS[5]));
                                 String newPhenotypeValue = elementAttributes.get(Structure.generateContextName(AUTDB_RESOURCEID, AUTDB_ITEMKEYS[5]));
                                 if (oldPhenotypeProfile.length() > 0 && newPhenotypeValue.length() > 0) {
-                                    oldPhenotypeProfile += ", " + newPhenotypeValue;                                
+                                    oldPhenotypeProfile += ", " + newPhenotypeValue;
                                 }
                                 oldElementAttributes.put(Structure.generateContextName(AUTDB_RESOURCEID, AUTDB_ITEMKEYS[5]), oldPhenotypeProfile);
                                 allRowsData.put(localElementId, oldElementAttributes);

@@ -18,12 +18,13 @@ import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 /**
  * AccessTool for NIF CCDB
  * @author s.kharat
  */
-public class CcDBAccessTool extends AbstractNifResourceAccessTool{
-    
+public class CcDBAccessTool extends AbstractNifResourceAccessTool {
+
     private static final String CCDB_URL = "http://ccdb.ucsd.edu";
     private static final String CCDB_NAME = "Cell Centered Database (via NIF)";
     private static final String CCDB_RESOURCEID = "CCDB";
@@ -34,24 +35,20 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
             + "The goal of the CCDB project is to make unique and valuable datasets available to the scientific community for visualization, reuse and reanalysis. Data in the CCDB can be accessed by performing a Search or by browsing through our Gallery. Data in the CCDB may be downloaded freely and reused for non-profit use within the terms of our usage agreement.";
     private static final String CCDB_LOGO = "http://neurolex.org/w/images/a/a4/Ccdb.jpg";
     private static final String CCDB_ELT_URL = "http://ccdb.ucsd.edu/sand/main?event=displaySum&mpid=";
-    private static final String[] CCDB_ITEMKEYS = {"ProjectName", "Species", "Region", "CellType","Age","Microscope_Type"}; //, "System", "Organ"
-    private static final Double[] CCDB_WEIGHTS = {1.0, 0.8, 0.9, 0.9,0.5,0.5}; //, 0.6, 0.8
-    private static final String[] CCDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,Structure.NOT_FOR_ANNOTATION,Structure.NOT_FOR_ANNOTATION}; //, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION
+    private static final String[] CCDB_ITEMKEYS = {"ProjectName", "Species", "Region", "CellType", "Age", "Microscope_Type"}; 
+    private static final Double[] CCDB_WEIGHTS = {1.0, 0.8, 0.9, 0.9, 0.5, 0.5}; //, 0.6, 0.8
+    private static final String[] CCDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION}; //, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION
     private static Structure CCDB_STRUCTURE = new Structure(CCDB_ITEMKEYS, CCDB_RESOURCEID, CCDB_WEIGHTS, CCDB_ONTOIDS);
     private static String CCDB_MAIN_ITEMKEY = "ProjectName";
-    
     // Constant 
-    private static final String CCDB_Database = "CCDB";
-    private static final String [] CCDB_Indexable = {"All Information"}; // ,"Anatomical Detail" (currently not retrieved  from NIF)
+    private static final String nifId = "nif-0000-00007-1";
     private static final String CCDB_ProjectName = "Project Name";
     private static final String CCDB_Species = "Organism";
     private static final String CCDB_Region = "Brain Region";
-    private static final String CCDB_CellTypes = "Cell Type";
-    private static final String CCDB_System = "System";
-    private static final String CCDB_Organ = "Organ";  
+    private static final String CCDB_CellTypes = "Cell Type";   
     private static final String CCDB_Image = "Image"; //Required to retrive localElementId 
     private static final String CCDB_Age = "Age";
-    private static final String CCDB_MicroscopeType = "Microscope Type";         
+    private static final String CCDB_MicroscopeType = "Microscope Type";
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -153,26 +150,26 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
     public HashSet<Element> getAllElements() {
         logger.info("* Get All Elements for CCDB ... ");
         HashSet<Element> elementSet = new HashSet<Element>();
-        int nbAdded = 0;        
+        int nbAdded = 0;
+        int offset = 0;
+        int totalCount = 0;
 
         try {
             //get all elements from _ET table
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
 
-            for(String indexable : CCDB_Indexable){    
-                int offset = 0;
-                int totalCount = 0;
-                
-                //parsing data
-                do {
-                    Document dom = queryFederation(CCDB_Database, indexable, query, offset, rowCount);
-                    Node tableData = dom.getFirstChild();
+
+            //parsing data
+            do {
+                Document dom = queryFederation(nifId, query, offset, rowCount);
+                if (dom != null) {
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -206,32 +203,33 @@ public class CcDBAccessTool extends AbstractNifResourceAccessTool{
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[4]), value);
                             } else if (name.equalsIgnoreCase(CCDB_MicroscopeType)) {//Microscope Type
                                 elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[5]), value);
-                            }                            
-                          }                        
-                            //appending localElementId to project Name. 
-                            elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]),elementAttributes.get(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0])) + " " + localElementId);
-                                
-                            //Check if elementId is present locally.
-                            if (allElementsInET.contains(localElementId)) {
-                                continue;
-                            } else {
-                                //adding more attribte retrived from second indexable request
-                                if(allRowsData.containsKey(localElementId)){
-                                 //   System.out.println("Updating previuos map for: " + localElementId);
-                                    Map<String,String> initEleAttributes = allRowsData.get(localElementId);
-                                    for(String key : elementAttributes.keySet()){
-                                        initEleAttributes.put(key, elementAttributes.get(key));
-                                    }
-                                    allRowsData.put(localElementId, initEleAttributes);
-                                }else{
-                                //    System.out.println("Adding value for: " + localElementId);
-                                    allRowsData.put(localElementId, elementAttributes);
-                                }
                             }
+                        }
+                        //appending localElementId to project Name. 
+                        elementAttributes.put(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0]), elementAttributes.get(Structure.generateContextName(CCDB_RESOURCEID, CCDB_ITEMKEYS[0])) + " " + localElementId);
+
+                        //Check if elementId is present locally.
+                        if (allElementsInET.contains(localElementId)) {
+                            continue;
+                        } else {
+                            //adding more attribte retrived from second indexable request
+                            if (allRowsData.containsKey(localElementId)) {
+                                //   System.out.println("Updating previuos map for: " + localElementId);
+                                Map<String, String> initEleAttributes = allRowsData.get(localElementId);
+                                for (String key : elementAttributes.keySet()) {
+                                    initEleAttributes.put(key, elementAttributes.get(key));
+                                }
+                                allRowsData.put(localElementId, initEleAttributes);
+                            } else {
+                                //    System.out.println("Adding value for: " + localElementId);
+                                allRowsData.put(localElementId, elementAttributes);
+                            }
+                        }
                     }
 
-                } while (offset < totalCount);
-            }    
+                }
+            } while (offset < totalCount);
+
             //parsing ends
 
             // Second phase: creation of elements           

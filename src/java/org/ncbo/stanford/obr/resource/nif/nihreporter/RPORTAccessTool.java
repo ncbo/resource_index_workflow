@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
  * @author s.kharat
  */
 public class RPORTAccessTool extends AbstractNifResourceAccessTool {
-    
+
     private static final String URL = "http://report.nih.gov/";
     private static final String NAME = "NIH RePORTER (via NIF)";
     private static final String RESOURCEID = "RPORT";
@@ -39,11 +39,8 @@ public class RPORTAccessTool extends AbstractNifResourceAccessTool {
         Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Project_Title";
-    
     // Constant 
-    private static final String Database = "RePORTER";
-    private static final String Indexable = "CurrentNIHGrants";
-   
+    private static final String nifId = "nif-0000-10319-1";
     private static final String Project_Title = "Project Title";
     private static final String Abstract = "Abstract";
     private static final String Project_Number = "Project Number";
@@ -52,7 +49,6 @@ public class RPORTAccessTool extends AbstractNifResourceAccessTool {
     private static final String Grant_code = "Grant Code";
     private static final String Funding_Year = "Funding Year";
     private static final String Funding_Institute = "Funding Institute";
-    
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -164,14 +160,14 @@ public class RPORTAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -198,7 +194,7 @@ public class RPORTAccessTool extends AbstractNifResourceAccessTool {
                             } else if (name.equalsIgnoreCase(Project_Number)) {
                                 localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), Jsoup.parse(value).text());
-                            } else if (name.equalsIgnoreCase(PI_Names)) {                                
+                            } else if (name.equalsIgnoreCase(PI_Names)) {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), value);
                             } else if (name.equalsIgnoreCase(Address)) {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), value);
@@ -208,7 +204,7 @@ public class RPORTAccessTool extends AbstractNifResourceAccessTool {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), value);
                             } else if (name.equalsIgnoreCase(Funding_Institute)) {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[7]), value);
-                            } 
+                            }
                         }
 
                         //Check if elementId is present in database.

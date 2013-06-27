@@ -44,8 +44,7 @@ public class PMHTAccessTool extends AbstractNifResourceAccessTool {
     private static Structure PMH_STRUCTURE = new Structure(PMH_ITEMKEYS, PMH_RESOURCEID, PMH_WEIGHTS, PMH_ONTOIDS);
     private static String PMH_MAIN_ITEMKEY = "Test_Name";
     // Constant 
-    private static final String PMH_Database = "PubMedHealth";
-    private static final String PMH_Indexable = "Tests";
+    private static final String nifId = "nlx_32805-2";
     private static final String PMH_Name = "Test Name";
     private static final String pmh_title = "Title";
     private static final String pmh_text = "Text";
@@ -177,14 +176,14 @@ public class PMHTAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(PMH_Database, PMH_Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();

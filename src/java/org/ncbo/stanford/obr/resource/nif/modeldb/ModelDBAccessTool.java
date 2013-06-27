@@ -38,10 +38,8 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
     private static final String[] MDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure MDB_STRUCTURE = new Structure(MDB_ITEMKEYS, MDB_RESOURCEID, MDB_WEIGHTS, MDB_ONTOIDS);
     private static String MDB_MAIN_ITEMKEY = "title";
-    
     // Constants 
-    private static final String MDB_Database = "ModelDB";
-    private static final String MDB_Indexable = "Models";
+    private static final String nifId = "nif-0000-00004-1";
     private static final String title = "Model Name";
     private static final String modelTypes = "Type";
     private static final String cellTypes = "Neurons";
@@ -160,56 +158,59 @@ public class ModelDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(MDB_Database, MDB_Indexable, query, offset, rowCount);
-                Node tableData = dom.getFirstChild();
-                //get total records
-                totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
-                offset += rowCount;
+                Document dom = queryFederation(nifId, query, offset, rowCount);
+                if (dom != null) {
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
+                    //get total records
+                    totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
+                    offset += rowCount;
 
-                Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
-                // Iterate over the returned structure 
-                NodeList rows = results.getChildNodes();
-                for (int i = 0; i < rows.getLength(); i++) {
-                    String localElementId = EMPTY_STRING;
-                    Map<String, String> elementAttributes = new HashMap<String, String>();
+                    // Iterate over the returned structure 
+                    NodeList rows = results.getChildNodes();
+                    for (int i = 0; i < rows.getLength(); i++) {
+                        String localElementId = EMPTY_STRING;
+                        Map<String, String> elementAttributes = new HashMap<String, String>();
 
-                    Node row = rows.item(i);
-                    for (int j = 0; j < row.getChildNodes().getLength(); j++) {
-                        NodeList vals = row.getChildNodes().item(j).getChildNodes();
-                        String name = null;
-                        String value = null;
-                        for (int k = 0; k < vals.getLength(); k++) {
-                            if (nodeName.equals(vals.item(k).getNodeName())) {
-                                name = vals.item(k).getTextContent();
-                            } else if (nodeValue.equals(vals.item(k).getNodeName())) {
-                                value = vals.item(k).getTextContent();
+                        Node row = rows.item(i);
+                        for (int j = 0; j < row.getChildNodes().getLength(); j++) {
+                            NodeList vals = row.getChildNodes().item(j).getChildNodes();
+                            String name = null;
+                            String value = null;
+                            for (int k = 0; k < vals.getLength(); k++) {
+                                if (nodeName.equals(vals.item(k).getNodeName())) {
+                                    name = vals.item(k).getTextContent();
+                                } else if (nodeValue.equals(vals.item(k).getNodeName())) {
+                                    value = vals.item(k).getTextContent();
+                                }
+                            }
+                            if (name.equalsIgnoreCase(title)) { //local Element Id and Tittle
+                                localElementId = value.substring(value.indexOf(MDB_ELT_URL) + MDB_ELT_URL.length(), value.indexOf(endTag));
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[0]), Jsoup.parse(value).text());
+                            } else if (name.equalsIgnoreCase(modelTypes)) { //ModelType
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[1]), value);
+                            } else if (name.equalsIgnoreCase(cellTypes)) { //cellType
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[2]), value);
+                            } else if (name.equalsIgnoreCase(channels)) { //Channels
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[3]), value);
+                            } else if (name.equalsIgnoreCase(receptors)) { //Receptors
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[4]), value);
+                            } else if (name.equalsIgnoreCase(transmitters)) { //Transmitters
+                                elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[5]), value);
+                            }
+                            //Check if elementId is present locally.
+                            if (allElementsInET.contains(localElementId)) {
+                                continue;
+                            } else {
+                                allRowsData.put(localElementId, elementAttributes);
                             }
                         }
-                        if (name.equalsIgnoreCase(title)) { //localElementId and Tittle
-                            localElementId = value.substring(value.indexOf(MDB_ELT_URL) + MDB_ELT_URL.length(), value.indexOf(endTag));                      
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[0]), Jsoup.parse(value).text());
-                       //     System.out.println(localElementId + " : " + elementAttributes.get(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[0])));
-                        } else if (name.equalsIgnoreCase(modelTypes)) { //ModelType
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[1]), value);
-                        } else if (name.equalsIgnoreCase(cellTypes)) { //cellType
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[2]), value);
-                        } else if (name.equalsIgnoreCase(channels)) { //Channels
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[3]), value);
-                        } else if (name.equalsIgnoreCase(receptors)) { //Receptors
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[4]), value);
-                        } else if (name.equalsIgnoreCase(transmitters)) { //Transmitters
-                            elementAttributes.put(Structure.generateContextName(MDB_RESOURCEID, MDB_ITEMKEYS[5]), value);
-                        }
-                        //Check if elementId is present locally.
-                        if (allElementsInET.contains(localElementId)) {
-                            continue;
-                        } else {
-                            allRowsData.put(localElementId, elementAttributes);
-                        }
                     }
+                } else {
+                    offset += rowCount;
+                    logger.info("Increase OFFSET");
                 }
-
             } while (offset < totalCount);
 
             //parsing ends

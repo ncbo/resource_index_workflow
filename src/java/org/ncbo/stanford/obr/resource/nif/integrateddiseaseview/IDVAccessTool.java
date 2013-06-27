@@ -38,8 +38,7 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Name";
     // Constant 
-    private static final String Database = "NIF Integrated Disease";
-    private static final String Indexable = "Info";
+    private static final String nifId = "nlx_86401-1";
     private static final String Name = "Name";
     private static final String Synonym = "Synonym";
     private static final String Description = "Description";
@@ -122,7 +121,7 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
 
             // for each experiments accessed by the tool
             Iterator<Element> i = allElementList.iterator();
-            while (i.hasNext()) {                
+            while (i.hasNext()) {
                 myExp = i.next();
                 try {
                     if (!myExp.getElementStructure().hasNullValues()) {
@@ -158,14 +157,14 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();

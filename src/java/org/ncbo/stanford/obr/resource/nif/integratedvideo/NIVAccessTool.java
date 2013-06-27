@@ -42,8 +42,7 @@ public class NIVAccessTool extends AbstractNifResourceAccessTool {
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCE_ID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Title";
     // Constant 
-    private static final String Database = "NIF Integrated Video";
-    private static final String Indexable = "Videos";
+    private static final String nifId = "nlx_13182-1";
     private static final String Title = "Title";
     private static final String Description = "Description";
     private static final String Author = "Author";
@@ -165,15 +164,14 @@ public class NIVAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
-
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();

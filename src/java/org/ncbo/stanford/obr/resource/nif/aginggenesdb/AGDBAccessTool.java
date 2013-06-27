@@ -40,10 +40,8 @@ public class AGDBAccessTool extends AbstractNifResourceAccessTool {
     private static final String[] AGDB_ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION};
     private static Structure AGDB_STRUCTURE = new Structure(AGDB_ITEMKEYS, AGDB_RESOURCEID, AGDB_WEIGHTS, AGDB_ONTOIDS);
     private static String AGDB_MAIN_ITEMKEY = "Gene_Name";
-  
     // Constant 
-    private static final String AGDB_Database = "AgingGenesDB";
-    private static final String AGDB_Indexable = "Genes";
+    private static final String nifId = "nif-0000-23326-2";
     private static final String Gene_Name = "Gene Name";
     private static final String Organism = "Organism";
     private static final String Aging_Phenotype = "Aging Phenotype";
@@ -164,14 +162,14 @@ public class AGDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(AGDB_Database, AGDB_Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
