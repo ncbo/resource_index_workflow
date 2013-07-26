@@ -167,7 +167,7 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllValuesByColumn(Unique_field_columns);
 
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
-            //int rowcnt = 1;
+            int rowcnt = 1;
 
             //parsing data
             do {
@@ -232,9 +232,9 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
                         } else {
                             allElementsInET.add(intA + intB + intDetMethod + intType);
 
-                            //additional row count value appended to localElementId to overcome unique constraint restriction for this column in DB.
-//                            localElementId += SLASH_STRING + rowcnt;
-//                            rowcnt++;
+//                          additional row count value appended to localElementId to overcome unique constraint restriction for this column in DB.
+                            localElementId += SLASH_STRING + rowcnt;
+                            rowcnt++;
                             allRowsData.put(localElementId, elementAttributes);
                         }
 
@@ -275,6 +275,8 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
                 }
                 // put the element structure in a new element
                 try {
+                    // Removing additional int value.
+                    localElementID = localElementID.substring(0,localElementID.indexOf(SLASH_STRING));
                     Element exp = new Element(localElementID, elementStructure);
                     elementSet.add(exp);
                 } catch (Element.BadElementStructureException e) {
