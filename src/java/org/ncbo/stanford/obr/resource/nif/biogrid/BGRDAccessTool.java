@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
  * @author s.kharat
  */
 public class BGRDAccessTool extends AbstractNifResourceAccessTool {
-    
+
     private static final String URL = "http://thebiogrid.org/";
     private static final String NAME = "BioGRID (via NIF)";
     private static final String RESOURCEID = "BGRD";
@@ -32,32 +32,29 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
             + "with data compiled through comprehensive curation efforts. The current version searches over 36,000 articles containing over 560,000 interactions. "
             + "Complete coverage of the entire literature is maintained for budding yeast (S. cerevisiae), fission yeast (S. pombe) and thale cress (A. thaliana), "
             + "and efforts to expand curation across multiple metazoan species are underway.";
-
     private static final String LOGO = "http://neurolex.org/w/images/2/27/BioGRID.PNG";
     private static final String ELT_URL = "http://thebiogrid.org/search.php?search=";
-    private static final String[] ITEMKEYS = {"Interactor_A", "Organism_A", "Interactor_B", "Organism_B", "Interaction_Detection_Method", "Interaction_Types", "Source_Database", "Confidence_Values","Publication"};
-    private static final Double[] WEIGHTS = {1.0, 0.9, 0.9, 0.9, 0.5, 0.5, 0.0, 0.0,0.0};
-    private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
-        Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
+    private static final String[] ITEMKEYS = {"Interactor_A_and_Interactor_B", "Interactor_A", "Organism_A", "Interactor_B", "Organism_B", "Interaction_Detection_Method", "Interaction_Types", "Source_Database", "Confidence_Values"};
+    private static final Double[] WEIGHTS = {0.0, 1.0, 0.9, 0.9, 0.9, 0.5, 0.5, 0.0, 0.0};
+    private static final String[] ONTOIDS = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
+        Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
-    private static String MAIN_ITEMKEY = "Interactor_A";
-    
+    private static String MAIN_ITEMKEY = "Interactor_A_and_Interactor_B";
     // Constant 
-    private static final String Database = "BioGRID";
-    private static final String Indexable = "Interactions";
-   
+    private static final String nifId = "nif-0000-00432-1";
     private static final String InteractorA = "Interactor A";
     private static final String OrganismA = "Organism A";
     private static final String InteractorB = "Interactor B";
     private static final String OrganismB = "Organism B";
     private static final String Interaction_Detection_Method = "Interaction Detection Method";
-    private static final String Interaction_Types = "Interaction Types";
+    private static final String Interaction_Types = "Interaction Type";
     private static final String Source_Database = "Source Database";
     private static final String Confidence_Values = "Confidence Values";
-    private static final String Publication = "Publication";
-    
-    private static final String Unique_field_columns = "concat(bgrd_interactor_a, bgrd_interactor_b, bgrd_interaction_detection_method, bgrd_interaction_types)";
-    
+    //Resource uniqueness is checked against four fields (InteractorA, InteractorB,Interaction_Detection_Method, and Interaction_Types)
+    private static final String Unique_field_columns = "concat(" + Structure.generateContextName(RESOURCEID, ITEMKEYS[1]) + ","
+            + Structure.generateContextName(RESOURCEID, ITEMKEYS[3]) + ","
+            + Structure.generateContextName(RESOURCEID, ITEMKEYS[5]) + ","
+            + Structure.generateContextName(RESOURCEID, ITEMKEYS[6]) + ")";
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -94,8 +91,8 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public String elementURLString(String elementLocalID) {
-         //separating row count value from localElementId
-        String elemetId []= elementLocalID.split(SLASH_STRING);
+        //separating row count value from localElementId
+        String elemetId[] = elementLocalID.split(SLASH_STRING);
         return ELT_URL + elemetId[0];
     }
 
@@ -167,21 +164,21 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
         try {
             //get all elements from _ET table
             //Unique entry combination for this resource is checked against 4 fields (bgrd_interactor_a, bgrd_interactor_b, bgrd_interaction_detection_method, bgrd_interaction_types)
-            HashSet<String> allElementsInET  = this.resourceUpdateService.getAllValuesByColumn(Unique_field_columns);
-            
+            HashSet<String> allElementsInET = this.resourceUpdateService.getAllValuesByColumn(Unique_field_columns);
+
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
-            int rowcnt = 1;
-            
+            //int rowcnt = 1;
+
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -208,40 +205,39 @@ public class BGRDAccessTool extends AbstractNifResourceAccessTool {
                             if (name.equalsIgnoreCase(InteractorA)) {
                                 localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
                                 intA = Jsoup.parse(value).text();
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), intA);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), intA);
                             } else if (name.equalsIgnoreCase(OrganismA)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), value);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(InteractorB)) {
-                                intB = value;
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), intB);
-                            } else if (name.equalsIgnoreCase(OrganismB)) {                                
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), value);
+                                intB = Jsoup.parse(value).text();
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), intB);
+                            } else if (name.equalsIgnoreCase(OrganismB)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(Interaction_Detection_Method)) {
                                 intDetMethod = value;
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), intDetMethod);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), intDetMethod);
                             } else if (name.equalsIgnoreCase(Interaction_Types)) {
                                 intType = value;
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), intType);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), intType);
                             } else if (name.equalsIgnoreCase(Source_Database)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), value);
-                            } else if (name.equalsIgnoreCase(Confidence_Values)) {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[7]), value);
-                            } else if (name.equalsIgnoreCase(Publication)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[8]), Jsoup.parse(value).text());
-                            } 
+                            } else if (name.equalsIgnoreCase(Confidence_Values)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[8]), value);
+                            }
                         }
-
+                        elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), intA + "-" + intB);
                         //Check if elementId is present in database.
                         if (allElementsInET.contains(intA + intB + intDetMethod + intType)) {
                             continue;
                         } else {
                             allElementsInET.add(intA + intB + intDetMethod + intType);
-                           
+
                             //additional row count value appended to localElementId to overcome unique constraint restriction for this column in DB.
-                            localElementId += SLASH_STRING + rowcnt;
-                            rowcnt++;
+//                            localElementId += SLASH_STRING + rowcnt;
+//                            rowcnt++;
                             allRowsData.put(localElementId, elementAttributes);
                         }
+
                     }
                 } else {
                     offset += rowCount;
