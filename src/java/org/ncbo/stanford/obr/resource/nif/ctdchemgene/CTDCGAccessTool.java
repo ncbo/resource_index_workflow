@@ -66,7 +66,7 @@ public class CTDCGAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.BIG;
+        return ResourceType.SMALL;
     }
 
     @Override
@@ -157,8 +157,7 @@ public class CTDCGAccessTool extends AbstractNifResourceAccessTool {
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
 
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
-            int rowcnt = 1;
-
+     
             //parsing data
             do {
                 Document dom = queryFederation(nifId, query, offset, rowCount);
@@ -209,9 +208,7 @@ public class CTDCGAccessTool extends AbstractNifResourceAccessTool {
                         //Check if elementId is present in database.
                         if (allElementsInET.contains(localElementId)) {
                             continue;
-                        } else {
-                            localElementId += SLASH_STRING + rowcnt;
-                            rowcnt++;
+                        } else {                            
                             allRowsData.put(localElementId, elementAttributes);
                         }
                     }
