@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * AccessTool for Coriell Cell Repository (via NIF).
+ * AccessTool for CellImageLibrary (via NIF).
  * @author s.kharat
  */
 public class CILAccessTool extends AbstractNifResourceAccessTool {
