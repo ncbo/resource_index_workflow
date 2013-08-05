@@ -32,15 +32,14 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
             + "of cells from a variety of organisms, showcasing cell architecture, intracellular functionalities, and both normal and abnormal processes.";
     private static final String LOGO = "http://neurolex.org/w/images/1/17/The_Cell_-_an_image_library.PNG";
     private static final String ELT_URL = "http://cellimagelibrary.org/images/";
-    private static final String[] ITEMKEYS = {"Image", "Image_description", "Cellular_component", "Organism", "Investigator_name", "CellType", "CellLine"};
-    private static final Double[] WEIGHTS = {0.0, 1.0, 0.9, 0.5, 0.7, 0.0, 0.0};
-    private static final String[] ONTOIDS = {Structure.NOT_FOR_ANNOTATION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
-        Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
+    private static final String[] ITEMKEYS = {"Image_description", "Cellular_component", "Organism", "Investigator_name", "CellType", "CellLine", "Image"};
+    private static final Double[] WEIGHTS = {1.0, 0.9, 0.5, 0.7, 0.0, 0.0, 0.0};
+    private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
+        Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
-    private static String MAIN_ITEMKEY = "Image";
+    private static String MAIN_ITEMKEY = "Image_description";
     // Constant 
-    private static final String Database = "CellImageLibrary";
-    private static final String Indexable = "CIL";
+    private static final String nifId = "nif-0000-37639-1";
     private static final String Image = "Image";
     private static final String Image_description = "Image description";
     private static final String Cellular_component = "Cellular Component";
@@ -66,7 +65,7 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.BIG;
+        return ResourceType.MEDIUM;
     }
 
     @Override
@@ -150,7 +149,7 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
         HashSet<Element> elementSet = new HashSet<Element>();
         int nbAdded = 0;
         int offset = 0;
-        int totalCount = 1000;
+        int totalCount = 0;
 
         try {
             //get all elements from _ET table            
@@ -160,14 +159,14 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+                Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
-                    //      totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
+                    totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
@@ -189,20 +188,20 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
                                 }
                             }
 
-                            if (name.equalsIgnoreCase(Image)) {
-                                localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
+                            if (name.equalsIgnoreCase(Image_description)) {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), value);
-                            } else if (name.equalsIgnoreCase(Image_description)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), value);
                             } else if (name.equalsIgnoreCase(Cellular_component)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), value);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), value);
                             } else if (name.equalsIgnoreCase(Organism)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), Jsoup.parse(value).text());
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(Investigator_name)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), value);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), value);
                             } else if (name.equalsIgnoreCase(CellType)) {
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), value);
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), value);
                             } else if (name.equalsIgnoreCase(CellLine)) {
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), value);
+                            } else if (name.equalsIgnoreCase(Image)) {
+                                localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), value);
                             }
                         }
