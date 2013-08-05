@@ -61,7 +61,7 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.BIG;
+        return ResourceType.MEDIUM;
     }
 
     @Override
@@ -146,12 +146,14 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
         int nbAdded = 0;
         int offset = 0;
         int totalCount = 0;
-        String uniCheckfields = "concat(local_element_id,ctddp_pathway_name,ctddp_disease_Name,ctddp_inference_gene_symbol)";
+   //     String uniCheckfields = "concat(local_element_id,ctddp_pathway_name,ctddp_disease_Name,ctddp_inference_gene_symbol)";
 
         try {
 
             //Unique entry combination for this resource is checked against 4 fields (local_element_id + Pathway_Name + Disease_Name + Inference_Gene_Symbol)
-            HashSet<String> allElementsInET = this.resourceUpdateService.getAllValuesByColumn(uniCheckfields);
+//            HashSet<String> allElementsInET = this.resourceUpdateService.getAllValuesByColumn(uniCheckfields); 
+            
+            HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
 
             Map<StringBuffer, Map<String, String>> allRowsData = new HashMap<StringBuffer, Map<String, String>>();
 
@@ -200,11 +202,10 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
                             }
                         }
 
-                        //Check if elementId is present in database.
-                        if (allElementsInET.contains(localElementId + PathwayN + DiseaseN + InferenceGS)) {
+                        //Check if elementId is present in database.  if (allElementsInET.contains(localElementId + PathwayN + DiseaseN + InferenceGS)) {
+                        if (allElementsInET.contains(localElementId)) {
                             continue;
                         } else {
-                            allElementsInET.add(localElementId + PathwayN + DiseaseN + InferenceGS);
                             allRowsData.put(localElementId, elementAttributes);
                         }
                     }
