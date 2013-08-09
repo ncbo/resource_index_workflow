@@ -157,7 +157,7 @@ public class CTDCDAccessTool extends AbstractNifResourceAccessTool {
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
 
             Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
-            int rowcnt = 1;
+           // int rowcnt = 1;
 
             //parsing data
             do {
@@ -210,8 +210,8 @@ public class CTDCDAccessTool extends AbstractNifResourceAccessTool {
                         if (allElementsInET.contains(localElementId)) {
                             continue;
                         } else {
-                            localElementId += SLASH_STRING + rowcnt;
-                            rowcnt++;
+//                            localElementId += SLASH_STRING + rowcnt;
+//                            rowcnt++;
                             allRowsData.put(localElementId, elementAttributes);
                         }
                     }
