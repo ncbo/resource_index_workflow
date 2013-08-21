@@ -32,17 +32,17 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
             + "In detail, it contains information about gene/protein-disease associations, chemical-disease associations, interactions between chemicals and genes/proteins, "
             + "as well as the related pathways.";
     private static final String LOGO = "http://neurolex.org/w/images/b/bb/CTD.PNG";
-    private static final String ELT_URL = "http://ctdbase.org/detail.go?type=pathway&acc=";
+    private static final String ELT_URL = "http://ctdbase.org/detail.go?type=disease&acc=";
     private static final String[] ITEMKEYS = {"Pathway_Name", "Disease_Name", "Inference_Gene_Symbol"};
     private static final Double[] WEIGHTS = {1.0, 0.9, 0.9};
     private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION};
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
-    private static String MAIN_ITEMKEY = "Pathway_Name";
+    private static String MAIN_ITEMKEY = "Disease_Name";
     // Constant 
     private static final String nifId = "nif-0000-02683-3";
     private static final String Pathway_Name = "Pathway Name";
     private static final String DiseaseName = "Disease";
-    private static final String Inference_Gene_Symbol = "Inference Gene Symbol";
+    private static final String Inference_Gene_Symbol = "Association Inferred via Gene";
     private Map<String, String> localOntologyIDMap;
 
     // constructors
@@ -146,13 +146,9 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
         int nbAdded = 0;
         int offset = 0;
         int totalCount = 0;
-   //     String uniCheckfields = "concat(local_element_id,ctddp_pathway_name,ctddp_disease_Name,ctddp_inference_gene_symbol)";
 
         try {
 
-            //Unique entry combination for this resource is checked against 4 fields (local_element_id + Pathway_Name + Disease_Name + Inference_Gene_Symbol)
-//            HashSet<String> allElementsInET = this.resourceUpdateService.getAllValuesByColumn(uniCheckfields); 
-            
             HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
 
             Map<StringBuffer, Map<String, String>> allRowsData = new HashMap<StringBuffer, Map<String, String>>();
@@ -172,9 +168,6 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
                     NodeList rows = results.getChildNodes();
                     for (int i = 0; i < rows.getLength(); i++) {
                         StringBuffer localElementId = new StringBuffer(EMPTY_STRING);
-                        String PathwayN = EMPTY_STRING;
-                        String DiseaseN = EMPTY_STRING;
-                        String InferenceGS = EMPTY_STRING;
                         Map<String, String> elementAttributes = new HashMap<String, String>();
 
                         Node row = rows.item(i);
@@ -190,14 +183,11 @@ public class CTDDPAccessTool extends AbstractNifResourceAccessTool {
                                 }
                             }
                             if (name.equalsIgnoreCase(Pathway_Name)) {
-                                localElementId = new StringBuffer(value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag)));
-                                PathwayN = Jsoup.parse(value).text();
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), Jsoup.parse(value).text());
+                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), value);
                             } else if (name.equalsIgnoreCase(DiseaseName)) {
-                                DiseaseN = Jsoup.parse(value).text();
+                                localElementId = new StringBuffer(value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag)));
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), Jsoup.parse(value).text());
                             } else if (name.equalsIgnoreCase(Inference_Gene_Symbol)) {
-                                InferenceGS = value;
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), value);
                             }
                         }
