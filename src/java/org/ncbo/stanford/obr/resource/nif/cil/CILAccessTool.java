@@ -32,10 +32,10 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
             + "of cells from a variety of organisms, showcasing cell architecture, intracellular functionalities, and both normal and abnormal processes.";
     private static final String LOGO = "http://neurolex.org/w/images/1/17/The_Cell_-_an_image_library.PNG";
     private static final String ELT_URL = "http://cellimagelibrary.org/images/";
-    private static final String[] ITEMKEYS = {"Image_description", "Cellular_component", "Organism", "Investigator_name", "CellType", "CellLine", "Image"};
-    private static final Double[] WEIGHTS = {1.0, 0.9, 0.5, 0.7, 0.0, 0.0, 0.0};
+    private static final String[] ITEMKEYS = {"Image_description", "Cellular_component", "Organism", "Investigator_name", "CellType", "CellLine"};//, "Image"
+    private static final Double[] WEIGHTS = {1.0, 0.9, 0.5, 0.7, 0.0, 0.0};//, 0.0
     private static final String[] ONTOIDS = {Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION, Structure.FOR_CONCEPT_RECOGNITION,
-        Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};
+        Structure.FOR_CONCEPT_RECOGNITION, Structure.NOT_FOR_ANNOTATION, Structure.NOT_FOR_ANNOTATION};//, Structure.NOT_FOR_ANNOTATION
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Image_description";
     // Constant 
@@ -202,7 +202,7 @@ public class CILAccessTool extends AbstractNifResourceAccessTool {
                                 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), value);
                             } else if (name.equalsIgnoreCase(Image)) {
                                 localElementId = value.substring(value.indexOf(ELT_URL) + ELT_URL.length(), value.indexOf(endTag));
-                                elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), value);
+                             //   elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), value);
                             }
                         }
 
