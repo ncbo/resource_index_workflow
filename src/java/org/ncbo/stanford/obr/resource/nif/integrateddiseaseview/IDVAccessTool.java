@@ -38,7 +38,7 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCEID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Name";
     // Constant 
-    private static final String nifId = "nlx_86401-1";
+    private static final String nifId = "nlx_154697-6";
     private static final String Name = "Name";
     private static final String Synonym = "Synonym";
     private static final String Description = "Description";
