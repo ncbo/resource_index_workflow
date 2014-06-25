@@ -42,7 +42,7 @@ public class NIVAccessTool extends AbstractNifResourceAccessTool {
     private static Structure STRUCTURE = new Structure(ITEMKEYS, RESOURCE_ID, WEIGHTS, ONTOIDS);
     private static String MAIN_ITEMKEY = "Title";
     // Constant 
-    private static final String nifId = "nlx_13182-1";
+    private static final String nifId = "nlx_154697-11";
     private static final String Title = "Title";
     private static final String Description = "Description";
     private static final String Author = "Author";
