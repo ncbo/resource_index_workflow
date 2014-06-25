@@ -41,6 +41,7 @@ public class DRGDBAccessTool extends AbstractNifResourceAccessTool {
     private static String MAIN_ITEMKEY = "Gene_Name";
     
     // Constant 
+    private static final String nifId = "nif-0000-37443-1";
     private static final String Database = "Drug Related Gene Database";
     private static final String Indexable = "DRG";
     private static final String Publication = "Publication";
@@ -145,7 +146,7 @@ public class DRGDBAccessTool extends AbstractNifResourceAccessTool {
         } catch (Exception e) {
             logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e);
         }
-        logger.info(nbElement + " elements added to the OBR_IDV_ET table.");
+        logger.info(nbElement + " elements added to the OBR_DRGDB_ET table.");
         return nbElement;
     }
 
@@ -153,7 +154,7 @@ public class DRGDBAccessTool extends AbstractNifResourceAccessTool {
      *  @return HashSet<Element>
      */
     public HashSet<Element> getAllElements() {
-        logger.info("* Get All Elements for Integrated Disease View ... ");
+    	logger.info("* Get All Elements for Drug Related Gene Database ... ");
         HashSet<Element> elementSet = new HashSet<Element>();
         int nbAdded = 0;
         int offset = 0;
@@ -169,14 +170,16 @@ public class DRGDBAccessTool extends AbstractNifResourceAccessTool {
 
             //parsing data
             do {
-                Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
-                if (dom != null) {
-                    Node tableData = dom.getFirstChild();
+                //Document dom = queryFederation(Database, Indexable, query, offset, rowCount);
+            	Document dom = queryFederation(nifId, query, offset, rowCount);
+                
+            	if (dom != null) {
+                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
 
-                    Node results = tableData.getFirstChild();
+                    Node results = tableData.getChildNodes().item(1);
 
                     // Iterate over the returned structure 
                     NodeList rows = results.getChildNodes();
