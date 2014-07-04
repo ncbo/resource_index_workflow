@@ -159,7 +159,7 @@ public class IDVAccessTool extends AbstractNifResourceAccessTool {
             do {
                 Document dom = queryFederation(nifId, query, offset, rowCount);
                 if (dom != null) {
-                    Node tableData = dom.getFirstChild().getChildNodes().item(1);
+                    Node tableData = dom.getFirstChild().getChildNodes().item(2);
                     //get total records
                     totalCount = Integer.parseInt(tableData.getAttributes().getNamedItem(resultCount).getNodeValue());
                     offset += rowCount;
