@@ -229,17 +229,17 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 				//Parsing the file
 				logger.info("Parsing "+filePath +" file...");
 				dom = AbstractXmlResourceAccessTool.parseXML(filePath);
-				
+				//System.out.println("Parsing completed!!!!!!!!");
 				//get the root element
 				org.w3c.dom.Element domRoot = dom.getDocumentElement();
 				//get the node list of 'safetyreport' XML elements
 				NodeList experimentList = domRoot.getElementsByTagName(AERS_SAFETYREPORT);
-				 
+				 //System.out.println("Node Parsing completed!!!!!!!!");
 				if(experimentList != null && experimentList.getLength() > 0) {
 					int listSize = experimentList.getLength();
 					logger.info("Total number of elements on " + this.getToolResource().getResourceName() + ": " + listSize);
 					// for each 'safetyreport' XML element
-					for(int i = 0 ; i <listSize; i++) {
+					for(int i = 0 ; i <50; i++) {
 						aersElement = new AersDataElement((org.w3c.dom.Element)experimentList.item(i), this);
 						element = aersElement.getElement();
 						if (resourceUpdateService.addElement(element)){
@@ -383,20 +383,25 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 							NodeList reactionList=patientList.item(j).getChildNodes();
 							for(int k=0;k<reactionList.getLength();k++){
 								if(reactionList.item(k).getNodeName().equals(AERS_REACTION_DES_DRAFT_)){
-									reactionMedDrapt+=reactionList.item(k).getTextContent()+COMMA_SEPARATOR;
+                                                                    if(!reactionMedDrapt.contains(reactionList.item(k).getTextContent()))
+                                                                    reactionMedDrapt+=reactionList.item(k).getTextContent()+COMMA_SEPARATOR;
 								}//if
 							}//for
 						} else if(patientList.item(j).getNodeName().equals(AERS_DRUG_)){
 							NodeList drugList=patientList.item(j).getChildNodes();								
 							for(int k=0;k<drugList.getLength();k++){
 								if(drugList.item(k).getNodeName().equals(AERS_DRUG_CHAR_)){
-									drugCharacterization+=safetyReportsSpecification.getProperty(SPEC_CHAR_+drugList.item(k).getTextContent().trim()).toString().trim()+COMMA_SEPARATOR;
+									if(!drugCharacterization.contains(safetyReportsSpecification.getProperty(SPEC_CHAR_+drugList.item(k).getTextContent().trim()).toString().trim()))
+                                                                            drugCharacterization+=safetyReportsSpecification.getProperty(SPEC_CHAR_+drugList.item(k).getTextContent().trim()).toString().trim()+COMMA_SEPARATOR;
 								} else if(drugList.item(k).getNodeName().equals(AERS_DRUG_NAME_)){
-									medicinalProduct+=drugList.item(k).getTextContent()+COMMA_SEPARATOR;
+									if(!medicinalProduct.contains(drugList.item(k).getTextContent()))
+                                                                        medicinalProduct+=drugList.item(k).getTextContent()+COMMA_SEPARATOR;
 								} else if(drugList.item(k).getNodeName().equals(AERS_DRUG_ADMIN_)){
-									drugAdministrationRoute+=safetyReportsSpecification.getProperty(SPEC_ADMIN_+drugList.item(k).getTextContent().trim()).toString().trim()+COMMA_SEPARATOR;
+									if(!drugAdministrationRoute.contains(safetyReportsSpecification.getProperty(SPEC_ADMIN_+drugList.item(k).getTextContent().trim()).toString().trim()))
+                                                                        drugAdministrationRoute+=safetyReportsSpecification.getProperty(SPEC_ADMIN_+drugList.item(k).getTextContent().trim()).toString().trim()+COMMA_SEPARATOR;
 								} else if(drugList.item(k).getNodeName().equals(AERS_DRUG_INDI_)){
-									drugIndication+=drugList.item(k).getTextContent()+COMMA_SEPARATOR;
+									if(!drugIndication.contains(drugList.item(k).getTextContent()))
+                                                                        drugIndication+=drugList.item(k).getTextContent()+COMMA_SEPARATOR;
 								}
 							}
 						}
@@ -416,9 +421,9 @@ public class AersDataAccessTool extends AbstractXmlResourceAccessTool {
 				this.eltInfo.put(DRUG_CHAR, drugCharacterization.substring(0,drugCharacterization.length()));
 			}	
 			if(medicinalProduct.length()>2){
-				this.eltInfo.put(DRUG_NAMES, medicinalProduct.substring(0,medicinalProduct.length()-2));
+				this.eltInfo.put(DRUG_NAMES, medicinalProduct.substring(0,medicinalProduct.length()-2));                                
 			}else{
-				this.eltInfo.put(DRUG_NAMES, medicinalProduct.substring(0,medicinalProduct.length()));
+				this.eltInfo.put(DRUG_NAMES, medicinalProduct.substring(0,medicinalProduct.length()));                                
 			}
 			if(drugAdministrationRoute.length()>2){
 				this.eltInfo.put(DRUG_ADMIN_ROUTE, drugAdministrationRoute.substring(0,drugAdministrationRoute.length()-2));
