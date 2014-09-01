@@ -22,6 +22,7 @@ import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
 import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
+import java.util.Map.Entry;
 
 /**
  * 
@@ -66,6 +67,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 	private static PreparedStatement getFundingAmountByGrantAndYearStatement;
 	private static PreparedStatement getObrLocalElementIdStatement;
 	private static String            tableSQLName = "innolyst_grants";
+        private static String Unique_field_column = "rxrd_title";
 	 
 	public RxrdAccessTool(){
 		super(RXRD_NAME, RXRD_RESOURCEID, RXRD_STRUCTURE);
@@ -142,6 +144,9 @@ public class RxrdAccessTool extends ResourceAccessTool {
 		// get the list of element in the database (ie. list of grants in rxroads db)
 		HashSet<Integer> localElementIDList       = this.getElementList();		
 		HashSet<String> allElementLocalIDs = resourceUpdateService.getAllLocalElementIDs();
+                
+                //for unique check on "rxrd_title"
+                HashSet<String> allElementsTitlesInET = this.resourceUpdateService.getAllValuesByColumn(Unique_field_column);
 		
 		// Removed already existed element.
 		HashSet<Integer> allElemenIDs = new HashSet<Integer>();		
@@ -162,11 +167,25 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				// get data related to each element and create this element
 				myGrant = this.getElementData(localElementID, basicStructure);
 				// write element data in the OBR_XX_ET table
-				//System.out.println("add grant: "+myGrant.getLocalElementId()+", "+myGrant.getElementStructure().getContexts().get("RXRD_title"));
+				
 				if(!myGrant.getElementStructure().hasNullValues()){	
-					if(resourceUpdateService.addElement(myGrant)){
-						nbAdded++;				
-					}
+                                    
+                                    //check if title already exists 
+                                   
+                                    String title="";
+                                    for(Entry<String, String> e :   myGrant.getElementStructure().getContexts().entrySet()){
+                                        if(e.getKey().contains("title")){
+                                           title = e.getValue(); 
+                                        }
+                                    }
+                                
+                                    if(!allElementsTitlesInET.contains(title)){
+                                        // System.out.println("** added " );   
+                                         if(resourceUpdateService.addElement(myGrant)){
+                                                allElementsTitlesInET.add(title);	
+                                                nbAdded++;				
+                                            }
+                                    }
 				}				
 				// populates the OBR_RXRD_CTX table				
 				try{
@@ -255,7 +274,7 @@ public class RxrdAccessTool extends ResourceAccessTool {
 				if(rSet.getString(1)!=null){
 					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), rSet.getString(1));
 				}else{
-					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), EMPTY_STRING);
+					elementStructure.putContext(Structure.generateContextName(RXRD_RESOURCEID, RXRD_ITEMKEYS[0]), EMPTY_STRING);                                        
 				}
 				/*
 				//summary				
