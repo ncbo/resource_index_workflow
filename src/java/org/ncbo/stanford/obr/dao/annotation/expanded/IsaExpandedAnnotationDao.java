@@ -65,6 +65,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"position_to INT(11) UNSIGNED, " +
 					"child_concept_id INT(11) UNSIGNED, " +
 					"parent_level SMALLINT(5) UNSIGNED NOT NULL, " +					
+<<<<<<< HEAD
 					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +
 					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
 					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
@@ -72,6 +73,9 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"INDEX X_" + this.getTableSQLName() +"_child_concept_id(child_concept_id) USING BTREE, " +	
 					"INDEX X_" + this.getTableSQLName() +"_parent_level(parent_level) USING BTREE, " +	
 					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
+=======
+					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
+>>>>>>> origin/branch1.0
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 	
@@ -144,7 +148,11 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(" WHERE workflow_status = ");
 		updatingQueryb.append(WorkflowStatusEnum.DIRECT_ANNOTATION_DONE.getStatus());
 		try{
+<<<<<<< HEAD
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), false);
+=======
+			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
+>>>>>>> origin/branch1.0
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
@@ -209,7 +217,11 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
 		boolean deleted = false;
 		StringBuffer queryb = new StringBuffer();
+<<<<<<< HEAD
 		/*queryb.append("DELETE EAT FROM ");
+=======
+		queryb.append("DELETE EAT FROM ");
+>>>>>>> origin/branch1.0
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" EAT, ");
 		queryb.append(conceptDao.getMemoryTableSQLName( ));	
@@ -224,6 +236,7 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append("', ");
 		}
 		queryb.delete(queryb.length()-2, queryb.length());
+<<<<<<< HEAD
 		queryb.append(");");*/
 		
 		queryb.append("DELETE EAT FROM ");
@@ -247,6 +260,10 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		queryb.delete(queryb.length()-2, queryb.length());
 		queryb.append(")));");
 		
+=======
+		queryb.append(");");
+
+>>>>>>> origin/branch1.0
 		try{			 
 			this.executeSQLUpdate(queryb.toString() );
 			deleted = true;
@@ -270,8 +287,13 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	 *  
 	 *  @return HashMap<Integer, Integer>
 	 */
+<<<<<<< HEAD
 	public HashMap<Integer, Long> getISAAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
+=======
+	public HashMap<Integer, Integer> getISAAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
+>>>>>>> origin/branch1.0
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
@@ -288,14 +310,22 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
+<<<<<<< HEAD
 			queryb.append(dictionary.getDictionaryId());				 
+=======
+			queryb.append(dictionary.getDictionaryID());				 
+>>>>>>> origin/branch1.0
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
+<<<<<<< HEAD
 				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
+=======
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
+>>>>>>> origin/branch1.0
 			}			
 			rSet.close();
 		}
@@ -306,6 +336,10 @@ public class IsaExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			logger.error("** PROBLEM ** Cannot get IS A annotations statistics from "+this.getTableSQLName()+" .", e);
 		}
 		return annotationStats;
+<<<<<<< HEAD
+=======
+		 
+>>>>>>> origin/branch1.0
 	}  
 	 
 }

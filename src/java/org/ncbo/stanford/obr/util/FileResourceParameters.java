@@ -13,12 +13,15 @@ public class FileResourceParameters implements StringHelper{
 	// OBR schema host name
 	public static final String OBR_SCHEMA_HOST 	= MessageUtils.getMessage("obr.schema.host.name");
 	
+<<<<<<< HEAD
 	// OBR schema name
 	public static final String OBR_SCHEMA = MessageUtils.getMessage("obr.schema.name");
 	
 	// OBR version
 	public static final String OBR_VERSION 	= MessageUtils.getMessage("obr.version");
 	
+=======
+>>>>>>> origin/branch1.0
 	// SVN code path
 	public static final String SVN_CODE_PATH = MessageUtils.getMessage("obr.svn.code.path");
 	
@@ -60,7 +63,11 @@ public class FileResourceParameters implements StringHelper{
 	}
 	
 	public static String resourceLogFolder(){
+<<<<<<< HEAD
 		return selectRightFolder(RESOURCE_LOG_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING + OBR_SCHEMA + SLASH_STRING);
+=======
+		return selectRightFolder(RESOURCE_LOG_FOLDER + SVN_CODE_PATH + SLASH_STRING + OBR_SCHEMA_HOST + SLASH_STRING );
+>>>>>>> origin/branch1.0
 	}
 	 
 	public static String blackListFolder(){
@@ -93,7 +100,11 @@ public class FileResourceParameters implements StringHelper{
 		try{
 			File ncboDataObrFolder = new File(NCBODATA_OBR_FOLDER);
 		    if (ncboDataObrFolder.exists()){
+<<<<<<< HEAD
 		    	folder = NCBODATA_OBR_FOLDER + OBR_VERSION + SLASH_STRING+ folderName;
+=======
+		    	folder = NCBODATA_OBR_FOLDER + folderName;
+>>>>>>> origin/branch1.0
 			}
 		    else{		    	 
 		    	folder = LOCAL_FOLDER + folderName;
@@ -106,5 +117,9 @@ public class FileResourceParameters implements StringHelper{
 			folderFile.mkdirs();
 		}
 		return folder;
+<<<<<<< HEAD
 	}  
+=======
+	} 
+>>>>>>> origin/branch1.0
 }

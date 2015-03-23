@@ -80,6 +80,7 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 	 */
 	public void removeExpandedAnnotations(List<String> localOntologyIDs) {
 		
+<<<<<<< HEAD
 //		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			isaExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
 			mapExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
@@ -110,6 +111,33 @@ public class SemanticExpansionServiceImpl extends AbstractResourceService implem
 		} else{
 			logger.info("\tIndexes already present in table " + mapExpandedAnnotationTableDao.getTableSQLName());
 		}
+		
+=======
+		if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+			isaExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
+			mapExpandedAnnotationTableDao.deleteEntriesFromOntologies(localOntologyIDs); 
+		 }else{
+			 for (String localOntologyID : localOntologyIDs) {
+				 isaExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+				 mapExpandedAnnotationTableDao.deleteEntriesFromOntology(localOntologyID); 
+			}
+			 
+		 }	
+>>>>>>> origin/branch1.0
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.ncbo.stanford.obr.service.semantic.SemanticExpansionService#createIndexForExpandedAnnotationTable()
+	 */
+	public void createIndexForExpandedAnnotationTables() {
+		if(!isaExpandedAnnotationTableDao.indexesExist()){
+			isaExpandedAnnotationTableDao.createIndexes();	 
+		} 
+		
+		if(!mapExpandedAnnotationTableDao.indexesExist()){
+			mapExpandedAnnotationTableDao.createIndexes();	 
+		}  
 		
 	}
 

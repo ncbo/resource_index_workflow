@@ -54,7 +54,12 @@ public class ConceptDao extends AbstractObsDao {
 		"local_concept_id VARCHAR(246) NOT NULL UNIQUE, " +
 		"ontology_id INT(11) NOT NULL, " +
 		"is_toplevel BOOL NOT NULL, " +	 
+<<<<<<< HEAD
 		"full_id TEXT, " +		 
+=======
+		"full_id TEXT, " +
+		"INDEX X_" + this.getTableSQLName() +"_local_concept_id (local_concept_id), " +
+>>>>>>> origin/branch1.0
 		"INDEX X_" + this.getTableSQLName() +"_ontology_id (ontology_id), " +
 		"INDEX X_" + this.getTableSQLName() +"_isTopLevel (is_toplevel)" +
 	")ENGINE=MyISAM DEFAULT CHARSET=latin1 ;";

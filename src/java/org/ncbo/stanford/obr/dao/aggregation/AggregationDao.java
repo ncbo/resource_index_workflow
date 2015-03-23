@@ -15,7 +15,6 @@ import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.IsaExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.annotation.expanded.MapExpandedAnnotationDao;
 import org.ncbo.stanford.obr.dao.element.ElementDao;
-import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
 
@@ -40,7 +39,6 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 public class AggregationDao extends AbstractObrDao {
 
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.table.suffix"); // element Index Table
-	private static final String WORKFLOW_TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.workflow.table.suffix");
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
@@ -50,18 +48,14 @@ public class AggregationDao extends AbstractObrDao {
 	 * The suffix that will be added for Aggregation table is "_aggregation".
 	 */
 	public AggregationDao(String resourceID) {
-		super(resourceID, WORKFLOW_TABLE_SUFFIX);
+		super(resourceID, TABLE_SUFFIX);
 	}
 
 	/**
 	 * Returns the SQL table name for a given resourceID 
 	 */
 	public static String name(String resourceID){
-		return OBR_PREFIX + resourceID.toLowerCase() + WORKFLOW_TABLE_SUFFIX;
-	}
-	
-	private String getSortedTableSQLName(){
-		return OBR_PREFIX + this.resourceID.toLowerCase() + TABLE_SUFFIX;
+		return OBR_PREFIX + resourceID.toLowerCase() + TABLE_SUFFIX;
 	}
 	
 	@Override
@@ -70,8 +64,7 @@ public class AggregationDao extends AbstractObrDao {
 					"element_id INT UNSIGNED NOT NULL, " +
 					"concept_id INT UNSIGNED NOT NULL, " +
 					"score FLOAT, " +
-					"UNIQUE INDEX X_" + getTableSQLName() +"_element_id(element_id, concept_id) USING BTREE " +	
-					//"INDEX X_" + getTableSQLName() +"_concept_id(concept_id) USING BTREE " +	
+					"UNIQUE element_id(element_id, concept_id) " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1; ;";
 	}
 	
@@ -125,7 +118,7 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean addEntry(AggregationAnnotation entry){
 		boolean inserted = false;
 		try {
-			this.addEntryStatement.setString(1, entry.getLocalElementId());
+			this.addEntryStatement.setString(1, entry.getLocalElementID());
 			this.addEntryStatement.setString(2, entry.getLocalConceptID());
 			this.addEntryStatement.setFloat(3, entry.getScore());
 			this.executeSQLUpdate(this.addEntryStatement);
@@ -202,7 +195,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index isa expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info("\t" +nbAnnotation + " annotations aggregated with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
+		logger.info("\t" +nbAnnotation + " annotations indexed with isa expanded annotations in : " + timer.millisecondsToTimeString(timer.duration()) );
 
 		// Switches the indexingDone flags on EAT
 		StringBuffer updatingQueryb2 = new StringBuffer();
@@ -237,7 +230,7 @@ public class AggregationDao extends AbstractObrDao {
 			logger.error("** PROBLEM ** Cannot index mapping expanded annotations from _EAT.", e);
 		}
 		timer.end();
-		logger.info("\t" + nbAnnotation + " annotations aggregated with mapping expanded annotations in : " 
+		logger.info("\t" + nbAnnotation + " annotations indexed with mapping expanded annotations in : " 
 				+ timer.millisecondsToTimeString(timer.duration()));
 		
 		// Switches the workflow_status flags on mapping annotation
@@ -262,26 +255,6 @@ public class AggregationDao extends AbstractObrDao {
 				+ " in  : " + timer.millisecondsToTimeString(timer.duration()));  		
 		return this.numberOfEntry();
 	} 
-	
-	/**
-	 * 
-	 * 
-	 * @param resourceType
-	 */
-	public boolean sortAggregation(ResourceType resourceType){
-		try{
-			if(ResourceType.BIG== resourceType){
-				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), this.getSortedTableSQLName(), "1");
-			}else{
-				this.callStoredProcedure("sort_aggregation_table", this.getTableSQLName(), this.getSortedTableSQLName(), "0");
-			}			
-			return true;
-		}
-		catch(Exception e){
-			logger.error("** PROBLEM ** Cannot sort aggregation table " + this.getTableSQLName(), e);
-		}		
-		return false;
-	}
 
 	/**
 	 *  
@@ -400,7 +373,7 @@ public class AggregationDao extends AbstractObrDao {
 	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
 		boolean deleted = false;
 		StringBuffer queryb = new StringBuffer();
-		/*queryb.append("DELETE IT FROM ");
+		queryb.append("DELETE IT FROM ");
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" IT, ");
 		queryb.append(conceptDao.getMemoryTableSQLName());	
@@ -415,29 +388,8 @@ public class AggregationDao extends AbstractObrDao {
 			queryb.append("', ");
 		}
 		queryb.delete(queryb.length()-2, queryb.length());
-		queryb.append(");");*/
-		
-		queryb.append("DELETE IT FROM ");
-		queryb.append(this.getTableSQLName());
-		queryb.append(" IT ");
-		queryb.append(" WHERE IT.concept_id IN ");
-		queryb.append(" ( SELECT id FROM  ");
-		queryb.append(conceptDao.getMemoryTableSQLName());
-		queryb.append(" CT ");
-		queryb.append(" WHERE CT.ontology_id IN ");
-		queryb.append(" ( SELECT id FROM  ");
-		queryb.append(ontologyDao.getMemoryTableSQLName());
-		queryb.append(" OT ");
-		
-		queryb.append(" Where OT.local_ontology_id IN ( "); 
-		for (String localOntologyID : localOntologyIDs) {
-			queryb.append("'");
-			queryb.append(localOntologyID);
-			queryb.append("', ");
-		}
-		queryb.delete(queryb.length()-2, queryb.length());
-		queryb.append(")));");
-		
+		queryb.append(");");
+
 		try{			 
 			this.executeSQLUpdate(queryb.toString() );
 			deleted = true;
@@ -454,14 +406,14 @@ public class AggregationDao extends AbstractObrDao {
 	//**********************************Statistics Method****************
 	 
 	/**
-	 * This method gives number of aggregated annotations for each ontologyID 
+	 * This method gives number of indexed annotations for each ontologyID 
 	 * @param dictionary 
 	 * @param withCompleteDictionary 
 	 *  
-	 * @return map containing number of aggregated annotations for each ontologyID as key.
+	 * @return map containing number of indexed annotations for each ontologyID as key.
 	 */
-	public HashMap<Integer, Long> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
+	public HashMap<Integer, Integer> getAggregatedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
+		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
 		
 		StringBuffer queryb = new StringBuffer();
 		if(withCompleteDictionary){
@@ -478,14 +430,14 @@ public class AggregationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE IT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
-			queryb.append(dictionary.getDictionaryId());				 
+			queryb.append(dictionary.getDictionaryID());				 
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
+				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
 			}			
 			rSet.close();
 		}
@@ -493,7 +445,7 @@ public class AggregationDao extends AbstractObrDao {
 			return this.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 		}
 		catch (SQLException e) {
-			logger.error("** PROBLEM ** Cannot get aggregated annotations statistics from "+this.getTableSQLName()+" .", e);
+			logger.error("** PROBLEM ** Cannot get indexed annotations statistics from "+this.getTableSQLName()+" .", e);
 		}
 		return annotationStats;
 		 
@@ -521,7 +473,7 @@ public class AggregationDao extends AbstractObrDao {
 			this.score = score;
 		}
 
-		public String getLocalElementId() {
+		public String getLocalElementID() {
 			return localElementID;
 		}
 

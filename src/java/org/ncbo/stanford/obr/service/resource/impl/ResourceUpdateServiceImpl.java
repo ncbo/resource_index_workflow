@@ -102,8 +102,13 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		isaExpandedAnnotationTableDao.reInitializeSQLTable();
 		mapExpandedAnnotationTableDao.reInitializeSQLTable();
 		aggregationTableDao.reInitializeSQLTable();
+<<<<<<< HEAD
 		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceId());
 		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceId());
+=======
+		resourceTableDao.resetDictionary(resourceAccessTool.getToolResource().getResourceID());
+		statisticsDao.deleteStatisticsForResource(resourceAccessTool.getToolResource().getResourceID());
+>>>>>>> origin/branch1.0
 	}
 	
 	/**
@@ -255,6 +260,7 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 	 * 
 	 */
 	public void calculateObrStatistics(boolean withCompleteDictionary, DictionaryBean dictionary) {
+<<<<<<< HEAD
 		
 		long aggregated;
 		long mgrep;
@@ -262,11 +268,21 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		long isA ;
 		long mapping;
 		
+=======
+		
+		int aggregated;
+		int mgrep;
+		int reported;
+		int isA ;
+		int mapping;
+		
+>>>>>>> origin/branch1.0
 		logger.info("*** Processing of statistics started...");
 		ExecutionTimer timer = new ExecutionTimer();
 		timer.start();
 		
 		// Getting Aggregated annotations
+<<<<<<< HEAD
 		HashMap<Integer, Long> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
 
 		// Getting MGREP annotations
@@ -280,18 +296,41 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		
 		// Getting Mapping annotations
 		HashMap<Integer, Long> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+=======
+		HashMap<Integer, Integer> aggregatedAnnotations= aggregationTableDao.getAggregatedAnnotationStatistics(withCompleteDictionary, dictionary);
+
+		// Getting MGREP annotations
+		HashMap<Integer, Integer> mgrepAnnotations = directAnnotationTableDao.getMgrepAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting REPORTED annotations
+		HashMap<Integer, Integer> reportedAnnotations= directAnnotationTableDao.getReportedAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting ISA annotations
+		HashMap<Integer, Integer> isaAnnotations= isaExpandedAnnotationTableDao.getISAAnnotationStatistics(withCompleteDictionary, dictionary);
+		
+		// Getting Mapping annotations
+		HashMap<Integer, Integer> mappingAnnotations= mapExpandedAnnotationTableDao.getMappingAnnotationStatistics(withCompleteDictionary, dictionary);
+>>>>>>> origin/branch1.0
 		
 		HashSet<StatisticsEntry> entries = new HashSet<StatisticsEntry>();
 		 
 		
 		// Get resource id (primary key) from ResourceTable
+<<<<<<< HEAD
 		int resource_id = resourceTableDao.getResourceIdKey(resourceAccessTool.getToolResource().getResourceId()); 
+=======
+		int resource_id = resourceTableDao.getResourceIDKey(resourceAccessTool.getToolResource().getResourceID()); 
+>>>>>>> origin/branch1.0
 		 
 		// Iterating for each ontologies
 		for (Integer ontologyID : aggregatedAnnotations.keySet()) {			
 			 
 			if(aggregatedAnnotations.get(ontologyID)!= null){
+<<<<<<< HEAD
 				aggregated = aggregatedAnnotations.get(ontologyID);
+=======
+				aggregated = aggregatedAnnotations.get(ontologyID).intValue();
+>>>>>>> origin/branch1.0
 			}else{
 				aggregated = 0;
 			}
@@ -326,7 +365,11 @@ public class ResourceUpdateServiceImpl extends AbstractResourceService implement
 		}
 		
 		// Adding/updating entries for OBR_STATS tables.
+<<<<<<< HEAD
 		long noOfEntiesUpdated=statisticsDao.addEntries(entries); 
+=======
+		int noOfEntiesUpdated=statisticsDao.addEntries(entries); 
+>>>>>>> origin/branch1.0
 		
 		logger.info("\tNumber of entries added/updated in statistics table are :" + noOfEntiesUpdated);
 		timer.end();

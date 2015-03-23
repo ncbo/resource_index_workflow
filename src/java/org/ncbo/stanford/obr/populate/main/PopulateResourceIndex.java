@@ -24,6 +24,7 @@ public class PopulateResourceIndex {
 		boolean poluateSlaveTables = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.populate"));
 		boolean processResources = Boolean.parseBoolean(MessageUtils.getMessage("obr.resources.process"));
 		boolean removeDuplicateOntologies = Boolean.parseBoolean(MessageUtils.getMessage("obs.slave.ontology.remove"));
+<<<<<<< HEAD
 		boolean excuteSyncronization = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync"));
 		boolean replicateObsTables = Boolean.parseBoolean(MessageUtils.getMessage("obr.database.sync.obs.tables"));
 		try{ 
@@ -59,6 +60,25 @@ public class PopulateResourceIndex {
 			if(excuteSyncronization){	
 				// Replicate obs tables if one of replicateObsTables, poluateSlaveTables, removeDuplicateOntologies
 				resourceIndexWorkflow.executeSyncronizationScript(replicateObsTables || poluateSlaveTables || removeDuplicateOntologies);
+=======
+		
+		try{
+			// Populate obs tables from master database 
+			if(poluateSlaveTables){	
+				resourceIndexWorkflow.populateObsSlaveTables();
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+			}				
+			
+			// Populate resource index data
+			if(processResources){
+				 resourceIndexWorkflow.startResourceIndexWorkflow();
+			}
+		   
+			// Remove duplicates.
+			if(removeDuplicateOntologies){
+				resourceIndexWorkflow.removeOntologyDuplicates();
+				resourceIndexWorkflow.loadObsSlaveTablesIntoMemory();
+>>>>>>> origin/branch1.0
 			}
 			
 		}catch (Exception e) {

@@ -30,6 +30,12 @@ public interface ObsDataPopulationService {
 	public void loadObsSlaveTablesIntoMemory() throws SQLException;	
 	
 	/**
+	 * This method load obs table and stuff into memory.  
+	 * It creates obs tables with MEMORY storage engin.
+	 */
+	public void loadObsSlaveTablesIntoMemory() throws SQLException;	
+	
+	/**
 	 * Populates new ontology versions present in OBS master database which are not present in 
 	 * slave ontology table with particular dictionary. 
 	 *  

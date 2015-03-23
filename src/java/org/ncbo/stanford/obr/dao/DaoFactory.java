@@ -58,11 +58,15 @@ public interface DaoFactory {
 	
 	/** Singleton data access object for statistics table. */
 	public static final StatisticsDao statisticsDao = StatisticsDao.getInstance();
+<<<<<<< HEAD
 	
 	/** Singleton data access object for obr ontology table. */
 	public static final ObrOntologyDao obrOntologyDao = ObrOntologyDao.getInstance();
 	
 	/** Singleton data access object for obr execution table. */
 	public static final ExecutionDao executionDao = ExecutionDao.getInstance();
+=======
+	 
+>>>>>>> origin/branch1.0
 
 }

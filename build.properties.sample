@@ -4,6 +4,9 @@ obr.version=test
 # SVN repository path  e.g. trunk, branch, tag
 obr.svn.code.path=branch1.0
 
+# SVN repository path  e.g. trunk, branch, tag
+obr.svn.code.path=branch1.0
+
 # App name
 app.name=${ant.project.name}
 
@@ -48,7 +51,10 @@ obr.jdbc.driver=com.mysql.jdbc.Driver
 obr.jdbc.username=yourusername
 obr.jdbc.password=yourpassword
 obr.schema.host.name=localhost
+<<<<<<< HEAD
 obr.schema.name=schema_name
+=======
+>>>>>>> origin/branch1.0
 
 # Configuring RXRD database 
 obr.rxrd.jdbc.url=jdbc:mysql://localhost:3306/rxrd

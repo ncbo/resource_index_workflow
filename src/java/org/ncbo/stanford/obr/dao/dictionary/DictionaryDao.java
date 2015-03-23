@@ -236,6 +236,7 @@ public class DictionaryDao extends AbstractObrDao {
 	 * for a given dictionaryID. Used to generate a dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
+<<<<<<< HEAD
 	public long writeDictionaryFile(File file, int dictionaryID){
 		StringBuffer queryb = new StringBuffer();		 
 		queryb.append("SELECT TT.id, TT.name FROM ");
@@ -245,6 +246,13 @@ public class DictionaryDao extends AbstractObrDao {
 		queryb.append(" CT, ");
 		queryb.append(ontologyDao.getMemoryTableSQLName());
 		queryb.append(" OT WHERE TT.concept_id=CT.id AND CT.ontology_id=OT.id AND TT.");		 
+=======
+	public int writeDictionaryFile(File file, int dictionaryID){
+		StringBuffer queryb = new StringBuffer();		 
+		queryb.append("SELECT id, name FROM ");
+		queryb.append(TermDao.name());
+		queryb.append("TT WHERE TT.");		 
+>>>>>>> origin/branch1.0
 		queryb.append(this.blackListFilter());
 		queryb.append(" AND OT.dictionary_id = ");
 		queryb.append(dictionaryID);
@@ -268,7 +276,11 @@ public class DictionaryDao extends AbstractObrDao {
 	 * Used to generate a complete dictionary file for Mgrep.
 	 * @return The number of lines written in the given file.
 	 */
+<<<<<<< HEAD
 	public long writeDictionaryFile(File file){
+=======
+	public int writeDictionaryFile(File file){
+>>>>>>> origin/branch1.0
 		
 		StringBuffer queryb = new StringBuffer();		 
 		queryb.append("SELECT id, name FROM ");
