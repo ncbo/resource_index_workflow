@@ -75,17 +75,13 @@ public class DirectAnnotationDao extends AbstractObrDao {
 					"position_to INT(11), " +
 					"term_id INT(11) UNSIGNED, " +					
 					"dictionary_id SMALLINT(5) UNSIGNED NOT NULL, " +
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +	
-					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_term_id(term_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_dictionary_id(dictionary_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
-=======
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +					
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
+					"INDEX X_" + this.getTableSQLName() +"_element_id  USING BTREE(element_id), " +	//no rajesh modification
+					"INDEX X_" + this.getTableSQLName() +"_concept_id USING BTREE(concept_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id USING BTREE(context_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_term_id USING BTREE(term_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_dictionary_id USING BTREE(dictionary_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status USING BTREE(workflow_status) " +	
 				")ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 	}
 	
@@ -145,7 +141,6 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * Add an new entry in corresponding SQL table.
 	 * @return True if the entry was added to the SQL table, false if a problem occurred during insertion.
 	 */
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 	public boolean addEntry(DirectAnnotationEntry entry ){
 		boolean inserted = false;
 		try {		 
@@ -153,15 +148,6 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addEntryStatement.setString (2, entry.getLocalConceptID());
 			this.addEntryStatement.setString (3, entry.getContextName());
 			this.addEntryStatement.setInt    (4, entry.getDictionaryId());
-=======
-	private boolean addEntry(DirectAnnotationEntry entry ){
-		boolean inserted = false;
-		try {		 
-			this.addEntryStatement.setString (1, entry.getLocalElementID());
-			this.addEntryStatement.setString (2, entry.getLocalConceptID());
-			this.addEntryStatement.setString (3, entry.getContextName());
-			this.addEntryStatement.setInt    (4, entry.getDictionaryID());
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			this.addEntryStatement.setInt(5, entry.getWorkflowStatus());		 
 			this.executeSQLUpdate(this.addEntryStatement);
 			inserted = true;
@@ -218,13 +204,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			this.addMgrepEntryStatement.setInt    (4, entry.getTermID());
 			this.addMgrepEntryStatement.setInt    (5, entry.getFrom());
 			this.addMgrepEntryStatement.setInt    (6, entry.getTo());
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryId());
 			this.addMgrepEntryStatement.setInt	  (8, entry.getWorkflowStatus());
-=======
-			this.addMgrepEntryStatement.setInt    (7, entry.getDictionaryID());
-			this.addMgrepEntryStatement.setInt(8, entry.getWorkflowStatus());
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 		 
 			this.executeSQLUpdate(this.addMgrepEntryStatement);
 			inserted = true;
@@ -249,7 +230,6 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 * @return the number of added entries
 	 */
 	public int addEntries(HashSet<DirectAnnotationEntry> entries){
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 		int nbInserted = 0;		
 		
 		for(DirectAnnotationEntry entry: entries){					 			 	 
@@ -259,12 +239,6 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			}catch (Exception e) {
 				logger.error("** PROBLEM ** Cannot add " + entry.toString() + "on table " + this.getTableSQLName());
 				 
-=======
-		int nbInserted = 0;		 
-		for(DirectAnnotationEntry entry: entries){
-			if (this.addEntry(entry)){
-				nbInserted++; 
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			}
 		}  
 		
@@ -361,11 +335,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 		timer.reset();
 		timer.start();
 		try{
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), false);
-=======
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), joinQuery.toString(), true);
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			}
 		catch(SQLException e){
 			logger.error("** PROBLEM ** Cannot join the temporary table and OBS_TT to load the file " + mgrepFile.getName()+". 0 returned", e);
@@ -550,13 +520,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  @return Map containing number of mgerp annotations for each ontology as key. 
 	 *   
 	 */
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 	public HashMap<Integer, Long> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
-=======
-	public HashMap<Integer, Integer> getMgrepAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -573,11 +538,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NOT NULL AND OT.dictionary_id = ");
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			queryb.append(dictionary.getDictionaryId());				 
-=======
-			queryb.append(dictionary.getDictionaryID());				 
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			queryb.append( " GROUP BY OT.id; ");
 		} 
 		
@@ -605,13 +566,8 @@ public class DirectAnnotationDao extends AbstractObrDao {
 	 *  
 	 *  @return Map containing number of reported annotations for each ontology as key. 
 	 */
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 	public HashMap<Integer, Long> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
-=======
-	public HashMap<Integer, Integer> getReportedAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 		
 		StringBuffer queryb = new StringBuffer();		 
 		if(withCompleteDictionary){
@@ -628,11 +584,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE DAT.concept_id=CT.id AND CT.ontology_id=OT.id AND DAT.term_id IS NULL AND OT.dictionary_id = ");
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			queryb.append(dictionary.getDictionaryId());				 
-=======
-			queryb.append(dictionary.getDictionaryID());				 
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			queryb.append( " GROUP BY OT.id; ");
 		}  
 		try {			 			
@@ -797,11 +749,7 @@ public class DirectAnnotationDao extends AbstractObrDao {
 			sb.append(", ");
 			sb.append(this.to);
 			sb.append(", ");			
-<<<<<<< HEAD:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			sb.append(this.getDictionaryId());
-=======
-			sb.append(this.getDictionaryID());
->>>>>>> origin/branch1.0:src/java/org/ncbo/stanford/obr/dao/annotation/DirectAnnotationDao.java
 			sb.append(", ");			
 			sb.append(this.getWorkflowStatus());		 
 			sb.append("]");
