@@ -65,17 +65,13 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 					"position_to INT(11) UNSIGNED, " +
 					"mapped_concept_id INT(11) UNSIGNED, " +
 					"mapping_type TINYINT(1) UNSIGNED NOT NULL, " +					
-<<<<<<< HEAD
 					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', " +
-					"INDEX X_" + this.getTableSQLName() +"_element_id(element_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_concept_id(concept_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_context_id(context_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id(mapped_concept_id) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_mapping_type(mapping_type) USING BTREE, " +	
-					"INDEX X_" + this.getTableSQLName() +"_workflow_status(workflow_status) USING BTREE " +	
-=======
-					"workflow_status TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'" +
->>>>>>> origin/branch1.0
+					"INDEX X_" + this.getTableSQLName() +"_element_id USING BTREE(element_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_concept_id USING BTREE(concept_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_context_id USING BTREE(context_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_mapped_concept_id USING BTREE(mapped_concept_id), " +	
+					"INDEX X_" + this.getTableSQLName() +"_mapping_type USING BTREE(mapping_type), " +	
+					"INDEX X_" + this.getTableSQLName() +"_workflow_status USING BTREE(workflow_status) " +	
 					")ENGINE=MyISAM DEFAULT CHARSET=latin1;";				 
 	}
 	
@@ -149,11 +145,7 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		updatingQueryb.append(WorkflowStatusEnum.IS_A_CLOSURE_DONE.getStatus());
 		
 		try{
-<<<<<<< HEAD
 			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), false);
-=======
-			nbAnnotation = this.executeWithStoreProcedure(this.getTableSQLName(), queryb.toString(), true);
->>>>>>> origin/branch1.0
 			this.executeSQLUpdate(updatingQueryb.toString());
 		}
 		catch(SQLException e){
@@ -218,12 +210,8 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	public boolean deleteEntriesFromOntologies(List<String> localOntologyIDs){		
 		boolean deleted = false;
 		StringBuffer queryb = new StringBuffer();
-<<<<<<< HEAD
 		
 		/*queryb.append("DELETE EAT FROM ");
-=======
-		queryb.append("DELETE EAT FROM ");
->>>>>>> origin/branch1.0
 		queryb.append(this.getTableSQLName());		
 		queryb.append(" EAT, ");
 		queryb.append(conceptDao.getMemoryTableSQLName( ));	
@@ -238,7 +226,6 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append("', ");
 		}
 		queryb.delete(queryb.length()-2, queryb.length());
-<<<<<<< HEAD
 		queryb.append(");");*/
 		
 		
@@ -265,10 +252,6 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 		queryb.append(")));");
 		
 		
-=======
-		queryb.append(");");
-
->>>>>>> origin/branch1.0
 		try{			 
 			this.executeSQLUpdate(queryb.toString() );
 			deleted = true;
@@ -292,13 +275,8 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 	 *  
 	 *  @return HashMap<Integer, Integer>
 	 */
-<<<<<<< HEAD
 	public HashMap<Integer, Long> getMappingAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
 		HashMap<Integer, Long> annotationStats = new HashMap<Integer, Long>();
-=======
-	public HashMap<Integer, Integer> getMappingAnnotationStatistics(boolean withCompleteDictionary, DictionaryBean dictionary){
-		HashMap<Integer, Integer> annotationStats = new HashMap<Integer, Integer>();
->>>>>>> origin/branch1.0
 		
 		StringBuffer queryb = new StringBuffer(); 
 		if(withCompleteDictionary){
@@ -315,22 +293,14 @@ public class MapExpandedAnnotationDao extends AbstractExpandedAnnotationDao {
 			queryb.append(" AS CT, ");
 			queryb.append(ontologyDao.getMemoryTableSQLName());
 			queryb.append(" AS OT WHERE EAT.concept_id=CT.id AND CT.ontology_id=OT.id AND OT.dictionary_id = ");
-<<<<<<< HEAD
 			queryb.append(dictionary.getDictionaryId());				 
-=======
-			queryb.append(dictionary.getDictionaryID());				 
->>>>>>> origin/branch1.0
 			queryb.append( " GROUP BY OT.id; ");
 		}
 		
 		try {			 			
 			ResultSet rSet = this.executeSQLQuery(queryb.toString());
 			while(rSet.next()){
-<<<<<<< HEAD
 				annotationStats.put(rSet.getInt(1), rSet.getLong(2));
-=======
-				annotationStats.put(rSet.getInt(1), rSet.getInt(2));
->>>>>>> origin/branch1.0
 			}			
 			rSet.close();
 		}
