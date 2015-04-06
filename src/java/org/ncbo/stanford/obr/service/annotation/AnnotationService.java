@@ -50,7 +50,6 @@ public interface AnnotationService {
 	 * 
 	 */
 	public void createIndexForAnnotationTable();
-<<<<<<< HEAD
 	
 	/**
 	 * This method gives number of elements present for annotation with given dictionary id
@@ -74,6 +73,4 @@ public interface AnnotationService {
 	 * @return
 	 */
 	public boolean disableIndexes();
-=======
->>>>>>> origin/branch1.0
 }
