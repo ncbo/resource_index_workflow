@@ -52,7 +52,6 @@ public interface ResourceIndexWorkflow {
 	 */
 	public void removeOntologyDuplicates();	
 	
-<<<<<<< HEAD
 	/**
 	 * This step execute replication mechanism between resource index 
 	 * master/slave database.
@@ -61,6 +60,4 @@ public interface ResourceIndexWorkflow {
 	 */
 	public void executeSyncronizationScript(boolean replicateObsTables)throws Exception;
 	
-=======
->>>>>>> origin/branch1.0
 }
