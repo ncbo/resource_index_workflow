@@ -113,7 +113,6 @@ public class SemanticTypeDao extends AbstractObsDao {
 		StringBuffer queryb = new StringBuffer();
 		queryb.append("DELETE ST FROM ");
 		queryb.append(this.getTableSQLName());		
-<<<<<<< HEAD
 		queryb.append(" ST ");
 		queryb.append(" WHERE ST.concept_id in (");
 		queryb.append(" SELECT id from  ");
@@ -132,18 +131,12 @@ public class SemanticTypeDao extends AbstractObsDao {
 		
 		/*queryb.append("DELETE ST FROM ");
 		queryb.append(this.getTableSQLName());		
-=======
->>>>>>> origin/branch1.0
 		queryb.append(" ST, ");
 		queryb.append(ConceptDao.name( ));	
 		queryb.append(" CT, ");
 		queryb.append(OntologyDao.name());
 		queryb.append(" OT ");
-<<<<<<< HEAD
 		queryb.append(" WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");*/
-=======
-		queryb.append(" WHERE ST.concept_id = CT.id AND CT.ontology_id = OT.id AND OT.local_ontology_id = ?");
->>>>>>> origin/branch1.0
 		deleteEntriesFromOntologyStatement = this.prepareSQLStatement(queryb.toString());
 	}
 	
