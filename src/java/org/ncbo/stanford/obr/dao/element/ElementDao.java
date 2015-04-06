@@ -16,10 +16,7 @@ import obs.obr.populate.Element;
 import obs.obr.populate.Structure;
 
 import org.ncbo.stanford.obr.dao.AbstractObrDao;
-<<<<<<< HEAD
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao;
-=======
->>>>>>> origin/branch1.0
 import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
 import org.ncbo.stanford.obr.enumeration.WorkflowStatusEnum;
 import org.ncbo.stanford.obr.util.MessageUtils;
@@ -434,7 +431,6 @@ public class ElementDao extends AbstractObrDao {
 	
 	/**
 	 * This method checks whether non annotated elements are present.
-<<<<<<< HEAD
 	 * 
 	 * @param dictionaryID
 	 * @return
@@ -464,45 +460,9 @@ public class ElementDao extends AbstractObrDao {
 	/**
 	 * Updates the field dictionaryID of all the rows in the table where the dictionaryID is null or < to the given one. 
 	 * Returns the number of updated elements. (to be verified)
-=======
->>>>>>> origin/branch1.0
-	 * 
-	 * @param dictionaryID
-	 * @return
-	 */
-<<<<<<< HEAD
-=======
-	public boolean containElementsForMgrepAnnotation(int dictionaryID){
-		boolean result = false;
-		StringBuffer queryb = new StringBuffer();
-		queryb.append("SELECT count(id) FROM ");
-		queryb.append(this.getTableSQLName());		 
-		queryb.append(" WHERE dictionary_id IS NULL OR dictionary_id<");
-		queryb.append(dictionaryID);		 
-		queryb.append(";");
-		
-		try{
-			ResultSet rSet = this.executeSQLQuery(queryb.toString());
-			if(rSet.first()){
-				int nonAnnotatedElement = rSet.getInt(1);
-				if(nonAnnotatedElement> 0){
-					result = true;
-				}
-			} 
-		}catch (SQLException e) {
-			 logger.error("Problem in getting non annotated element count", e);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Updates the field dictionaryID of all the rows in the table where the dictionaryID is null or < to the given one. 
-	 * Returns the number of updated elements. (to be verified)
 	 * 
 	 * @param useTemporaryElementTable 
 	 */
->>>>>>> origin/branch1.0
 	public long updateDictionary(int dictionaryID){
 		long nbUpdated;
 		StringBuffer updatingQueryb = new StringBuffer();		 
@@ -531,11 +491,7 @@ public class ElementDao extends AbstractObrDao {
 	 * @param useTemporaryElementTable 
 	 * 
 	 */
-<<<<<<< HEAD
 	public long addExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion, DirectAnnotationDao directAnnotationDao){		
-=======
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure, String contextName, String localOntologyID, boolean isNewVirsion){		
->>>>>>> origin/branch1.0
 				
 		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
 		long nbReportedAnnotations =0 ;
