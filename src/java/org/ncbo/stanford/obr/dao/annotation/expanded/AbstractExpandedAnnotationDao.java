@@ -214,11 +214,7 @@ public abstract class AbstractExpandedAnnotationDao extends AbstractObrDao {
 			
 		}
 
-<<<<<<< HEAD
 		public String getLocalElementId() {
-=======
-		public String getLocalElementID() {
->>>>>>> origin/branch1.0
 			return localElementID;
 		}
 
@@ -311,11 +307,7 @@ public abstract class AbstractExpandedAnnotationDao extends AbstractObrDao {
 			this.indexingDone = indexingDone;
 		}
 
-<<<<<<< HEAD
 		public String getLocalElementId() {
-=======
-		public String getLocalElementID() {
->>>>>>> origin/branch1.0
 			return localElementID;
 		}
 
