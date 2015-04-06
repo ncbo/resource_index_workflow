@@ -10,10 +10,6 @@ import obs.common.utils.ExecutionTimer;
 import obs.obr.populate.Structure;
 
 import org.apache.log4j.Logger;
-<<<<<<< HEAD
-=======
-import org.ncbo.stanford.obr.dao.annotation.DirectAnnotationDao.DirectAnnotationEntry;
->>>>>>> origin/branch1.0
 import org.ncbo.stanford.obr.dao.dictionary.DictionaryDao;
 import org.ncbo.stanford.obr.resource.ResourceAccessTool;
 import org.ncbo.stanford.obr.service.AbstractResourceService;
@@ -51,11 +47,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		logger.info("*** Executing  Direct Annotation process... ");
 		// processes direct mgrep annotations
 		
-<<<<<<< HEAD
 		if(elementTableDao.numberOfElementsForMgrepAnnotation(dictionary.getDictionaryId())> 0){
-=======
-		if(elementTableDao.containElementsForMgrepAnnotation(dictionary.getDictionaryID())){
->>>>>>> origin/branch1.0
 			nbAnnotation = this.conceptRecognitionWithMgrep(dictionary,
 			 		withCompleteDictionary, stopwords);
 		} else{
@@ -67,17 +59,10 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 		// updates the dictionary column in _ET
 		logger.info("\tUpdating the dictionary field in ElementTable...");		  
 		// Update dictionary id for element table.		 
-<<<<<<< HEAD
 		elementTableDao.updateDictionary(dictionary.getDictionaryId());	
 		
 		timer.end();
 		logger.info("### Direct annotation processed in: " + timer.millisecondsToTimeString(timer.duration()));
-=======
-		elementTableDao.updateDictionary(dictionary.getDictionaryID());	
-		
-		timer.end();
-		logger.info("### Direct processed in: " + timer.millisecondsToTimeString(timer.duration()));
->>>>>>> origin/branch1.0
 			
 		return nbAnnotation;
 	}
@@ -113,11 +98,7 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 					dictionaryDao.writeDictionaryFile(dictionaryFile);
 				} else {
 					dictionaryDao.writeDictionaryFile(dictionaryFile, dictionary
-<<<<<<< HEAD
 							.getDictionaryId());
-=======
-							.getDictionaryID());
->>>>>>> origin/branch1.0
 				}
 			}
 		} catch (IOException e) {
@@ -255,26 +236,15 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	 * @param structure
 	 * @return
 	 */
-<<<<<<< HEAD
 	public long addExistingAnnotations(int dictionaryID, Structure structure){
 		long nbAnnotations =0; 
-=======
-	public HashSet<DirectAnnotationEntry> getExistingAnnotations(int dictionaryID, Structure structure){
-		
-		HashSet<DirectAnnotationEntry> reportedAnnotations = new HashSet<DirectAnnotationEntry>();
-		 
->>>>>>> origin/branch1.0
 		for(String contextName: structure.getContextNames()){
 			// we must exclude contexts NOT_FOR_ANNOTATION and contexts FOR_CONCEPT_RECOGNITION 
 			if(!structure.getOntoID(contextName).equals(Structure.FOR_CONCEPT_RECOGNITION) &&
 					!structure.getOntoID(contextName).equals(Structure.NOT_FOR_ANNOTATION)){
 				boolean isNewVersionOntlogy = ontologyDao.hasNewVersionOfOntology(structure.getOntoID(contextName), structure.getResourceId());
 				String localOntologyID = ontologyDao.getLatestLocalOntologyID(structure.getOntoID(contextName));
-<<<<<<< HEAD
 				nbAnnotations += elementTableDao.addExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy, directAnnotationTableDao);				
-=======
-				reportedAnnotations.addAll(elementTableDao.getExistingAnnotations(dictionaryID, structure, contextName, localOntologyID, isNewVersionOntlogy));				
->>>>>>> origin/branch1.0
 			}
 			
 		}
@@ -314,7 +284,6 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 	
 	public void createIndexForAnnotationTable() {	
 		if(!directAnnotationTableDao.isIndexExist()){
-<<<<<<< HEAD
 			 directAnnotationTableDao.createIndex();
 			 logger.info("\tIndexes created for table " + directAnnotationTableDao.getTableSQLName());
 		} else{
@@ -347,9 +316,5 @@ public class AnnotationServiceImpl extends AbstractResourceService implements
 			&& isaExpandedAnnotationTableDao.enableIndexes(bigResource)
 			&& mapExpandedAnnotationTableDao.enableIndexes(bigResource);
 		 
-=======
-			 directAnnotationTableDao.createIndex();		 
-		} 
->>>>>>> origin/branch1.0
 	}
 }
