@@ -6,10 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
-<<<<<<< HEAD
 import java.util.Set;
-=======
->>>>>>> origin/branch1.0
 
 import obs.common.utils.Utilities;
 
