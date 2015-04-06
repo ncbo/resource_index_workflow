@@ -352,33 +352,8 @@ public class ObsMasterDao implements DaoFactory{
 		catch ( Exception e) {
 			logger.error("** PROBLEM ** Cannot get entries from master ralation table.", e);
 		}		
-<<<<<<< HEAD
 		return null;
 	}
-	
-	/**
-	 * This method get LSemanticType table entries from master relation tables for given ontology versions
-	 * and write the result into text file.
-	 * 
-	 * @param localOntologyIDs list of local ontology ids.
-	 * @return {@code File} containing relation entries.
-	 */
-	public File writeMasterLSemanticTypeEntries(){		 
-		StringBuffer selectQuery = new StringBuffer();
-		selectQuery.append("SELECT ST.id, ST.semantic_type, ST.description FROM ");
-		selectQuery.append(lSemanticTypeDao.getTableSQLName());
-		selectQuery.append(" ST;");			
-		try {		
-			return writeQueryResultFile(selectQuery.toString(), SEMANTIC_ENTRIES_FILENAME);			
-		}  
-		catch ( Exception e) {
-			logger.error("** PROBLEM ** Cannot get entries from master ralation table.", e);
-		}		
-=======
->>>>>>> origin/branch1.0
-		return null;
-	}
-	
 	
 	/**
 	 * This method get LSemanticType table entries from master relation tables for given ontology versions
