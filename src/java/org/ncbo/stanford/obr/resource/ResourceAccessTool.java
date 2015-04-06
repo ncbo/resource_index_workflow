@@ -80,11 +80,7 @@ public abstract class ResourceAccessTool implements StringHelper {
 			AbstractObrDao.contextTableDao.addEntry(context);
 		}
 		
-<<<<<<< HEAD
 		logger.info("ResourceAccessTool " + this.getToolResource().getResourceId() + " created to access " + this.getToolResource().getResourceName() +" (" + this.getToolResource().getResourceId() + ").\n");
-=======
-		logger.info("ResourceAccessTool " + this.getToolResource().getResourceID() + " created to access " + this.getToolResource().getResourceName() +" (" + this.getToolResource().getResourceID() + ").\n");
->>>>>>> origin/branch1.0
 	} 
 		
 	/** 
@@ -330,15 +326,10 @@ public abstract class ResourceAccessTool implements StringHelper {
 	 * @param {@code List} of localOntologyID containing version of given ontology.
 	 */
 	public void removeOntologies(List<String> localOntologyIDs){
-<<<<<<< HEAD
 		// Remove entries from aggregation table  
 		aggregationService.removeAggregation(localOntologyIDs);
 		// Remove entries from concept frequency table  
 		aggregationService.removeConceptFrequncy(localOntologyIDs);
-=======
-		// Remove entries from indexing table  
-		aggregationService.removeAggregation(localOntologyIDs);
->>>>>>> origin/branch1.0
 		// Remove entries from expanded annotation table  
 		semanticExpansionService.removeExpandedAnnotations(localOntologyIDs);
 		// Remove entries from annotation table.
@@ -378,7 +369,6 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void createIndexForAnnotationTables() {
 		annotationService.createIndexForAnnotationTable();
 		semanticExpansionService.createIndexForExpandedAnnotationTables(); 
-<<<<<<< HEAD
 	}	
 	
 	/**
@@ -387,7 +377,4 @@ public abstract class ResourceAccessTool implements StringHelper {
 	public void calulateConceptFrequncy() {
 		 aggregationService.calulateConceptFrequncy(); 
 	}
-=======
-	}	 
->>>>>>> origin/branch1.0
 }
