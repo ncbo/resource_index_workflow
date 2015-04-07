@@ -5,6 +5,8 @@ package org.ncbo.stanford.obr.service.aggregation;
 
 import java.util.List;
 
+import org.ncbo.stanford.obr.enumeration.ResourceType;
+
 import obs.obr.populate.ObrWeight;
 
 /**
@@ -25,10 +27,48 @@ public interface AggregationService {
 	public long aggregation(ObrWeight weights);
 	
 	/**
+	 *  Sort Aggregation
+	 * 
+	 * @param resourceType  Used for calculating score
+	 * @return  Boolean  
+	 * 
+	 */
+	public boolean sortAggregation(ResourceType resourceType);
+	
+	/**
 	 * Method removes indexing done for given ontology versions.
 	 * 
 	 * @param {@code List} of localOntologyID String containing ontology version.
 	 */
 	public void removeAggregation(List<String> localOntologyID);
 
+	/**
+	 * Method calculates concept frequency from aggregation table 
+	 *  
+	 * @return The number of annotations created in the index. 
+	 * 
+	 */
+	public long calulateConceptFrequncy();
+	
+	/**
+	 * Method removes concept frequency calculation done for given ontology versions.
+	 * 
+	 * @param {@code List} of localOntologyID String containing ontology version.
+	 */
+	public void removeConceptFrequncy(List<String> localOntologyID);
+
+	/**
+	 *  Enable indexes for aggregation table
+	 *   
+	 * @param bigResource
+	 * @return
+	 */
+	public boolean enableIndexes(boolean bigResource);
+	
+	/**
+	 * Disable indexes for aggregation table
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes();
 }

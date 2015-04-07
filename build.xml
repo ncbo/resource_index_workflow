@@ -40,7 +40,6 @@
 		<fileset refid="shared.jars" /> 	
 		<fileset refid="protege.jars" /> 		
 		<fileset refid="cananolab.jars" /> 	
-<<<<<<< HEAD
     
 		<fileset dir="${ontologyaccess.dir}/dist">
 			<include name="**/*.jar"/>
