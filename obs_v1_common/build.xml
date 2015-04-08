@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     obs_v1_common 
+                   
+     kyadav                                                                
+     ====================================================================== -->
+<project name="obs_v1_common" default="usage" basedir=".">
+
+	<property name="app.name" value="obs_v1_common" />
+	<property name="app.version" value="1.0" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="shared.lib.dir" value="${basedir}/../shared_libs" />
+	<property name="ontologyaccess.dir" value="${basedir}/../OntologyAccess"/>
+	
+	
+	<path id="master-classpath">
+		<pathelement path="${build.dir}" />		
+		<fileset dir="${shared.lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dist.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${ontologyaccess.dir}/dist">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- ================================= 
+	          target: clean	                        
+	     ================================= -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />		 
+	</target> 
+	
+	<target name="build_ontology_access">
+		<echo>Building OntologyAccess project Starts...</echo>
+		<ant antfile="${ontologyaccess.dir}/build.xml" target="build" inheritall="false"/>
+		<echo>Building OntologyAccess project Ends...</echo>
+		<echo>...</echo>				 
+		<echo>...</echo>
+	</target>
+	
+	<!-- ================================= 
+	          target: build	                        
+	     ================================= -->
+	<target name="build" depends="clean,build_ontology_access" >
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<javac destdir="${build.dir}" debug="true" optimize="true" failonerror="true" includeantruntime="false">
+			<src path="${src.dir}" />
+			<classpath refid="master-classpath" />
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		
+		<jar destfile="${dist.dir}/${app.name}_v${app.version}.jar">
+			<fileset dir="${build.dir}">
+				<include name="**/*.*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- ================================= 
+	          target: usage	       
+			  Default target 			                          
+		 ================================= -->
+	<target name="usage">
+		<echo message="" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="build    --> builds and creats jar file." />
+		<echo message="clean    --> Clean all resource directories." />
+		<echo message="" />
+	</target>
+</project>
