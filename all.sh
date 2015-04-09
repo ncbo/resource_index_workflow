@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #Shell Script to execute resource index workflow
-#
+#raj
 
 ant clean all
 cd dist
