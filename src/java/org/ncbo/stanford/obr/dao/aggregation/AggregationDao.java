@@ -39,6 +39,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 public class AggregationDao extends AbstractObrDao {
 
 	private static final String TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.table.suffix"); // element Index Table
+	private static final String WORKFLOW_TABLE_SUFFIX = MessageUtils.getMessage("obr.aggregation.workflow.table.suffix"); //Added the line
 	
 	private PreparedStatement addEntryStatement;	 
 	private PreparedStatement deleteEntriesFromOntologyStatement;
