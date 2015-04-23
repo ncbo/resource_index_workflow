@@ -20,8 +20,6 @@ import obs.obr.populate.Structure;
 import org.ncbo.stanford.obr.enumeration.ResourceType;
 import org.ncbo.stanford.obr.resource.nif.AbstractNifResourceAccessTool;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 /**
  * AccessTool for CTD Pathways (via NIF).
  * @author r.malviya
@@ -44,7 +42,7 @@ public class CTDCAccessTool extends AbstractNifResourceAccessTool {
     private static String MAIN_ITEMKEY = "Chemical";
     private Map<String, String> localOntologyIDMap;
     private static char seprator='	';
-    private double MAX_ROW=5000;
+    private double MAX_ROW=800;
 
     // constructors
     public CTDCAccessTool() {
@@ -107,42 +105,12 @@ public class CTDCAccessTool extends AbstractNifResourceAccessTool {
         }
         return localOntologyIDMap;
     }
-
+    
     @Override
     public int updateResourceContent() {
         int nbElement = 0;
         this.getAllElements();
-        try {
-            Element myExp;
-            HashSet<Element> allElementList;
-            //Get all elements from resource site
-            allElementList = this.getAllElements();
-            logger.info("Number of new elements to dump: " + allElementList.size());
-
-            // for each experiments accessed by the tool
-            
-            Iterator<Element> i = allElementList.iterator();
-            int rowCount=0;
-            while (i.hasNext()) {
-            	rowCount++;
-                myExp = i.next();
-                try {
-                    if (!myExp.getElementStructure().hasNullValues()) {
-                        if (this.resourceUpdateService.addElement(myExp)) {
-                            nbElement++;
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_CTDCD_ET table.", e);
-                }
-            }
-            if(rowCount==MAX_ROW){
-            	this.updateResourceContent();
-            }
-        } catch (Exception e) {
-            logger.error("** PROBLEM ** Cannot update resource " + this.getToolResource().getResourceName(), e);
-        }
-        logger.info(nbElement + " elements added to the OBR_CTDCD_ET table.");
+  
         return nbElement;
     }
 
@@ -150,77 +118,72 @@ public class CTDCAccessTool extends AbstractNifResourceAccessTool {
      *  @return HashSet<Element>
      */
     @SuppressWarnings("resource")
-	public HashSet<Element> getAllElements() {
-        logger.info("* Get All Elements for NIF CTD ChemDisease ... ");
-        HashSet<Element> elementSet = new HashSet<Element>();
-        int nbAdded = 0;
+	public void getAllElements() {
+     
         try{
         	HashSet<String> allElementsInET = this.resourceUpdateService.getAllLocalElementIDs();
         	
         	Map<String, Map<String, String>> allRowsData = new HashMap<String, Map<String, String>>();
         	
         	URL csvFile=new URL("http://ctdbase.org/reports/CTD_chemicals.tsv.gz");
-        	CSVReader csvReader=null;
-        	
-        	csvReader = new CSVReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(csvFile.openStream()))), seprator);
-        	
-        	String[] headerRow;
-        	
- 
-			while ((headerRow = csvReader.readNext()) != null) {
-				if (headerRow[0].contains("Fields:")) {
-					headerRow = csvReader.readNext();
-					headerRow = csvReader.readNext();
-					break;
-				}
-			}
-        	
-				int rowCount=0;
-        	while((headerRow=csvReader.readNext())!=null){
-        			
-        			for(int i=0;i<headerRow.length;i++){
-        				String localElementId=EMPTY_STRING;
-        				Map<String, String> elementAttributes = new HashMap<String, String>();
-        				while(i<headerRow.length){
-        				if (i==0)
-        					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[0]), headerRow[i]);
-        				else if(i==1)
-        					localElementId =headerRow[i] ;
-        				else if(i==2)
-        					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[1]), headerRow[i]);
-        				else if(i==3)
-       					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[2]), headerRow[i]);
-        				else if(i==4)
-       					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[3]), headerRow[i]);
-        				else if(i==5)
-       					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[4]), headerRow[i]);
-        				else if(i==6)
-       					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[5]), headerRow[i]);
-        				else if(i==7)
-       					 elementAttributes.put(Structure.generateContextName(RESOURCEID, ITEMKEYS[6]), headerRow[i]);
-        				i++;
-        				}
-        				
-        				if (allElementsInET.contains(localElementId)) {
-                            continue;
-                        } else {
-                        	rowCount++;
-                            allRowsData.put(localElementId, elementAttributes);
-                        }
-        				
-                           
-        			}
-        			if(rowCount==MAX_ROW){
-        				break;
-        			}
-        			
-        	}//parsing ends
+        	BufferedReader fileReader= new BufferedReader(new InputStreamReader(new GZIPInputStream(csvFile.openStream())));
+           	 String headerRow="";
+		     int a=1,b=0;
+		     final String DELIMITER = "	";
+        		     while ((headerRow = fileReader.readLine()) != null)
+	            {
+	                //Get all tokens available in line
+	                String[] tokens = headerRow.split(DELIMITER);
+	                if(tokens[0].equals("# ChemicalName"))
+	                	b=a+2;
+	                if(b==a){
+	                	break;
+	                }
+	                a++;
+	            }
+				
+				while(headerRow!=null){
+					int rowCount=0;
+				while ((headerRow = fileReader.readLine()) != null) {
+					String[] tokens = headerRow.split(DELIMITER);
+					for (int i = 0, j = 0; i < tokens.length; i++) {
+						Map<String, String> elementAttributes = new HashMap<String, String>();
+						String localElementId = EMPTY_STRING;
+						while (i < tokens.length) {
 
-            // Second phase: creation of elements           
+							if (i == 1)
+								localElementId = tokens[i];
+							else {
+								elementAttributes.put(Structure
+										.generateContextName(RESOURCEID,
+												ITEMKEYS[j]), tokens[i]);
+								j++;
+							}
+							i++;
+
+						}
+						if (allElementsInET.contains(localElementId)) {
+							continue;
+						} else {
+							rowCount++;
+							allRowsData.put(localElementId, elementAttributes);
+						}
+					}
+
+					if (rowCount == MAX_ROW) {
+						break;
+					}
+
+				}//parsing ends
+
+            // Second phase: creation of elements 
+        	if(rowCount>1){
+        		System.out.println("Start data insert into database");
+        		HashSet<Element> elementSet = new HashSet<Element>();
             for (String localElementID : allRowsData.keySet()) {
                 Map<String, String> elementAttributes = new HashMap<String, String>();
-                elementAttributes = allRowsData.get(localElementID);
-
+                elementAttributes = allRowsData.get(localElementID);  
+                
                 // PUT DATA INTO A STRUCTURE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 Structure elementStructure = new Structure(STRUCTURE.getContextNames());
                 for (String contextName : STRUCTURE.getContextNames()) {
@@ -251,13 +214,36 @@ public class CTDCAccessTool extends AbstractNifResourceAccessTool {
                     logger.error(EMPTY_STRING, e);
                 }
             }
-            nbAdded = elementSet.size();
-            logger.info((nbAdded) + " rows found.");
-         
+            allRowsData.clear();
+            Element myExp;
+            int nbElement = 0;
+            Iterator<Element> i = elementSet.iterator();
+     
+            while (i.hasNext()) {
+            	rowCount++;
+                myExp = i.next();
+                try {
+                    if (!myExp.getElementStructure().hasNullValues()) {
+                        if (this.resourceUpdateService.addElement(myExp)) {
+                            nbElement++;
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("** PROBLEM ** Problem with id " + myExp.getLocalElementId() + " when populating the OBR_CTDCD_ET table.", e);
+                }
+                
+            }
+            logger.info(nbElement + " elements added to the OBR_CTDCD_ET table.");
+        }
+        	System.out.println("End to insert into data base");
+				}
+                  
+        	
         } catch (Exception e) {
             logger.error("** PROBLEM ** Problem in getting rows.", e);
         }
-        return elementSet;
+     
         
     }
-}
+}    
+//rajesh
