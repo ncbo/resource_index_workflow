@@ -27,7 +27,7 @@ public interface ObsDataPopulationService {
 	 * This method load obs table and stuff into memory.  
 	 * It creates obs tables with MEMORY storage engin.
 	 */
-	public void loadObsSlaveTablesIntoMemory() throws SQLException;	
+	//public void loadObsSlaveTablesIntoMemory() throws SQLException;	
 	
 	/**
 	 * This method load obs table and stuff into memory.  
