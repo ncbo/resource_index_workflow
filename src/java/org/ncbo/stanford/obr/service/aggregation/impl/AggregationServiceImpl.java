@@ -33,6 +33,17 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 		return nbAnnotation;
 	} 
 	
+	public boolean sortAggregation(ResourceType resourceType) {
+		boolean result= false;
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		logger.info("*** Executing aggregation sorting process.... ");
+		result = aggregationTableDao.sortAggregation(resourceType);
+		timer.end();
+		logger.info("### Aggregation sorted in: " + timer.millisecondsToTimeString(timer.duration()));
+		return result;
+	}
+	
 	/**
 	 * Method removes indexing done for given ontology versions.
 	 * 
@@ -42,13 +53,56 @@ public class AggregationServiceImpl extends AbstractResourceService implements A
 	 * @param {@code List} of localOntologyID containing ontology versions.
 	 */
 	public void removeAggregation(List<String> localOntologyIDs) {
-		 if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
+//		 if(resourceAccessTool.getResourceType()!= ResourceType.BIG){
 			 aggregationTableDao.deleteEntriesFromOntologies(localOntologyIDs);	
-		 }else{
-			 for (String localOntologyID : localOntologyIDs) {
-				 aggregationTableDao.deleteEntriesFromOntology(localOntologyID);
-			}
-			 
-		 }		 	
+//		 }else{
+//			 for (String localOntologyID : localOntologyIDs) {
+//				 aggregationTableDao.deleteEntriesFromOntology(localOntologyID);
+//			}
+//			 
+//		 }		 	
 	} 
+	
+	/**
+	 * Method calculates concept frequency from aggregation table 
+	 *  
+	 * @return The number of annotations created in the index. 	
+	 */
+	public long calulateConceptFrequncy() {
+		long nbAnnotation;
+		ExecutionTimer timer = new ExecutionTimer();
+		timer.start();
+		logger.info("*** Executing concept frequency process.... ");
+		nbAnnotation = conceptFrequencyDao.calulateConceptFrequncy();
+		timer.end();
+		logger.info("### Concept frequency  processed in: " + timer.millisecondsToTimeString(timer.duration()));
+		return nbAnnotation;
+	}
+
+	/**
+	 * Method removes concept frequency calculation done for given ontology versions.
+	 * 
+	 * @param {@code List} of localOntologyID String containing ontology version.
+	 */
+	public void removeConceptFrequncy(List<String> localOntologyIDs) {		 
+		conceptFrequencyDao.deleteEntriesFromOntologies(localOntologyIDs);	
+	} 
+	
+	/**
+	 * Disable indexes for aggregation tables
+	 * 
+	 * @return
+	 */
+	public boolean disableIndexes() {		
+		return aggregationTableDao.disableIndexes();				 
+	}
+
+	/**
+	 * Enable indexes for aggregation table
+	 *   
+	 * @return
+	 */
+	public boolean enableIndexes(boolean bigResource) {	
+		return aggregationTableDao.enableIndexes(bigResource);	 
+	}
 }
