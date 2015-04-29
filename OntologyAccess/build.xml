@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     OntologyAccess 
+                   
+     kyadav                                                                
+     ====================================================================== -->
+<project name="OntologyAccess" default="usage" basedir=".">
+	<property file="build.properties" />
+
+	<property name="app.name" value="OntologyAccess" />
+	<property name="app.version" value="1.0" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="shared.lib.dir" value="${basedir}/../shared_libs" />
+	<property name="tmpl.dir" value="tmpl" />	 
+	<property name="config.dir" value="${basedir}/conf"/>	
+	 
+	<path id="master-classpath">
+		<pathelement path="${build.dir}" />		
+		<fileset dir="${shared.lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dist.dir}">
+			<include name="**/*.jar" />
+		</fileset>		 
+	</path>
+
+	<!-- ================================= 
+	          target: clean	                        
+	     ================================= -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />		 
+	</target> 
+	
+	<!-- ================================= 
+	          target: prepare	                        
+	     ================================= -->
+	<target name="prepare" description="Create configuration files using templates">
+		<copy file="${tmpl.dir}/config.properties.tmpl" tofile="${config.dir}/config.properties" overwrite="true">
+			<filterset>
+				<filter token="bpobrapikey" value="${bp.obr.apikey}" />
+				<filter token="bpurlbase" value="${bp.url.base}" />
+			</filterset>
+		</copy>
+	</target>
+	
+	<!-- ================================= 
+	          target: build	                        
+	     ================================= -->
+	<target name="build" depends="clean, prepare" >
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<javac destdir="${build.dir}" debug="true" optimize="true" failonerror="true" includeantruntime="false">
+			<src path="${src.dir}" />
+			<classpath refid="master-classpath" />
+		</javac>
+		
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties" />
+			</fileset>
+			<fileset dir="${config.dir}">
+				<include name="*.properties" />		
+				<include name="*.xml" />
+				<include name="*.dtd" />
+			</fileset>
+		</copy>
+		
+		<jar destfile="${dist.dir}/${app.name}_v${app.version}.jar">
+			<fileset dir="${build.dir}">
+				<include name="**/*.*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- ================================= 
+	          target: usage	       
+			  Default target 			                          
+		 ================================= -->
+	<target name="usage">
+		<echo message="" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="build    --> builds and creats jar file." />
+		<echo message="clean    --> Clean all resource directories." />
+		<echo message="" />
+	</target>
+</project>

@@ -1,0 +1,5 @@
+# Application API Key for BioPortal Authentication
+bp.obr.apikey=yourapikey
+
+# BioPortal Base URL
+bp.url.base=http://rest.bioontology.org
